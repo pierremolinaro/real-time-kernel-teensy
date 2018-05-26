@@ -6,14 +6,12 @@ import sys, os
 #----------------------------------------------------------------------------------------------------------------------*
 
 separator = "//" + ("—" * 118) + "\n"
-#------------------------------ Arg 1 is estination file
+#------------------------------ Arg 1 is destination file
 destinationFile = sys.argv [1]
 #------------------------------ Arg 2 is task count ("*" is no task)
 TASK_COUNT = sys.argv [2]
 #------------------------------ Arg 3 is teensy name
 TEENSY_NAME = sys.argv [3]
-#------------------------------ Arg 4 is assertion generation value
-ASSERTION_GENERATION = sys.argv [4]
 #------------------------------ Header files
 s = "#pragma once\n\n"
 s += separator + "\n"
@@ -24,12 +22,25 @@ s += "\n"
 s += separator
 #------------------------------
 s += "\n"
-s += "static const uint32_t TASK_COUNT = " + TASK_COUNT + " ;\n"
+s += "static const uint32_t TASK_COUNT = " + TASK_COUNT + " ;\n\n"
 s += "#define " + TEENSY_NAME + "\n"
-s += "#define ASSERTION_GENERATION (" + ASSERTION_GENERATION + ")\n"
 s += "\n"
 s += separator
-
+s += "//  FALLTHROUGH\n"
+s += separator + "\n"
+s += "#if __GNUC__ < 7\n"
+s += "  #define FALLTHROUGH\n"
+s += "#else\n"
+s += "  #define FALLTHROUGH __attribute__ ((fallthrough))\n"
+s += "#endif\n\n"
+s += separator
+s += "//   DIAGNOSTICS\n"
+s += separator + "\n"
+s += "#if __GNUC__ > 5\n"
+s += "  #pragma GCC diagnostic error \"-Wduplicated-branches\"\n"
+s += "  #pragma GCC diagnostic error \"-Wmisleading-indentation\"\n"
+s += "#endif\n\n"
+s += separator
 #------------------------------ Write destination file
 f = open (destinationFile, "wt")
 f.write (s)

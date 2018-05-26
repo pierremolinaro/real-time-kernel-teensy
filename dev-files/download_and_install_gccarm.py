@@ -9,25 +9,10 @@ import os, urllib, subprocess, sys
 
 import archive_directory
 import tool_directory
+import dev_platform
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   RTS-SOFTWARE URL                                                                                                   *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-
-def compilerRepositoryURL () :
- return "https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2017q4/gcc-arm-none-eabi-7-2017-q4-major-mac.tar.bz2"
-# return "https://developer.arm.com/-/media/Files/downloads/gnu-rm/6-2017q2/gcc-arm-none-eabi-6-2017-q2-update-mac.tar.bz2"
-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   DISTRIBUTION GCC                                                                                                   *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-
-def distributionGCC () :
-  return "gcc-arm-none-eabi-7-2017-q4-major"
-#  return "gcc-arm-none-eabi-6-2017-q2-update"
-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   FOR PRINTING IN COLOR                                                                                              *
+#   FOR PRINTING IN COLOR
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 class bcolors:
@@ -44,7 +29,29 @@ class bcolors:
     BOLD_RED = '\033[1m' + '\033[91m'
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   runCommand                                                                                                         *
+#   DISTRIBUTION GCC
+#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+
+def distributionGCC () :
+  gcc = "gcc-arm-none-eabi-7-2017-q4-major"
+  if dev_platform.getPlatform () == "linux32" :
+    gcc = "gcc-arm-none-eabi-5_4-2016q3"
+  return gcc
+
+#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#   ARCHIVE URL (from https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
+#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+
+def compilerArchiveURL () :
+  baseURL = "https://developer.arm.com/-/media/Files/downloads/gnu-rm/"
+  PLATFORM = dev_platform.getPlatform ()
+  distribution = "7-2017q4/gcc-arm-none-eabi-7-2017-q4-major-" + PLATFORM + ".tar.bz2"
+  if dev_platform.getPlatform () == "linux32" :
+    distribution = "5_4-2016q3/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2"
+  return baseURL + distribution
+
+#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#   runCommand
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def runCommand (cmd) :
@@ -52,13 +59,12 @@ def runCommand (cmd) :
   for s in cmd:
     str += " " + s
   print bcolors.BOLD_BLUE + str + bcolors.ENDC
-  childProcess = subprocess.Popen (cmd)
-  childProcess.wait ()
-  if childProcess.returncode != 0 :
-    sys.exit (childProcess.returncode)
+  returncode = subprocess.call (cmd)
+  if returncode != 0 :
+    sys.exit (returncode)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   ARCHIVE DOWNLOAD                                                                                                   *
+#   ARCHIVE DOWNLOAD
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def downloadReportHook (a,b,fileSize):
@@ -82,7 +88,7 @@ def downloadArchive (archiveURL, archivePath):
   print ""
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#  Install GCC                                                                                                         *
+#  Install GCC
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def install_gcc (INSTALL_DIR) :
@@ -92,7 +98,7 @@ def install_gcc (INSTALL_DIR) :
   COMPILER_ARCHIVE_DIR = archive_directory.createAndGetArchiveDirectory ()
   #------------------------------------------------------------------ Download
   if not os.path.exists (COMPILER_ARCHIVE_DIR + "/" + DISTRIBUTION + ".tar.bz2"):
-    url = compilerRepositoryURL ()
+    url = compilerArchiveURL ()
     runCommand (["rm", "-f", COMPILER_ARCHIVE_DIR + "/" + DISTRIBUTION + ".tar.bz2.downloading"])
     downloadArchive (url, COMPILER_ARCHIVE_DIR + "/" + DISTRIBUTION + ".tar.bz2.downloading")
     runCommand (["mv",
@@ -114,7 +120,7 @@ def install_gcc (INSTALL_DIR) :
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   GET GCC TOOL DIRECTORY                                                                                             *
+#   GET GCC TOOL DIRECTORY
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def installGCCARMandGetToolDirectory () :

@@ -10,19 +10,17 @@ import makefile
 import common_definitions
 import download_and_install_gccarm
 import download_and_build_teensy_cli_loader
+import dev_platform
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   Run process and wait for termination                                                                               *
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def runProcess (command) :
-  childProcess = subprocess.Popen (command)
-#--- Wait for subprocess termination
-  if childProcess.poll () == None :
-    childProcess.wait ()
-  if childProcess.returncode != 0 :
-    print makefile.BOLD_RED () + "Error " + str (childProcess.returncode) + makefile.ENDC ()
-    sys.exit (childProcess.returncode)
+  returncode = subprocess.call (command)
+  if returncode != 0 :
+    print makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ()
+    sys.exit (returncode)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   Run process, get output and wait for termination                                                                   *
@@ -85,6 +83,11 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + "/bin/" + BASE_NAME + "-size"]
 #--------------------------------------------------------------------------- Teensy loader CLI
   TEENSY_CLI_LOADER_PATH = download_and_build_teensy_cli_loader.downloadTeensyCLILoaderThenCompileAndGetPath (TOOL_DIR + "/bin")
+#--------------------------------------------------------------------------- Linux UDEV rules
+  platform = dev_platform.getPlatform ()
+  if (platform == "linux") or (platform == "linux32") :
+    import udev_on_linux
+    udev_on_linux.installUDEVrulesOnLinux ()
 #--------------------------------------------------------------------------- Analyze JSON file
   print makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ()
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")

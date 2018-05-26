@@ -6,6 +6,7 @@
 import os, urllib, subprocess, sys
 
 import archive_directory
+import dev_platform
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   Source file name                                                                                                   *
@@ -47,10 +48,9 @@ def runCommand (cmd) :
   for s in cmd:
     str += " " + s
   print bcolors.BOLD_BLUE + str + bcolors.ENDC
-  childProcess = subprocess.Popen (cmd)
-  childProcess.wait ()
-  if childProcess.returncode != 0 :
-    sys.exit (childProcess.returncode)
+  returncode = subprocess.call (cmd)
+  if returncode != 0 :
+    sys.exit (returncode)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   ARCHIVE DOWNLOAD                                                                                                   *
@@ -83,6 +83,7 @@ def downloadArchive (archiveURL, archivePath):
 def installTeensyCLILoader (INSTALL_PATH) :
   print bcolors.BOLD_GREEN + "Install Teensy CLI Loader..." + bcolors.ENDC
   TEENSY_CLI_LOADER_URL = teensyCLILoaderRepositoryURL ()
+  PLATFORM = dev_platform.getPlatform ()
   #------------------------------------------------------------------ Archive dir
   COMPILER_ARCHIVE_DIR = archive_directory.createAndGetArchiveDirectory ()
   if not os.path.exists (COMPILER_ARCHIVE_DIR):
@@ -98,14 +99,26 @@ def installTeensyCLILoader (INSTALL_PATH) :
     runCommand (["rm", "master.zip"])
     runCommand (["rm", "-r", fileBaseName () + "-master"])
     os.chdir (savedCurrentDir)
-  runCommand (["gcc",
-               "-O2",
-               "-fomit-frame-pointer",
-               "-DUSE_APPLE_IOKIT",
-               COMPILER_ARCHIVE_DIR + "/" + fileBaseName () + ".c",
-               "-framework", "Foundation",
-               "-framework", "IOKit",
-               "-o", INSTALL_PATH])
+  #------------------------------------------------------------------ Compile command
+  COMPILE_COMMAND = [
+    "gcc",
+    "-O2",
+    "-fomit-frame-pointer",
+    COMPILER_ARCHIVE_DIR + "/" + fileBaseName () + ".c",
+    "-o", INSTALL_PATH
+  ]
+  if PLATFORM == "mac" :
+    COMPILE_COMMAND += [
+      "-DUSE_APPLE_IOKIT",
+      "-framework", "Foundation",
+      "-framework", "IOKit",
+    ]
+  elif PLATFORM == "linux" :
+    COMPILE_COMMAND += ["-DUSE_LIBUSB", "-lusb"]
+  elif PLATFORM == "linux32" :
+    COMPILE_COMMAND += ["-DUSE_LIBUSB", "-lusb"]
+  #------------------------------------------------------------------ Compile
+  runCommand (COMPILE_COMMAND)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   TOOL PATH                                                                                                          *

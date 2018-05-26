@@ -28,7 +28,6 @@ def commonLinkerFlags (usesLTO) :
 
 def checkModeOptions () :
   result = []
-#  result.append ("-O")
   result.append ("-x")
   result.append ("c++")
   result.append ("-DCHECK_ROUTINE_CALLS")
@@ -71,8 +70,8 @@ def C_Cpp_commonOptions (usesLTO):
     result.append ("-flto")
     result.append ("-ffat-lto-objects")
   result.append ("-Wno-unused-parameter")
-  result.append ("-Wduplicated-branches")
   result.append ("-Wshadow")
+  result.append ("-Wduplicated-branches")
   result.append ("-Wmisleading-indentation")
 #  result.append ("-fomit-frame-pointer")
   return result
