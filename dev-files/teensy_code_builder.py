@@ -19,7 +19,7 @@ import dev_platform
 def runProcess (command) :
   returncode = subprocess.call (command)
   if returncode != 0 :
-    print makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ()
+    print (makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ())
     sys.exit (returncode)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
@@ -39,7 +39,7 @@ def runProcessAndGetOutput (command) :
   if childProcess.poll () == None :
     childProcess.wait ()
   if childProcess.returncode != 0 :
-    print makefile.BOLD_RED () + "Error " + str (childProcess.returncode) + makefile.ENDC ()
+    print (makefile.BOLD_RED () + "Error " + str (childProcess.returncode) + makefile.ENDC ())
     sys.exit (childProcess.returncode)
   return result
 
@@ -50,14 +50,14 @@ def runProcessAndGetOutput (command) :
 def dictionaryFromJsonFile (file) :
   result = {}
   if not os.path.exists (os.path.abspath (file)):
-    print makefile.BOLD_RED () + "The '" + file + "' file does not exist" + makefile.ENDC ()
+    print (makefile.BOLD_RED () + "The '" + file + "' file does not exist" + makefile.ENDC ())
     sys.exit (1)
   try:
     f = open (file, "r")
     result = json.loads (f.read ())
     f.close ()
   except:
-    print makefile.BOLD_RED () + "Syntax error in " + file + makefile.ENDC ()
+    print (makefile.BOLD_RED () + "Syntax error in " + file + makefile.ENDC ())
     sys.exit (1)
   return result
 
@@ -72,7 +72,12 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   make = makefile.Make (GOAL)
   make.mMacTextEditor = "TextWrangler" # "Atom"
   allGoal = []
-#--------------------------------------------------------------------------- Compiler
+#--------------------------------------------------------------------------- Install Linux UDEV rules ?
+  platform = dev_platform.getPlatform ()
+  if (platform == "linux") or (platform == "linux32") :
+    import udev_on_linux
+    udev_on_linux.installUDEVrulesOnLinux ()
+#--------------------------------------------------------------------------- Install compiler ?
   BASE_NAME = "arm-none-eabi"
   TOOL_DIR = download_and_install_gccarm.installGCCARMandGetToolDirectory ()
   AS_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-as", "-mthumb", "-mcpu=cortex-m4"]
@@ -81,15 +86,10 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   LD_TOOL_WITH_OPTIONS = COMPILER_TOOL_WITH_OPTIONS
   OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-objcopy"]
   DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + "/bin/" + BASE_NAME + "-size"]
-#--------------------------------------------------------------------------- Teensy loader CLI
+#--------------------------------------------------------------------------- Install Teensy loader CLI ?
   TEENSY_CLI_LOADER_PATH = download_and_build_teensy_cli_loader.downloadTeensyCLILoaderThenCompileAndGetPath (TOOL_DIR + "/bin")
-#--------------------------------------------------------------------------- Linux UDEV rules
-  platform = dev_platform.getPlatform ()
-  if (platform == "linux") or (platform == "linux32") :
-    import udev_on_linux
-    udev_on_linux.installUDEVrulesOnLinux ()
 #--------------------------------------------------------------------------- Analyze JSON file
-  print makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ()
+  print (makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ())
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")
 #--- TEENSY
   linkerScript = ""
@@ -371,15 +371,14 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     s = runProcessAndGetOutput (DISPLAY_OBJ_SIZE_TOOL + ["-t"] + [PRODUCT_INTERNAL_FLASH + ".elf"])
     secondLine = s.split('\n')[1]
     numbers = [int(s) for s in secondLine.split() if s.isdigit()]
-    print "*** Internal FLASH:"
-    print "  ROM code:    " + str (numbers [0]) + " bytes"
-    print "  ROM data:    " + str (numbers [1]) + " bytes"
-    print "  RAM + STACK: " + str (numbers [2]) + " bytes"
+    print ("  ROM code:    " + str (numbers [0]) + " bytes")
+    print ("  ROM data:    " + str (numbers [1]) + " bytes")
+    print ("  RAM + STACK: " + str (numbers [2]) + " bytes")
 #----------------------------------------------- Run ?
   if GOAL == "run":
     FLASH_TEENSY = [TEENSY_CLI_LOADER_PATH, "-w", "-v", "-mmcu=TEENSY36"]
-    print makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ()
+    print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
     runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".ihex"])
-    print makefile.BOLD_GREEN () + "Success" + makefile.ENDC ()
+    print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
