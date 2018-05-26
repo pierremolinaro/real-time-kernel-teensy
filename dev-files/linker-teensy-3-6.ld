@@ -152,7 +152,7 @@ SECTIONS {
 
 SECTIONS {
   .heap : {
-    . = ALIGN (4) ;
+    . = ALIGN (8) ;
     __heap_start = . ;
   } > sram
 }
