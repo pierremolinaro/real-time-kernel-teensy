@@ -71,8 +71,8 @@ def C_Cpp_commonOptions (usesLTO):
     result.append ("-ffat-lto-objects")
   result.append ("-Wno-unused-parameter")
   result.append ("-Wshadow")
-  result.append ("-Wduplicated-branches")
-  result.append ("-Wmisleading-indentation")
+#   result.append ("-Wduplicated-branches")
+#   result.append ("-Wmisleading-indentation")
 #  result.append ("-fomit-frame-pointer")
   return result
 
