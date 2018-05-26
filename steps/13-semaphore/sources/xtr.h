@@ -47,6 +47,8 @@ void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) ;
 //  SYNCHRONIZATION
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+class TaskList ;
+
 void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) ;
 
 bool irq_makeTaskReadyFromBlockingList (IRQ_MODE_ TaskList & ioWaitingList) ;
