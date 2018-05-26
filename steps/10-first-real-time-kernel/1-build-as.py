@@ -3,27 +3,17 @@
 
 #----------------------------------------------------------------------------------------------------------------------*
 
-import sys, os, subprocess, atexit
+import sys, os, subprocess
 
 #----------------------------------------------------------------------------------------------------------------------*
 
-def cleanup():
-  if childProcess.poll () == None :
-    childProcess.kill ()
-
-#----------------------------------------------------------------------------------------------------------------------*
-
-#--- Register a function for killing subprocess
-atexit.register (cleanup)
 #--- Get script absolute path
 scriptDir = os.path.dirname (os.path.abspath (sys.argv [0]))
 os.chdir (scriptDir)
 #---
-childProcess = subprocess.Popen (["python", "1-build.py", "as", "0"])
+returncode = subprocess.call (["python", "1-build.py", "as", "0"])
 #--- Wait for subprocess termination
-if childProcess.poll () == None :
-  childProcess.wait ()
-if childProcess.returncode != 0 :
-  sys.exit (childProcess.returncode)
+if returncode != 0 :
+  sys.exit (returncode)
 
 #----------------------------------------------------------------------------------------------------------------------*
