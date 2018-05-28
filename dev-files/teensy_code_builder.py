@@ -98,13 +98,13 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     TeensyKey = dictionaire ["TEENSY"]
     if (TeensyKey == "3.1") or (TeensyKey == "3.2") :
       teensyName = "TEENSY31"
-      linkerScript = "linker-teensy-3-1.ld"
+      linkerScript = "teensy-3-1.ld"
     elif (TeensyKey == "3.5") :
       teensyName = "TEENSY35"
-      linkerScript = "linker-teensy-3-5.ld"
+      linkerScript = "teensy-3-5.ld"
     elif (TeensyKey == "3.6") :
       teensyName = "TEENSY36"
-      linkerScript = "linker-teensy-3-6.ld"
+      linkerScript = "teensy-3-6.ld"
     else:
       make.enterError ('In the makefile.json file, the "TEENSY" key value is invalid (possible values: "3.1", "3.2", "3.5" or "3.6").')
   else:
