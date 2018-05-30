@@ -325,7 +325,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       make.addRule (rule)
       asObjectFileList.append (listingFile)
 #--------------------------------------------------------------------------- Link for internal flash
-  PRODUCT_INTERNAL_FLASH = PRODUCT_DIR + "/product-internal-flash"
+  PRODUCT_INTERNAL_FLASH = PRODUCT_DIR + "/product"
   LINKER_SCRIPT_INTERNAL_FLASH = "../../dev-files/" + linkerScript
   allGoal.append (PRODUCT_INTERNAL_FLASH + ".elf")
 #--- Add link rule
