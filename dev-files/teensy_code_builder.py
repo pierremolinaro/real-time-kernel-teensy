@@ -340,16 +340,16 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mCommand += common_definitions.commonLinkerFlags (usesLTO)
   rule.mCommand += ["-o", PRODUCT_INTERNAL_FLASH + ".elf"]
   make.addRule (rule)
-#--- Add ihex rule
-  allGoal.append (PRODUCT_INTERNAL_FLASH + ".ihex")
-  rule = makefile.Rule ([PRODUCT_INTERNAL_FLASH + ".ihex"], "Hexing " + PRODUCT_INTERNAL_FLASH + ".ihex")
+#--- Add hex rule
+  allGoal.append (PRODUCT_INTERNAL_FLASH + ".hex")
+  rule = makefile.Rule ([PRODUCT_INTERNAL_FLASH + ".hex"], "Hexing " + PRODUCT_INTERNAL_FLASH + ".hex")
   rule.mDependences.append (PRODUCT_INTERNAL_FLASH + ".elf")
   rule.mDependences.append ("makefile.json")
   rule.mCommand += OBJCOPY_TOOL_WITH_OPTIONS
   rule.mCommand.append ("-O")
   rule.mCommand.append ("ihex")
   rule.mCommand.append (PRODUCT_INTERNAL_FLASH + ".elf")
-  rule.mCommand.append (PRODUCT_INTERNAL_FLASH + ".ihex")
+  rule.mCommand.append (PRODUCT_INTERNAL_FLASH + ".hex")
   make.addRule (rule)
 #--------------------------------------------------------------------------- Goals
   make.addGoal ("all", allGoal, "Build all")
@@ -378,7 +378,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   if GOAL == "run":
     FLASH_TEENSY = [TEENSY_CLI_LOADER_PATH, "-w", "-v", "-mmcu=TEENSY36"]
     print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
-    runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".ihex"])
+    runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".hex"])
     print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
