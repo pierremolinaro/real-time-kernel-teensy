@@ -3,6 +3,7 @@
 
 ## Other files
 *.pyc
+*.list
 steps/*/zBUILDS/
 steps/*/zSOURCES/
 steps/*/zPRODUCTS/
