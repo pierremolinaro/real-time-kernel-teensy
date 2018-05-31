@@ -42,7 +42,7 @@ SECTIONS {
   .text : {
   /*-------------------- Vectors */
     __vectors_start = . ;
-    KEEP (*(.isr_vector)) ;
+    KEEP (*(isr.vectors)) ;
     __vectors_end = . ;
   /*-------------------- Flash magic values */
     LONG (-1) ;

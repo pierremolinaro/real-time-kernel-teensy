@@ -59,6 +59,7 @@ runProcess (["rm", "-fR", ARCHIVE_NAME])
 runProcess (["mkdir", ARCHIVE_NAME])
 #--- Copy dev files
 runProcess (["mkdir", ARCHIVE_NAME + "/dev-files"])
+runProcessSingleCommand ("cp dev-files/*.c " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.py " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.ld " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.rules " + ARCHIVE_NAME + "/dev-files")
