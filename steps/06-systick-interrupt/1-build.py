@@ -24,7 +24,7 @@ f = open (jsonFilePath, "r")
 dictionary = json.loads (f.read ())
 f.close ()
 sys.path.append (scriptDir + "/../../dev-files")
-import teensy_code_builder
-teensy_code_builder.buildCode (goal, scriptDir, maxParallelJobs, maxParallelJobs == 1)
+import code_builder
+code_builder.buildCode (goal, scriptDir, maxParallelJobs, maxParallelJobs == 1)
 
 #----------------------------------------------------------------------------------------------------------------------*
