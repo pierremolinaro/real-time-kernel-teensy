@@ -16,13 +16,6 @@ def fileBaseName () :
   return "teensy_loader_cli"
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   REPOSITORY URL                                                                                                     *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-
-def teensyCLILoaderRepositoryURL () :
- return "https://github.com/PaulStoffregen/teensy_loader_cli/blob/master/" + fileBaseName () + ".c"
-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #   FOR PRINTING IN COLOR                                                                                              *
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
@@ -53,58 +46,19 @@ def runCommand (cmd) :
     sys.exit (returncode)
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-#   ARCHIVE DOWNLOAD                                                                                                   *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-
-def downloadReportHook (a,b,fileSize):
-  # "," at the end of the line is important!
-  if fileSize < (1 << 10):
-    sizeString = str (fileSize)
-  else:
-    if fileSize < (1 << 20):
-      sizeString = str (fileSize >> 10) + "Ki"
-    else:
-      sizeString = str (fileSize >> 20) + "Mi"
-  print "% 3.1f%% of %sB\r" % (min(100.0, float(a * b) / fileSize * 100.0), sizeString),
-  sys.stdout.flush()
-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
-
-def downloadArchive (archiveURL, archivePath):
-  print "URL: "+ archiveURL
-  print "Downloading..."
-  urllib.urlretrieve (archiveURL,  archivePath, downloadReportHook)
-  print ""
-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 #  Install Teensy CLI Loader                                                                                           *
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def installTeensyCLILoader (INSTALL_PATH) :
   print bcolors.BOLD_GREEN + "Install Teensy CLI Loader..." + bcolors.ENDC
-  TEENSY_CLI_LOADER_URL = teensyCLILoaderRepositoryURL ()
+  CURRENT_DIR = os.path.abspath (os.path.dirname (__file__))
   PLATFORM = dev_platform.getPlatform ()
-  #------------------------------------------------------------------ Archive dir
-  COMPILER_ARCHIVE_DIR = archive_directory.createAndGetArchiveDirectory ()
-  if not os.path.exists (COMPILER_ARCHIVE_DIR):
-    os.mkdir (COMPILER_ARCHIVE_DIR)
-  #------------------------------------------------------------------ Download
-  SOURCE_FILE_PATH = COMPILER_ARCHIVE_DIR + "/" + fileBaseName () + ".c"
-  if not os.path.exists (SOURCE_FILE_PATH) :
-    runCommand (["curl", "-L", "-o", COMPILER_ARCHIVE_DIR + "/master.zip", "https://github.com/PaulStoffregen/teensy_loader_cli/archive/master.zip"])
-    savedCurrentDir = os.getcwd ()
-    os.chdir (COMPILER_ARCHIVE_DIR)
-    runCommand (["unzip", "master.zip"])
-    runCommand (["cp", fileBaseName () + "-master/" + fileBaseName () + ".c", fileBaseName () + ".c"])
-    runCommand (["rm", "master.zip"])
-    runCommand (["rm", "-r", fileBaseName () + "-master"])
-    os.chdir (savedCurrentDir)
   #------------------------------------------------------------------ Compile command
   COMPILE_COMMAND = [
     "gcc",
     "-O2",
     "-fomit-frame-pointer",
-    COMPILER_ARCHIVE_DIR + "/" + fileBaseName () + ".c",
+    CURRENT_DIR + "/" + fileBaseName () + ".c",
     "-o", INSTALL_PATH
   ]
   if PLATFORM == "mac" :
@@ -124,7 +78,7 @@ def installTeensyCLILoader (INSTALL_PATH) :
 #   TOOL PATH                                                                                                          *
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
-def downloadTeensyCLILoaderThenCompileAndGetPath (TOOL_DIR) :
+def buildAndGetPath (TOOL_DIR) :
   path = TOOL_DIR + "/" + fileBaseName ()
 #--- Install tool ?
   if not os.path.exists (path) :

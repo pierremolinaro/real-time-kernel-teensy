@@ -9,7 +9,7 @@ import sys, os, subprocess, shutil, json
 import makefile
 import common_definitions
 import download_and_install_gccarm
-import download_and_build_teensy_cli_loader
+import teensy_cli_loader_builder
 import dev_platform
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
@@ -87,7 +87,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-objcopy"]
   DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + "/bin/" + BASE_NAME + "-size"]
 #--------------------------------------------------------------------------- Install Teensy loader CLI ?
-  TEENSY_CLI_LOADER_PATH = download_and_build_teensy_cli_loader.downloadTeensyCLILoaderThenCompileAndGetPath (TOOL_DIR + "/bin")
+  TEENSY_CLI_LOADER_PATH = teensy_cli_loader_builder.buildAndGetPath (TOOL_DIR + "/bin")
 #--------------------------------------------------------------------------- Analyze JSON file
   print (makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ())
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")
