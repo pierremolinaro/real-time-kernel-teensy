@@ -505,7 +505,7 @@ uint32_t microcontrollerSerialNumber (void) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void init (INIT_MODE) {
-//------------------------------------ Aller exécuter les routines d'initialisation de la section boot_routine_array
+//------------------------------------ Aller exécuter les routines d'initialisation de la section boot.routine.array
   extern void (* __boot_routine_array_start) (void) ;
   extern void (* __boot_routine_array_end) (void) ;
   void (* * ptr) (void) = & __boot_routine_array_start ;
@@ -521,7 +521,7 @@ void init (INIT_MODE) {
     (* ptr) () ;
     ptr ++ ;
   }
-//------------------------------------ Aller exécuter les routines d'initialisation de la section .monInit
+//------------------------------------ Aller exécuter les routines d'initialisation de la section init.routine.array
   extern void (* __init_routine_array_start) (void) ;
   extern void (* __init_routine_array_end) (void) ;
   ptr = & __init_routine_array_start ;
