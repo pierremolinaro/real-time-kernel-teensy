@@ -37,10 +37,8 @@
 
 #ifdef CHECK_ROUTINE_CALLS
   #define BOOT_MODE const BOOT_mode_class MODE
-  #define UNUSED_BOOT_MODE const BOOT_mode_class
 #else
   #define BOOT_MODE void
-  #define UNUSED_BOOT_MODE void
 #endif
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
