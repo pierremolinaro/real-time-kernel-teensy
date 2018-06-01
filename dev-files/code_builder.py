@@ -171,7 +171,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule = makefile.Rule ([baseHeader_file], "Build base header file")
   rule.mOpenSourceOnError = True
   rule.mDependences.append ("makefile.json")
-  rule.mCommand += ["../../dev-files/build_base_header_file.py", baseHeader_file, TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
+  rule.mCommand += ["../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build all header file
@@ -239,7 +239,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-c", sourcePath]
     rule.mCommand += ["-o", objectFileForChecking]
     rule.mCommand += ["-DSTATIC="]
-    rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
+#    rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", objectFileForChecking + ".dep"]
     make.addRule (rule)
@@ -254,7 +254,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-c", sourcePath]
     rule.mCommand += ["-o", objectFile]
     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
-    rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
+#     rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", objectFile + ".dep"]
     rule.mDependences.append (allHeaders_file)
@@ -272,7 +272,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-S", sourcePath]
     rule.mCommand += ["-o", asObjectFile]
     rule.mCommand += ["-DSTATIC="]
-    rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
+#     rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", asObjectFile + ".dep"]
     rule.mDependences.append (sourcePath)

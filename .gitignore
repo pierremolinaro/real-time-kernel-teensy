@@ -4,9 +4,9 @@
 ## Other files
 *.pyc
 *.list
-steps/*/zBUILDS/
-steps/*/zSOURCES/
-steps/*/zPRODUCTS/
+solutions/*/zBUILDS/
+solutions/*/zSOURCES/
+solutions/*/zPRODUCTS/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
