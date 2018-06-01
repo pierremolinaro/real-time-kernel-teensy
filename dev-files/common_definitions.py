@@ -30,7 +30,7 @@ def checkModeOptions () :
   result = []
   result.append ("-x")
   result.append ("c++")
-  result.append ("-DCHECK_ROUTINE_CALLS")
+  result.append ("-DCHECK_SOFTWARE_MODES")
   return result
 
 #----------------------------------------------------------------------------------------------------------------------*
