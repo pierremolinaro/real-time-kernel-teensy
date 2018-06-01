@@ -34,15 +34,15 @@ class TaskList {
   private: TaskList & operator = (const TaskList &) ;
 
 //-------------------------------------------- Iterator
-  public : class Iterator {
-    public : inline Iterator (IRQ_MODE_ const TaskList & inTaskList) :
+  public: class Iterator {
+    public: inline Iterator (IRQ_MODE_ const TaskList & inTaskList) :
     mIteratedList (inTaskList.mList) {
     }
 
     public: TaskControlBlock * nextTask (IRQ_MODE) ;
 
   //--- Private property
-    private : uint32_t mIteratedList ;
+    private: uint32_t mIteratedList ;
 
   //--- No copy
     private: Iterator (const Iterator &) ;

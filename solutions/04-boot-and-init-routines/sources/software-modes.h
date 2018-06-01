@@ -16,10 +16,10 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class BOOT_mode_class {
-    private : BOOT_mode_class (void) ;
-    private : BOOT_mode_class & operator = (const BOOT_mode_class &) ;
+    private: BOOT_mode_class (void) ;
+    private: BOOT_mode_class & operator = (const BOOT_mode_class &) ;
 
-    public : BOOT_mode_class (const BOOT_mode_class &) ;
+    public: BOOT_mode_class (const BOOT_mode_class &) ;
   } ;
 #endif
 
@@ -39,10 +39,10 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class INIT_mode_class {
-    private : INIT_mode_class (void) ;
-    private : INIT_mode_class & operator = (const INIT_mode_class &) ;
+    private: INIT_mode_class (void) ;
+    private: INIT_mode_class & operator = (const INIT_mode_class &) ;
 
-    public : INIT_mode_class (const INIT_mode_class &) ;
+    public: INIT_mode_class (const INIT_mode_class &) ;
   } ;
 #endif
 
@@ -62,10 +62,10 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class USER_mode_class {
-    private : USER_mode_class (void) ;
-    private : USER_mode_class & operator = (const USER_mode_class &) ;
+    private: USER_mode_class (void) ;
+    private: USER_mode_class & operator = (const USER_mode_class &) ;
 
-    public : USER_mode_class (const USER_mode_class &) ;
+    public: USER_mode_class (const USER_mode_class &) ;
   } ;
 #endif
 
@@ -85,10 +85,10 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class KERNEL_mode_class {
-    private : KERNEL_mode_class (void) ;
-    private : KERNEL_mode_class & operator = (const KERNEL_mode_class &) ;
+    private: KERNEL_mode_class (void) ;
+    private: KERNEL_mode_class & operator = (const KERNEL_mode_class &) ;
 
-    public : KERNEL_mode_class (const KERNEL_mode_class &) ;
+    public: KERNEL_mode_class (const KERNEL_mode_class &) ;
   } ;
 #endif
 
@@ -108,12 +108,12 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class IRQ_mode_class {
-    private : IRQ_mode_class (void) ;
-    private : IRQ_mode_class & operator = (const IRQ_mode_class &) ;
+    private: IRQ_mode_class (void) ;
+    private: IRQ_mode_class & operator = (const IRQ_mode_class &) ;
 
-    public : IRQ_mode_class (const IRQ_mode_class &) ;
-    public : IRQ_mode_class (const KERNEL_mode_class &) ;
-    public : IRQ_mode_class (const INIT_mode_class &) ;
+    public: IRQ_mode_class (const IRQ_mode_class &) ;
+    public: IRQ_mode_class (const KERNEL_mode_class &) ;
+    public: IRQ_mode_class (const INIT_mode_class &) ;
   } ;
 #endif
 
@@ -133,13 +133,13 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class SECTION_mode_class {
-    private : SECTION_mode_class (void) ;
-    private : SECTION_mode_class & operator = (const SECTION_mode_class &) ;
+    private: SECTION_mode_class (void) ;
+    private: SECTION_mode_class & operator = (const SECTION_mode_class &) ;
 
-    public : SECTION_mode_class (const SECTION_mode_class &) ;
-    public : SECTION_mode_class (const IRQ_mode_class &) ;
-    public : SECTION_mode_class (const KERNEL_mode_class &) ;
-    public : SECTION_mode_class (const INIT_mode_class &) ;
+    public: SECTION_mode_class (const SECTION_mode_class &) ;
+    public: SECTION_mode_class (const IRQ_mode_class &) ;
+    public: SECTION_mode_class (const KERNEL_mode_class &) ;
+    public: SECTION_mode_class (const INIT_mode_class &) ;
   } ;
 #endif
 
@@ -159,10 +159,10 @@
 
 #ifdef CHECK_SOFTWARE_MODES
   class FAULT_mode_class {
-    private : FAULT_mode_class (void) ;
-    private : FAULT_mode_class & operator = (const FAULT_mode_class &) ;
+    private: FAULT_mode_class (void) ;
+    private: FAULT_mode_class & operator = (const FAULT_mode_class &) ;
 
-    public : FAULT_mode_class (const FAULT_mode_class &) ;
+    public: FAULT_mode_class (const FAULT_mode_class &) ;
   } ;
 #endif
 
