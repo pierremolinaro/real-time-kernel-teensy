@@ -1,6 +1,0 @@
-{ "SOURCE-DIR" : ["sources"],
-
-  "TEENSY" : "3.6",
-
-  "CPU-MHZ" : 180
-}
