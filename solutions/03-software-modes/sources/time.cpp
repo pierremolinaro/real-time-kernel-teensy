@@ -4,16 +4,12 @@
 //   Configure systick
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static void startSystick (BOOT_MODE) {
+void startSystick (USER_MODE) {
 //------------------------------------ Configure Systick
   SYST_RVR = CPU_MHZ * 1000 - 1 ; // Underflow every ms
   SYST_CVR = 0 ;
   SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE ;
 }
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-MACRO_BOOT_ROUTINE (startSystick) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   busyWaitDuring
