@@ -380,7 +380,7 @@ uint32_t FlashKHz (void) {
 //  BOOT ROUTINE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void boot (BOOT_MODE) {
+void startPhase1 (void) {
 //--------------------------------------------------- Disable watchdog timer
 //--- These two instructions are required for unlocking watchdog timer
   WDOG_UNLOCK = 0xC520 ;
@@ -504,7 +504,7 @@ uint32_t microcontrollerSerialNumber (void) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void init (INIT_MODE) {
+void startPhase2 (void) {
 //------------------------------------ Aller exécuter les routines d'initialisation de la section boot.routine.array
   extern void (* __boot_routine_array_start) (void) ;
   extern void (* __boot_routine_array_end) (void) ;

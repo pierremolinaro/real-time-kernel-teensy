@@ -27,7 +27,7 @@ background.task.stack:
 
 reset.handler: @ Cortex M4 boots with interrupts enabled, in Thread mode
 @---------------------------------- Run boot, zero bss section, copy data section
-  bl    boot.function
+  bl    start.phase1
 @---------------------------------- Set PSP: this is stack for background task
   ldr   r0,  =background.task.stack + BACKGROUND.STACK.SIZE
   msr   psp, r0
@@ -42,7 +42,7 @@ reset.handler: @ Cortex M4 boots with interrupts enabled, in Thread mode
   isb
 @---------------------------------- Run init routines, interrupt disabled
   cpsid i              @ Disable interrupts
-  bl    init.function
+  bl    start.phase2
   cpsie i              @ Enable interrupts
 @---------------------------------- Run setup, loop
   bl    setup.function

@@ -48,6 +48,20 @@ def runProcessSingleCommand (command) :
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
+def compress (DIRECTORY, ARCHIVE) :
+#--- Save current dir
+  savedDir = os.getcwd ()
+#--- Set current dir
+  os.chdir (DIRECTORY)
+#--- Compress
+  runProcess (["tar", "cjvf", ARCHIVE + ".tar", ARCHIVE])
+  runProcess (["bzip2", "--compress", ARCHIVE + ".tar"])
+  runProcess (["rm", "-fR", ARCHIVE])
+#--- Restore dir
+  os.chdir (savedDir)
+
+#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+
 #--- Get script absolute path
 scriptDir = os.path.dirname (os.path.realpath (__file__))
 os.chdir (scriptDir)
@@ -73,23 +87,29 @@ runProcess (["rm", "-fr", ARCHIVE_NAME + "/steps/01-blink-led/zBUILDS"])
 runProcess (["rm", "-fr", ARCHIVE_NAME + "/steps/01-blink-led/zPRODUCTS"])
 runProcess (["rm", "-fr", ARCHIVE_NAME + "/steps/01-blink-led/zSOURCES"])
 #--- Create archive
-runProcess (["tar", "cjvf", ARCHIVE_NAME + ".tar", ARCHIVE_NAME])
-runProcess (["bzip2", "--compress", ARCHIVE_NAME + ".tar"])
-runProcess (["rm", "-fR", ARCHIVE_NAME])
+compress (scriptDir, ARCHIVE_NAME)
+# runProcess (["tar", "cjvf", ARCHIVE_NAME + ".tar", ARCHIVE_NAME])
+# runProcess (["bzip2", "--compress", ARCHIVE_NAME + ".tar"])
+# runProcess (["rm", "-fR", ARCHIVE_NAME])
 #--- Move archive to desktop
 runProcess (["mv", ARCHIVE_NAME + ".tar.bz2", os.path.expanduser ("~/Desktop/")])
 
 #-------------------------------------- Documents
-DOCUMENT_NAME = os.path.expanduser ("~/Desktop/info-treel-documents")
+DOCUMENT_DIR = os.path.expanduser ("~/Desktop/info-treel-documents")
 #--- Remove archive
-runProcess (["rm", "-fR", DOCUMENT_NAME])
+runProcess (["rm", "-fR", DOCUMENT_DIR])
 #--- Create archive
-runProcess (["mkdir", DOCUMENT_NAME])
+runProcess (["mkdir", DOCUMENT_DIR])
 #--- Copy PDF files
-runProcessSingleCommand ("cp pdf-2018-2019/*.pdf " + DOCUMENT_NAME)
+runProcessSingleCommand ("cp pdf-2018-2019/*.pdf " + DOCUMENT_DIR)
 #--- Step 03
-runProcess (["mkdir", DOCUMENT_NAME + "/03-files"])
-runProcess (["cp", "solutions/03-software-modes/sources/software-modes.h", DOCUMENT_NAME + "/03-files"])
+runProcess (["mkdir", DOCUMENT_DIR + "/03-files"])
+runProcess (["cp", "solutions/03-software-modes/sources/software-modes.h", DOCUMENT_DIR + "/03-files"])
+compress (DOCUMENT_DIR, "03-files")
+#--- Step 04
+runProcess (["mkdir", DOCUMENT_DIR + "/04-files"])
+runProcess (["cp", "solutions/04-boot-and-init-routines/sources/boot-init-macros.h", DOCUMENT_DIR + "/04-files"])
+compress (DOCUMENT_DIR, "04-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
