@@ -17,28 +17,14 @@ MACRO_BOOT_ROUTINE (startSystick) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static void enableSystickInterruptAndStartPIT (INIT_MODE) {
+static void enableSystickInterrupt (INIT_MODE) {
 //------------------------------------ Systick interrupt every ms
   SYST_CSR |= SYST_CSR_TICKINT ;
-//------------------------------------ Configure and chain PIT0 and PIT1 for 64-bit counting
-//--- Power on PIT
-  SIM_SCGC6 |= SIM_SCGC6_PIT ;
-//--- Enable PIT module
-  PIT_MCR = 0 ;
-//--- Disable PIT0 and PIT1
-  PIT_TCTRL (0) = 0 ;
-  PIT_TCTRL (1) = 0 ;
-//--- PIT0 and PIT1 down-count: initialize them with all 1's
-  PIT_LDVAL (0) = UINT32_MAX ;
-  PIT_LDVAL (1) = UINT32_MAX ;
-//--- Enable PIT0 and PIT1: start counting, chain PI1 to PIT0, no interrupt
-  PIT_TCTRL (1) = PIT_TCTRL_CHN | PIT_TCTRL_TEN ;
-  PIT_TCTRL (0) = PIT_TCTRL_TEN ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-MACRO_INIT_ROUTINE (enableSystickInterruptAndStartPIT) ;
+MACRO_INIT_ROUTINE (enableSystickInterrupt) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   busyWaitDuring — INIT MODE
