@@ -103,7 +103,7 @@ void busyWaitDuring (USER_MODE_ const uint32_t inDelayMS) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void busyWaitUntil (USER_MODE_ const uint32_t inDeadlineMS) {
-  while (gUptime <= inDeadlineMS) {}
+  while (inDeadlineMS > gUptime) {}
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
