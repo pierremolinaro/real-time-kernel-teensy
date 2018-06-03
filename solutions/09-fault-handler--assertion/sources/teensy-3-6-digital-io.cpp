@@ -7,18 +7,21 @@ void pinMode (const DigitalPort inPort, const DigitalMode inMode) {
   uint32_t config = 0 ;
   bool output = false ;
   switch (inMode) {
-  case OUTPUT :
+  case DigitalMode::OUTPUT :
     config = PORT_PCR_MUX (1) ;
     output = true ;
     break ;
-  case OUTPUT_OPEN_COLLECTOR :
+  case DigitalMode::OUTPUT_OPEN_COLLECTOR :
     config = PORT_PCR_MUX (1) | PORT_PCR_ODE ;
     output = true ;
     break ;
-  case INPUT :
+  case DigitalMode::INPUT :
     config = PORT_PCR_MUX(1) ;
     break ;
-  case INPUT_PULLUP :
+  case DigitalMode::INPUT_PULLDOWN :
+    config = PORT_PCR_MUX(1) | PORT_PCR_PE ;
+    break ;
+  case DigitalMode::INPUT_PULLUP :
     config = PORT_PCR_MUX(1) | PORT_PCR_PE | PORT_PCR_PS ;
     break ;
   }
@@ -256,7 +259,8 @@ void pinMode (const DigitalPort inPort, const DigitalMode inMode) {
     PORTE_PCR (11) = config ;
     bitband32 (GPIOE_PDDR, 11, output) ;
     break ;
-  case DigitalPort::None : // No port
+  case DigitalPort::True : // No port
+  case DigitalPort::False : // No port
     break ;
   }
 }
@@ -671,7 +675,8 @@ void digitalWrite (const DigitalPort inPort, const bool inValue) {
       GPIOE_PCOR = 1 << 11 ;
     }
     break ;
-  case DigitalPort::None : // No port
+  case DigitalPort::True : // No port
+  case DigitalPort::False : // No port
     break ;
   }
 }
@@ -855,7 +860,10 @@ bool digitalRead (const DigitalPort inPort) {
   case DigitalPort::D57 : // PTE11
     result = (GPIOE_PDIR & (1 << 11)) != 0 ;
     break ;
-  case DigitalPort::None : // No port, returns default value
+  case DigitalPort::False : // No port, returns always false
+    break ;
+  case DigitalPort::True : // No port, returns always true
+    result = true ;
     break ;
   }
   return result ;
@@ -1039,7 +1047,8 @@ void digitalToggle (const DigitalPort inPort) {
   case DigitalPort::D57 : // PTE11
     GPIOE_PTOR = 1 << 11 ;
     break ;
-  case DigitalPort::None : // No port, no effect
+  case DigitalPort::False : // No port, no effect
+  case DigitalPort::True : // No port, no effect
     break ;
   }
 }

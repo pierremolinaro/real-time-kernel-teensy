@@ -125,12 +125,12 @@ static void write8bitCommand_initMode (INIT_MODE_ const uint8_t inCommand) {
 
 static void setupLCD (INIT_MODE) {
 //--- Step 1: Configure ports
-  pinMode (LCD_D4, OUTPUT) ;
-  pinMode (LCD_D5, OUTPUT) ;
-  pinMode (LCD_D6, OUTPUT) ;
-  pinMode (LCD_D7, OUTPUT) ;
-  pinMode (LCD_RS, OUTPUT) ;
-  pinMode (LCD_E,  OUTPUT) ;
+  pinMode (LCD_D4, DigitalMode::OUTPUT) ;
+  pinMode (LCD_D5, DigitalMode::OUTPUT) ;
+  pinMode (LCD_D6, DigitalMode::OUTPUT) ;
+  pinMode (LCD_D7, DigitalMode::OUTPUT) ;
+  pinMode (LCD_RS, DigitalMode::OUTPUT) ;
+  pinMode (LCD_E,  DigitalMode::OUTPUT) ;
 //--- Step 2: wait for 15 ms
   busyWaitDuring_initMode (MODE_ 15) ;
 //--- Step 3: write command 0x30

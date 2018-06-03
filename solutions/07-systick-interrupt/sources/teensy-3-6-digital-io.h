@@ -68,26 +68,28 @@ enum class DigitalPort {
     D56, // PTE10
     D57, // PTE11
 //--- No port
-    None
+    True, // Fictive port: no effect on write, always read true
+    False // Fictive port: no effect on write, always read false
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-typedef enum {
+enum class DigitalMode {
     OUTPUT,
     OUTPUT_OPEN_COLLECTOR,
     INPUT,
-    INPUT_PULLUP,
-} DigitalMode ;
+    INPUT_PULLDOWN,
+    INPUT_PULLUP
+} ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-STATIC void pinMode (const DigitalPort inPort, const DigitalMode inMode) ;
+void pinMode (const DigitalPort inPort, const DigitalMode inMode) ;
 
-STATIC void digitalWrite (const DigitalPort inPort, const bool inValue) ;
+bool digitalRead (const DigitalPort inPort) ;
 
-STATIC bool digitalRead (const DigitalPort inPort) ;
+void digitalWrite (const DigitalPort inPort, const bool inValue) ;
 
-STATIC void digitalToggle (const DigitalPort inPort) ;
+void digitalToggle (const DigitalPort inPort) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

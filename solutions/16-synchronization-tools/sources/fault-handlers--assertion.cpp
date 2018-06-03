@@ -28,11 +28,11 @@ MACRO_BOOT_ROUTINE (configureFaultRegisters) ;
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void endlessLoop (FAULT_MODE) {
-  pinMode (L0_LED, OUTPUT) ;
-  pinMode (L1_LED, OUTPUT) ;
-  pinMode (L2_LED, OUTPUT) ;
-  pinMode (L3_LED, OUTPUT) ;
-  pinMode (L4_LED, OUTPUT) ;
+  pinMode (L0_LED, DigitalMode::OUTPUT) ;
+  pinMode (L1_LED, DigitalMode::OUTPUT) ;
+  pinMode (L2_LED, DigitalMode::OUTPUT) ;
+  pinMode (L3_LED, DigitalMode::OUTPUT) ;
+  pinMode (L4_LED, DigitalMode::OUTPUT) ;
   while (1) {
     digitalToggle (L0_LED) ;
     digitalToggle (L1_LED) ;
@@ -58,17 +58,17 @@ static void endlessLoop (FAULT_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void handleFault (FAULT_MODE_ const char * inTitle,  const uint32_t inLinkRegisterValue) {
-  pinMode (L0_LED, OUTPUT) ;
-  pinMode (L1_LED, OUTPUT) ;
-  pinMode (L2_LED, OUTPUT) ;
-  pinMode (L3_LED, OUTPUT) ;
-  pinMode (L4_LED, OUTPUT) ;
+  pinMode (L0_LED, DigitalMode::OUTPUT) ;
+  pinMode (L1_LED, DigitalMode::OUTPUT) ;
+  pinMode (L2_LED, DigitalMode::OUTPUT) ;
+  pinMode (L3_LED, DigitalMode::OUTPUT) ;
+  pinMode (L4_LED, DigitalMode::OUTPUT) ;
   uint32_t displayedPage = 0 ;
   uint32_t displayCounter = 0 ;
   bool encoderA = false ;
   bool display = true ;
-  pinMode (ENCODER_A, INPUT_PULLUP) ;
-  pinMode (ENCODER_B, INPUT_PULLUP) ;
+  pinMode (ENCODER_A, DigitalMode::INPUT_PULLUP) ;
+  pinMode (ENCODER_B, DigitalMode::INPUT_PULLUP) ;
   while (1) {
   //--- Wait
     busyWaitDuring_faultMode (MODE_ 1);

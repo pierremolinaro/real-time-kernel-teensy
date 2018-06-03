@@ -239,7 +239,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-c", sourcePath]
     rule.mCommand += ["-o", objectFileForChecking]
     rule.mCommand += ["-DSTATIC="]
-#    rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", objectFileForChecking + ".dep"]
     make.addRule (rule)
@@ -254,7 +253,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-c", sourcePath]
     rule.mCommand += ["-o", objectFile]
     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
-#     rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", objectFile + ".dep"]
     rule.mDependences.append (allHeaders_file)
@@ -272,7 +270,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-S", sourcePath]
     rule.mCommand += ["-o", asObjectFile]
     rule.mCommand += ["-DSTATIC="]
-#     rule.mCommand += ["-DCPU_MHZ=" + str (CPU_MHZ)]
     rule.mCommand += includeDirsInCompilerCommand
     rule.mCommand += ["-MD", "-MP", "-MF", asObjectFile + ".dep"]
     rule.mDependences.append (sourcePath)
