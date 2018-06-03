@@ -4,7 +4,6 @@
 
 #include "software-modes.h"
 
-
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void busyWaitDuring_initMode (INIT_MODE_ const uint32_t inDelayMS) ;
