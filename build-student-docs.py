@@ -88,9 +88,6 @@ runProcess (["rm", "-fr", ARCHIVE_NAME + "/steps/01-blink-led/zPRODUCTS"])
 runProcess (["rm", "-fr", ARCHIVE_NAME + "/steps/01-blink-led/zSOURCES"])
 #--- Create archive
 compress (scriptDir, ARCHIVE_NAME)
-# runProcess (["tar", "cjvf", ARCHIVE_NAME + ".tar", ARCHIVE_NAME])
-# runProcess (["bzip2", "--compress", ARCHIVE_NAME + ".tar"])
-# runProcess (["rm", "-fR", ARCHIVE_NAME])
 #--- Move archive to desktop
 runProcess (["mv", ARCHIVE_NAME + ".tar.bz2", os.path.expanduser ("~/Desktop/")])
 
@@ -101,7 +98,20 @@ runProcess (["rm", "-fR", DOCUMENT_DIR])
 #--- Create archive
 runProcess (["mkdir", DOCUMENT_DIR])
 #--- Copy PDF files
-runProcessSingleCommand ("cp pdf-2018-2019/*.pdf " + DOCUMENT_DIR)
+for root, dirs, files in os.walk ("keynotes-2018-2019") :
+  for name in files:
+    keynotePath = os.path.join (root, name)
+    (base, extension) = os.path.splitext (name)
+    if extension == ".key" :
+      pdfSourcePath = "pdf-2018-2019/" + base + ".pdf"
+      if not os.path.exists (pdfSourcePath) :
+        print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'existe pas" + bcolors.ENDC)
+        sys.exit (1)
+      elif os.path.getmtime (pdfSourcePath) < os.path.getmtime (keynotePath) :
+        print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'est pas à jour" + bcolors.ENDC)
+        sys.exit (1)
+      else:
+        runProcess (["cp", pdfSourcePath, DOCUMENT_DIR])
 #--- Step 03
 runProcess (["mkdir", DOCUMENT_DIR + "/03-files"])
 runProcess (["cp", "solutions/03-software-modes/sources/software-modes.h", DOCUMENT_DIR + "/03-files"])
@@ -110,6 +120,11 @@ compress (DOCUMENT_DIR, "03-files")
 runProcess (["mkdir", DOCUMENT_DIR + "/04-files"])
 runProcess (["cp", "solutions/04-boot-and-init-routines/sources/boot-init-macros.h", DOCUMENT_DIR + "/04-files"])
 compress (DOCUMENT_DIR, "04-files")
+#--- Step 05
+runProcess (["mkdir", DOCUMENT_DIR + "/05-files"])
+runProcess (["cp", "solutions/05-leds-pushbuttons/sources/teensy-3-6-digital-io.cpp", DOCUMENT_DIR + "/05-files"])
+runProcess (["cp", "solutions/05-leds-pushbuttons/sources/teensy-3-6-digital-io.h", DOCUMENT_DIR + "/05-files"])
+compress (DOCUMENT_DIR, "05-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
