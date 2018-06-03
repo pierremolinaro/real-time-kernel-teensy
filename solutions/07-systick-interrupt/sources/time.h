@@ -35,15 +35,3 @@ uint32_t millis (void) ;
 void systickInterruptServiceRoutine (SECTION_MODE) asm ("interrupt.section.SysTick") ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//
-// Insert routine address into 'real.time.interrupt.routine.array' section
-//
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-#define MACRO_REAL_TIME_INTERRUPT_ROUTINE(ROUTINE) \
-  static void (* UNIQUE_IDENTIFIER) (SECTION_MODE_ const uint32_t inUptime) \
-  __attribute__ ((section ("real.time.interrupt.routine.array"))) \
-  __attribute__ ((unused)) \
-  __attribute__ ((used)) = ROUTINE ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

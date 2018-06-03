@@ -8,18 +8,7 @@ static void startSystick (BOOT_MODE) {
 //------------------------------------ Configure Systick
   SYST_RVR = CPU_MHZ * 1000 - 1 ; // Underflow every ms
   SYST_CVR = 0 ;
-  SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE ;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-MACRO_BOOT_ROUTINE (startSystick) ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-static void enableSystickInterruptAndStartPIT (INIT_MODE) {
-//------------------------------------ Systick interrupt every ms
-  SYST_CSR |= SYST_CSR_TICKINT ;
+  SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE | SYST_CSR_TICKINT ;
 //------------------------------------ Configure and chain PIT0 and PIT1 for 64-bit counting
 //--- Power on PIT
   SIM_SCGC6 |= SIM_SCGC6_PIT ;
@@ -38,7 +27,7 @@ static void enableSystickInterruptAndStartPIT (INIT_MODE) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-MACRO_INIT_ROUTINE (enableSystickInterruptAndStartPIT) ;
+MACRO_BOOT_ROUTINE (startSystick) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   micros current value
