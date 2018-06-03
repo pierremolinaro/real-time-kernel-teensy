@@ -125,6 +125,11 @@ runProcess (["mkdir", DOCUMENT_DIR + "/05-files"])
 runProcess (["cp", "solutions/05-leds-pushbuttons/sources/teensy-3-6-digital-io.cpp", DOCUMENT_DIR + "/05-files"])
 runProcess (["cp", "solutions/05-leds-pushbuttons/sources/teensy-3-6-digital-io.h", DOCUMENT_DIR + "/05-files"])
 compress (DOCUMENT_DIR, "05-files")
+#--- Step 06
+runProcess (["mkdir", DOCUMENT_DIR + "/06-files"])
+runProcess (["cp", "solutions/06-lcd/sources/lcd-wo-fault-mode.cpp", DOCUMENT_DIR + "/06-files"])
+runProcess (["cp", "solutions/06-lcd/sources/lcd-wo-fault-mode.h", DOCUMENT_DIR + "/06-files"])
+compress (DOCUMENT_DIR, "06-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
