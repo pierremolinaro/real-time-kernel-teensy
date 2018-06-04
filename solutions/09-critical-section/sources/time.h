@@ -56,5 +56,4 @@ void systickInterruptServiceRoutine (SECTION_MODE) asm ("interrupt.section.SysTi
   __attribute__ ((unused)) \
   __attribute__ ((used)) = ROUTINE ;
 
-
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
