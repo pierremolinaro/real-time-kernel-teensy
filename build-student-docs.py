@@ -130,6 +130,10 @@ runProcess (["mkdir", DOCUMENT_DIR + "/06-files"])
 runProcess (["cp", "solutions/06-lcd/sources/lcd-wo-fault-mode.cpp", DOCUMENT_DIR + "/06-files"])
 runProcess (["cp", "solutions/06-lcd/sources/lcd-wo-fault-mode.h", DOCUMENT_DIR + "/06-files"])
 compress (DOCUMENT_DIR, "06-files")
+#--- Step 08
+runProcess (["mkdir", DOCUMENT_DIR + "/08-files"])
+runProcess (["cp", "solutions/08-volatile--systick-isr/sources/setup-loop.cpp", DOCUMENT_DIR + "/08-files"])
+compress (DOCUMENT_DIR, "08-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
