@@ -265,7 +265,7 @@ static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurren
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-MACRO_REAL_TIME_INTERRUPT_ROUTINE (irq_makeTasksReadyFromCurrentDate) ;
+MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //  SYNCHRONIZATION

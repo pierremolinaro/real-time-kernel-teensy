@@ -60,7 +60,7 @@ void systickInterruptServiceRoutine (IRQ_MODE) asm ("interrupt.service.SysTick")
 //
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#define MACRO_REAL_TIME_INTERRUPT_ROUTINE(ROUTINE) \
+#define MACRO_REAL_TIME_ISR(ROUTINE) \
   static void (* UNIQUE_IDENTIFIER) (IRQ_MODE_ const uint32_t inUptime) \
   __attribute__ ((section ("real.time.interrupt.routine.array"))) \
   __attribute__ ((unused)) \

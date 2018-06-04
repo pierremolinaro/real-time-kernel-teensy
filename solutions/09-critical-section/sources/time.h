@@ -50,7 +50,7 @@ void systickInterruptServiceRoutine (SECTION_MODE) asm ("interrupt.section.SysTi
 //
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#define MACRO_REAL_TIME_INTERRUPT_ROUTINE(ROUTINE) \
+#define MACRO_REAL_TIME_ISR(ROUTINE) \
   static void (* UNIQUE_IDENTIFIER) (SECTION_MODE_ const uint32_t inUptime) \
   __attribute__ ((section ("real.time.interrupt.routine.array"))) \
   __attribute__ ((unused)) \
