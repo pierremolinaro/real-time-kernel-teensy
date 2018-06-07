@@ -541,6 +541,12 @@ elif sectionScheme == "swint" :
 elif sectionScheme == "disableInterrupt" :
   for section in sectionList :
     sFile += generateDisableInterruptSection (section)
+else:
+  print (BOLD_RED ()
+         + "In the makefile.json file, the \"SECTION-SCHEME\" key has an invalid \"" + sectionScheme + "\" value; "
+         + "(possible value: \"disableInterrupt\", \"bkpt\", \"swint\")"
+         +  ENDC ())
+  sys.exit (1)
 #------------------------------ Interrupts as service
 for interruptServiceName in interruptServiceList :
   sFile += asSeparator ()
