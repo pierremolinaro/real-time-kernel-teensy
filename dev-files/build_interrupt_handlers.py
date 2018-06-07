@@ -541,7 +541,7 @@ elif sectionScheme == "swint" :
 elif sectionScheme == "disableInterrupt" :
   for section in sectionList :
     sFile += generateDisableInterruptSection (section)
-else:
+elif len (sectionList) > 0 :
   print (BOLD_RED ()
          + "In the makefile.json file, the \"SECTION-SCHEME\" key has an invalid \"" + sectionScheme + "\" value; "
          + "(possible value: \"disableInterrupt\", \"bkpt\", \"swint\")"
