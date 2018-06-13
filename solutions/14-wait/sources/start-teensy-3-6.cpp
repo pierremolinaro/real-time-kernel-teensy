@@ -402,9 +402,6 @@ void startPhase1 (void) {
 	if (PMC_REGSC & PMC_REGSC_ACKISO) {
     PMC_REGSC |= PMC_REGSC_ACKISO;
   }
-//--------------------------------------------------- Set interrupt priorities
-  #define AIRCR (* ((volatile uint32_t *) 0xE000ED0C))
-  AIRCR = 0x05FA0700 ; // Making all bits of NVIC_IPR registers act as subpriorities : no interrupt preemption
 //---------------------------------------------------
 //--- Since this is a write once register, make it visible to all F_CPU's
 //    so we can into other sleep modes in the future at any speed
