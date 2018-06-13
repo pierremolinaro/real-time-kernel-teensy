@@ -594,12 +594,12 @@ for unusedInterruptName in interruptNameSet :
   sFile += asSeparator () + "\n"
   sFile += "  .section .text.interrupt." + unusedInterruptName + ", \"ax\", %progbits\n\n"
   sFile += "  .align  1\n"
+  sFile += "  .type interrupt." + unusedInterruptName + ", %function\n"
   sFile += "  .global interrupt." + unusedInterruptName + "\n\n"
   sFile += "interrupt." + unusedInterruptName + ":\n"
   sFile += "  movs r0, #" + str (index) + "\n"
   sFile += "  b    unused.interrupt\n\n"
   index += 1
-#  sFile += "  interrupt." + unusedInterruptName + " = -1 \n\n"
 #------------------------------ Write destination file
 sFile += asSeparator ()
 f = open (destinationAssemblerFile, "wt")
