@@ -4,110 +4,112 @@
 #———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 def interruptNames () :
-  result  = ["NMI", "HardFault", "MemManage", "BusFault", "UsageFault"]
-  result += ["SVC", "DebugMonitor", "PendSV", "SysTick"]
-  result.append ("DMA0_DMA16")
-  result.append ("DMA1_DMA17")
-  result.append ("DMA2_DMA18")
-  result.append ("DMA3_DMA19")
-  result.append ("DMA4_DMA20")
-  result.append ("DMA5_DMA21")
-  result.append ("DMA6_DMA22")
-  result.append ("DMA7_DMA23")
-  result.append ("DMA8_DMA24")
-  result.append ("DMA9_DMA25")
-  result.append ("DMA10_DMA26")
-  result.append ("DMA11_DMA27")
-  result.append ("DMA12_DMA28")
-  result.append ("DMA13_DMA29")
-  result.append ("DMA14_DMA30")
-  result.append ("DMA15_DMA31")
-  result.append ("DMA_Error")
-  result.append ("FTFE")
-  result.append ("Read_Collision")
-  result.append ("CAN0_ORed_Message_buffer")
-  result.append ("CAN0_Bus_Off")
-  result.append ("CAN0_Error")
-  result.append ("CAN0_Tx_Warning")
-  result.append ("CAN0_Rx_Warning")
-  result.append ("CAN0_Wake_Up")
-  result.append ("CAN1_ORed_Message_buffer")
-  result.append ("CAN1_Bus_Off")
-  result.append ("CAN1_Error")
-  result.append ("CAN1_Tx_Warning")
-  result.append ("CAN1_Rx_Warning")
-  result.append ("CAN1_Wake_Up")
-  result.append ("SPI0")
-  result.append ("SPI1")
-  result.append ("SPI2")
-  result.append ("I2S0_Tx")
-  result.append ("I2S0_Rx")
-  result.append ("USBDCD")
-  result.append ("PDB0")
-  result.append ("PIT0")
-  result.append ("PIT1")
-  result.append ("PIT2")
-  result.append ("PIT3")
-  result.append ("FTM0")
-  result.append ("FTM1")
-  result.append ("FTM2")
-  result.append ("FTM3")
-  result.append ("ADC0")
-  result.append ("ADC1")
-  result.append ("RTC")
-  result.append ("RTC_Seconds")
-  result.append ("LPTMR0")
-  result.append ("TSI0")
-  result.append ("PORTA")
-  result.append ("PORTB")
-  result.append ("PORTC")
-  result.append ("PORTD")
-  result.append ("PORTE")
-  result.append ("WDOG_EWM")
-  result.append ("WDOG_EWM")
-  result.append ("CMT")
-  result.append ("MCG")
-  result.append ("I2C0")
-  result.append ("I2C1")
-  result.append ("I2C2")
-  result.append ("I2C3")
-  result.append ("UART0_RX_TX")
-  result.append ("UART0_ERR")
-  result.append ("UART1_RX_TX")
-  result.append ("UART1_ERR")
-  result.append ("UART2_RX_TX")
-  result.append ("UART2_ERR")
-  result.append ("UART3_RX_TX")
-  result.append ("UART3_ERR")
-  result.append ("UART4_RX_TX")
-  result.append ("UART4_ERR")
-  result.append ("USB0")
-  result.append ("CMP0")
-  result.append ("CMP1")
-  result.append ("CMP2")
-  result.append ("CMP3")
-  result.append ("LLWU")
-  result.append ("LVD_LVW")
-  result.append ("RNG")
-  result.append ("USBHS")
-  result.append ("USBHSDCD")
-  result.append ("SDHC")
-  result.append ("ENET_1588_Timer")
-  result.append ("ENET_Transmit")
-  result.append ("ENET_Receive")
-  result.append ("ENET_Error")
-  result.append ("LPUART0")
-  result.append ("TPM1")
-  result.append ("TPM2")
-  result.append ("DAC0")
-  result.append ("DAC1")
-  result.append ("PORTA")
-  result.append ("PORTB")
-  result.append ("PORTC")
-  result.append ("PORTD")
-  result.append ("PORTE")
-  result.append ("MCM")
-  result.append ("SWINT")
+  result = {}
+  result ["NMI"] = 2
+  result ["HardFault"] = 3
+  result ["MemManage"] = 4
+  result ["BusFault"] = 5
+  result ["UsageFault"] = 6
+  result ["SVC"] = 11
+  result ["DebugMonitor"] = 12
+  result ["PendSV"] = 14
+  result ["SysTick"] = 15
+  result ["DMA0_DMA16"] = 16
+  result ["DMA1_DMA17"] = 17
+  result ["DMA2_DMA18"] = 18
+  result ["DMA3_DMA19"] = 19
+  result ["DMA4_DMA20"] = 20
+  result ["DMA5_DMA21"] = 21
+  result ["DMA6_DMA22"] = 22
+  result ["DMA7_DMA23"] = 23
+  result ["DMA8_DMA24"] = 24
+  result ["DMA9_DMA25"] = 25
+  result ["DMA10_DMA26"] = 26
+  result ["DMA11_DMA27"] = 27
+  result ["DMA12_DMA28"] = 28
+  result ["DMA13_DMA29"] = 29
+  result ["DMA14_DMA30"] = 30
+  result ["DMA15_DMA31"] = 31
+  result ["DMA_Error"] = 32
+  result ["MCM"] = 33
+  result ["FTFE"] = 34
+  result ["Read_Collision"] = 35
+  result ["LVD_LVW"] = 36
+  result ["LLWU"] = 37
+  result ["WDOG_EWM"] = 38
+  result ["RNG"] = 39
+  result ["I2C0"] = 40
+  result ["I2C1"] = 41
+  result ["SPI0"] = 42
+  result ["SPI1"] = 43
+  result ["I2S0_Tx"] = 44
+  result ["I2S0_Rx"] = 45
+  result ["UART0_RX_TX"] = 47
+  result ["UART0_ERR"] = 48
+  result ["UART1_RX_TX"] = 49
+  result ["UART1_ERR"] = 50
+  result ["UART2_RX_TX"] = 51
+  result ["UART2_ERR"] = 52
+  result ["UART3_RX_TX"] = 53
+  result ["UART3_ERR"] = 54
+  result ["ADC0"] = 55
+  result ["CMP0"] = 56
+  result ["CMP1"] = 57
+  result ["FTM0"] = 58
+  result ["FTM1"] = 59
+  result ["FTM2"] = 60
+  result ["CMT"] = 61
+  result ["RTC"] = 62
+  result ["RTC_Seconds"] = 63
+  result ["PIT0"] = 64
+  result ["PIT1"] = 65
+  result ["PIT2"] = 66
+  result ["PIT3"] = 67
+  result ["PDB0"] = 68
+  result ["USB0"] = 69
+  result ["USBDCD"] = 70
+  result ["DAC0"] = 72
+  result ["MCG"] = 73
+  result ["LPTMR0"] = 74
+  result ["PORTA"] = 75
+  result ["PORTB"] = 76
+  result ["PORTC"] = 77
+  result ["PORTD"] = 78
+  result ["PORTE"] = 79
+  result ["SPI2"] = 81
+  result ["UART4_RX_TX"] = 82
+  result ["UART4_ERR"] = 83
+  result ["CMP2"] = 86
+  result ["FTM3"] = 87
+  result ["DAC1"] = 88
+  result ["ADC1"] = 89
+  result ["I2C2"] = 90
+  result ["CAN0_ORed_Message_buffer"] = 91
+  result ["CAN0_Bus_Off"] = 92
+  result ["CAN0_Error"] = 93
+  result ["CAN0_Tx_Warning"] = 94
+  result ["CAN0_Rx_Warning"] = 95
+  result ["CAN0_Wake_Up"] = 96
+  result ["SDHC"] = 97
+  result ["ENET_1588_Timer"] = 98
+  result ["ENET_Transmit"] = 99
+  result ["ENET_Receive"] = 100
+  result ["ENET_Error"] = 101
+  result ["LPUART0"] = 102
+  result ["TSI0"] = 103
+  result ["TPM1"] = 104
+  result ["TPM2"] = 105
+  result ["USBHSDCD"] = 106
+  result ["I2C3"] = 107
+  result ["CMP3"] = 108
+  result ["USBHS"] = 109
+  result ["CAN1_ORed_Message_buffer"] = 110
+  result ["CAN1_Bus_Off"] = 111
+  result ["CAN1_Error"] = 112
+  result ["CAN1_Tx_Warning"] = 113
+  result ["CAN1_Rx_Warning"] = 114
+  result ["CAN1_Wake_Up"] = 115
+  result ["SWINT"] = 64
   return result
 
 #———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

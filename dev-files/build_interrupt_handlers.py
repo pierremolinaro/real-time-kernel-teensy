@@ -402,8 +402,8 @@ def generateDisableInterruptSection (sectionName):
 #    ENTRY POINT
 #———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#------------------------------ Interrupt set
-interruptNameSet = set (interrupt_names_teensy_3_6.interruptNames ())
+#------------------------------ Interrupt dictionary
+interruptDictionary = interrupt_names_teensy_3_6.interruptNames ()
 # print "Dest " + destinationFile
 #------------------------------ Assembly destination file
 destinationCppFile = sys.argv [1]
@@ -436,18 +436,18 @@ for header in headerFiles:
       splitStr = line.strip ().split ("//$interrupt-section ")
       if len (splitStr) == 2 :
         interruptName = splitStr [1].strip ()
-        if interruptName in interruptNameSet :
+        if interruptName in interruptDictionary :
           interruptSectionList.append (interruptName)
-          interruptNameSet.remove (interruptName)
+          del interruptDictionary [interruptName]
         else:
           print (BOLD_RED () + "Error, interrupt '" + interruptName + "' does not exist, or is already assigned." + ENDC ())
           sys.exit (1)
       splitStr = line.strip ().split ("//$interrupt-service ")
       if len (splitStr) == 2 :
         interruptName = splitStr [1].strip ()
-        if interruptName in interruptNameSet :
+        if interruptName in interruptDictionary :
           interruptServiceList.append (interruptName)
-          interruptNameSet.remove (interruptName)
+          del interruptDictionary [interruptName]
         else:
           print (BOLD_RED () + "Error, interrupt '" + interruptName + "' does not exist, or is already assigned." + ENDC ())
           sys.exit (1)
@@ -476,7 +476,8 @@ if (len (sectionList) > 0) and (sectionScheme == "") :
 #------------------------------ Services
 if serviceScheme == "svc" :
   sFile += generateSVChandler ()
-  interruptNameSet.remove ("SVC")
+#   interruptNameSet.remove ("SVC")
+  del interruptDictionary ["SVC"]
   sFile += asSeparator ()
   sFile += "@   SERVICES\n"
   idx = 1
@@ -511,7 +512,8 @@ if serviceScheme == "svc" :
 if sectionScheme == "bkpt" :
   cppFile += generateCppForBreakpointSection ()
   sFile += generateBreakpointHandler ()
-  interruptNameSet.remove ("DebugMonitor")
+  del interruptDictionary ["DebugMonitor"]
+#   interruptNameSet.remove ("DebugMonitor")
   sFile += asSeparator ()
   sFile += "@   SECTIONS\n"
   idx = 0
@@ -531,7 +533,8 @@ if sectionScheme == "bkpt" :
 elif sectionScheme == "swint" :
   cppFile += generateCppForSoftwareInterruptSection ()
   sFile += generateSoftwareInterruptandler ()
-  interruptNameSet.remove ("SWINT")
+  del interruptDictionary ["SWINT"]
+ # interruptNameSet.remove ("SWINT")
   sFile += asSeparator ()
   sFile += "@   SECTIONS\n"
   idx = 0
@@ -587,8 +590,7 @@ for interruptSectionName in interruptSectionList :
   sFile += "@----------------------------------------- Goto interrupt function\n"
   sFile += "  b     interrupt.section." + interruptSectionName + "\n\n"
 #------------------------------ Unused interrupts
-index = 0
-for unusedInterruptName in interruptNameSet :
+for unusedInterruptName in interruptDictionary.keys () :
   sFile += asSeparator ()
   sFile += "@   INTERRUPT - UNUSED: " + unusedInterruptName + "\n"
   sFile += asSeparator () + "\n"
@@ -597,9 +599,8 @@ for unusedInterruptName in interruptNameSet :
   sFile += "  .type interrupt." + unusedInterruptName + ", %function\n"
   sFile += "  .global interrupt." + unusedInterruptName + "\n\n"
   sFile += "interrupt." + unusedInterruptName + ":\n"
-  sFile += "  movs r0, #" + str (index) + "\n"
+  sFile += "  movs r0, #" + str (interruptDictionary [unusedInterruptName]) + "\n"
   sFile += "  b    unused.interrupt\n\n"
-  index += 1
 #------------------------------ Write destination file
 sFile += asSeparator ()
 f = open (destinationAssemblerFile, "wt")
