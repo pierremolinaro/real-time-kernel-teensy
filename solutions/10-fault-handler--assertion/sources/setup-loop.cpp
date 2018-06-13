@@ -18,7 +18,7 @@ void loop (USER_MODE) {
   if (gDisplayTime <= millis ()) {
     const uint32_t s = systick () ;
     gotoLineColumn (MODE_ 0, 7) ;
-    printUnsigned (MODE_ millis () / gDownCounter) ;
+    printUnsigned (MODE_ millis () / gDownCounter) ; // DIVISION PAR ZÉRO APRÈS 10 s
     gDownCounter -- ;
     gotoLineColumn (MODE_ 1, 0) ;
     printUnsigned (MODE_ s) ;

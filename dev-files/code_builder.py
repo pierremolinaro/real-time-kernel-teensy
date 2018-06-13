@@ -86,6 +86,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   LD_TOOL_WITH_OPTIONS = COMPILER_TOOL_WITH_OPTIONS
   OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-objcopy"]
   DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + "/bin/" + BASE_NAME + "-size"]
+  OBJDUMP_TOOL = TOOL_DIR + "/bin/" + BASE_NAME + "-objdump"
 #--------------------------------------------------------------------------- Install Teensy loader CLI ?
   TEENSY_CLI_LOADER_PATH = teensy_cli_loader_builder.buildAndGetPath (TOOL_DIR + "/bin")
 #--------------------------------------------------------------------------- Analyze JSON file
@@ -244,12 +245,13 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     make.addRule (rule)
     rule.mPriority = -1
     allGoal.append (objectFileForChecking)
-#--- Compile source
+ #--- Compile source
     rule = makefile.Rule ([objectFile], "Compiling " + source)
     rule.mOpenSourceOnError = True
     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
     rule.mCommand += common_definitions.Cpp_actualOptions (usesLTO)
+    rule.mCommand += ["-g"]
     rule.mCommand += ["-c", sourcePath]
     rule.mCommand += ["-o", objectFile]
     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
@@ -261,6 +263,15 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.enterSecondaryDependanceFile (objectFile + ".dep", make)
     make.addRule (rule)
     objectFileList.append (objectFile)
+  #--- objdump python source
+    objdumpPythonFile = BUILD_DIR + "/" + source + ".objdump.py"
+    rule = makefile.Rule ([objdumpPythonFile], "Building " + objdumpPythonFile)
+    rule.mDependences.append (objectFile)
+    rule.mDependences.append ("makefile.json")
+    rule.mCommand += ["../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
+    rule.mPriority = -1
+    make.addRule (rule)
+    allGoal.append (objdumpPythonFile)
   #--- AS rule
     rule = makefile.Rule ([asObjectFile], "Compiling -> s " + source)
     rule.mOpenSourceOnError = True

@@ -134,6 +134,11 @@ compress (DOCUMENT_DIR, "06-files")
 runProcess (["mkdir", DOCUMENT_DIR + "/08-files"])
 runProcess (["cp", "solutions/08-volatile--systick-isr/sources/setup-loop.cpp", DOCUMENT_DIR + "/08-files"])
 compress (DOCUMENT_DIR, "08-files")
+#--- Step 10
+runProcess (["mkdir", DOCUMENT_DIR + "/10-files"])
+runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.cpp", DOCUMENT_DIR + "/10-files"])
+runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.h", DOCUMENT_DIR + "/10-files"])
+compress (DOCUMENT_DIR, "10-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
