@@ -77,6 +77,7 @@ runProcess (["mkdir", ARCHIVE_NAME + "/dev-files"])
 runProcessSingleCommand ("cp dev-files/*.c " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.py " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.ld " + ARCHIVE_NAME + "/dev-files")
+runProcessSingleCommand ("cp dev-files/*.txt " + ARCHIVE_NAME + "/dev-files")
 runProcessSingleCommand ("cp dev-files/*.rules " + ARCHIVE_NAME + "/dev-files")
 #--- Copy step 01
 runProcess (["mkdir", ARCHIVE_NAME + "/steps"])
@@ -136,6 +137,7 @@ runProcess (["cp", "solutions/08-volatile--systick-isr/sources/setup-loop.cpp", 
 compress (DOCUMENT_DIR, "08-files")
 #--- Step 10
 runProcess (["mkdir", DOCUMENT_DIR + "/10-files"])
+runProcess (["cp", "documentation/apnt209.pdf", DOCUMENT_DIR + "/10-files"])
 runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.cpp", DOCUMENT_DIR + "/10-files"])
 runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.h", DOCUMENT_DIR + "/10-files"])
 compress (DOCUMENT_DIR, "10-files")
