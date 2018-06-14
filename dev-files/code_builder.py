@@ -265,7 +265,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     objectFileList.append (objectFile)
   #--- objdump python source
     objdumpPythonFile = BUILD_DIR + "/" + source + ".objdump.py"
-    rule = makefile.Rule ([objdumpPythonFile], "Building " + objdumpPythonFile)
+    rule = makefile.Rule ([objdumpPythonFile], "Building " + source + ".objdump.py")
     rule.mDependences.append (objectFile)
     rule.mDependences.append ("makefile.json")
     rule.mCommand += ["../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]

@@ -25,9 +25,9 @@ background.task.stack:
   .global reset.handler
   .type reset.handler, %function
 
-reset.handler: @ Cortex M4 boots with interrupts disabled, in Thread mode
-@---------------------------------- Run boot, zero bss section, copy data section, ...
-  bl    start.function
+reset.handler: @ Cortex M4 boots with interrupts enabled, in Thread mode
+@---------------------------------- Run boot, zero bss section, copy data section
+  bl    start.phase1
 @---------------------------------- Set PSP: this is stack for background task
   ldr   r0,  =background.task.stack + BACKGROUND.STACK.SIZE
   msr   psp, r0
@@ -40,6 +40,10 @@ reset.handler: @ Cortex M4 boots with interrupts disabled, in Thread mode
 @--- Software must use an ISB barrier instruction to ensure a write to the CONTROL register
 @ takes effect before the next instruction is executed.
   isb
+@---------------------------------- Run init routines, interrupt disabled
+  cpsid i              @ Disable interrupts
+  bl    start.phase2
+  cpsie i              @ Enable interrupts
 @---------------------------------- Run setup, loop
   bl    setup.function
 background.task:

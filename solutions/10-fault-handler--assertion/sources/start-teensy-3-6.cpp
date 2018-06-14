@@ -380,7 +380,7 @@ uint32_t FlashKHz (void) {
 //  BOOT ROUTINE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void start (void) {
+void startPhase1 (void) {
 //--------------------------------------------------- Disable watchdog timer
 //--- These two instructions are required for unlocking watchdog timer
   WDOG_UNLOCK = 0xC520 ;
@@ -476,6 +476,32 @@ void start (void) {
   }
 //------------------------------------ Now, we can store serial number
   gMicrocontrollerSerialNumber = serialNumber ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   MICROCONTROLLER SERIAL NUMBER
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static uint32_t readMicrocontrollerSerialNumber (void) {
+  while ((FTFE_FSTAT & FTFE_FSTAT_CCIF) == 0) {} // Wait
+  FTFE_FSTAT = FTFE_FSTAT_RDCOLERR | FTFE_FSTAT_ACCERR | FTFE_FSTAT_FPVIOL;
+//--- FTFE_FCCOB3 is a 8-bit register, followed by 3 other 8-bit registers, we write value by a single 32-bit access)
+  FTFE_FCCOB_0_3 = 0x41070000 ;
+  FTFE_FSTAT = FTFE_FSTAT_CCIF ;
+  while ((FTFE_FSTAT & FTFE_FSTAT_CCIF) == 0) {} // Wait
+//--- Read serial number (FTFE_FCCOBB is a 8-bit register, followed by 3 other 8-bit registers, we get the serial number with a single 32-bit access)
+  return FTFE_FCCOB_8_11 ;
+}
+
+//······················································································································
+
+uint32_t microcontrollerSerialNumber (void) {
+  return gMicrocontrollerSerialNumber ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void startPhase2 (void) {
 //------------------------------------ Aller exécuter les routines d'initialisation de la section boot.routine.array
   extern void (* __boot_routine_array_start) (void) ;
   extern void (* __boot_routine_array_end) (void) ;
@@ -500,27 +526,6 @@ void start (void) {
     (* ptr) () ;
     ptr ++ ;
   }
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   MICROCONTROLLER SERIAL NUMBER
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-static uint32_t readMicrocontrollerSerialNumber (void) {
-  while ((FTFE_FSTAT & FTFE_FSTAT_CCIF) == 0) {} // Wait
-  FTFE_FSTAT = FTFE_FSTAT_RDCOLERR | FTFE_FSTAT_ACCERR | FTFE_FSTAT_FPVIOL;
-//--- FTFE_FCCOB3 is a 8-bit register, followed by 3 other 8-bit registers, we write value by a single 32-bit access)
-  FTFE_FCCOB_0_3 = 0x41070000 ;
-  FTFE_FSTAT = FTFE_FSTAT_CCIF ;
-  while ((FTFE_FSTAT & FTFE_FSTAT_CCIF) == 0) {} // Wait
-//--- Read serial number (FTFE_FCCOBB is a 8-bit register, followed by 3 other 8-bit registers, we get the serial number with a single 32-bit access)
-  return FTFE_FCCOB_8_11 ;
-}
-
-//······················································································································
-
-uint32_t microcontrollerSerialNumber (void) {
-  return gMicrocontrollerSerialNumber ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

@@ -15,6 +15,8 @@ void busyWaitDuring_initMode (INIT_MODE_ const uint32_t inDelayMS) ;
 //   FAULT MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+void configureSystick_faultMode (FAULT_MODE) ;
+
 void busyWaitDuring_faultMode (FAULT_MODE_ const uint32_t inDelayMS) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

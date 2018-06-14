@@ -58,6 +58,9 @@ static void endlessLoop (FAULT_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void handleFault (FAULT_MODE_ const char * inTitle,  const uint32_t inLinkRegisterValue) {
+//----------------- Init Systick (LCD display requires an 1 ms timer)
+  configureSystick_faultMode (MODE) ;
+//---
   pinMode (L0_LED, DigitalMode::OUTPUT) ;
   pinMode (L1_LED, DigitalMode::OUTPUT) ;
   pinMode (L2_LED, DigitalMode::OUTPUT) ;
@@ -200,6 +203,8 @@ void UsageFault_handler (FAULT_MODE) {
 void unusedInterrupt (FAULT_MODE_ const uint32_t inInterruptIndex) asm ("unused.interrupt") ;
 
 void unusedInterrupt (FAULT_MODE_ const uint32_t inInterruptIndex) {
+//----------------- Init Systick (LCD display requires an 1 ms timer)
+  configureSystick_faultMode (MODE) ;
 //----------------- Init display
   initScreen_faultMode (MODE) ;
 //----------------- Title
@@ -218,6 +223,8 @@ void section_assertionFailure (FAULT_MODE_
                                const uint32_t inMessageValue,
                                const char * inFileName,
                                const int inLine) {
+//----------------- Init Systick (LCD display requires an 1 ms timer)
+  configureSystick_faultMode (MODE) ;
 //----------------- Init display
   initScreen_faultMode (MODE) ;
 //----------------- Title
