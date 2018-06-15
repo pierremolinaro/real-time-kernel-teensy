@@ -362,6 +362,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #--------------------------------------------------------------------------- Goals
   make.addGoal ("all", allGoal, "Build all")
   make.addGoal ("run", allGoal, "Building all and run")
+  make.addGoal ("view-hex", allGoal, "Building all and show hex")
   make.addGoal ("display-obj-size", allGoal, "Build binaries and display object sizes")
   make.addGoal ("as", asObjectFileList, "Compile C and C++ to assembly")
 #--------------------------------------------------------------------------- Run jobs
@@ -375,7 +376,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   if GOAL == "display-obj-size" :
     makefile.runCommand (DISPLAY_OBJ_SIZE_TOOL + objectFileList + ["-t"], "Display Object Size", False, showCommand)
 #---------------------------------------------------------------------------- "All" or "run"
-  if (GOAL == "all") or (GOAL == "run") :
+  if (GOAL == "all") or (GOAL == "run") or (GOAL == "view-hex") :
     s = runProcessAndGetOutput (DISPLAY_OBJ_SIZE_TOOL + ["-t"] + [PRODUCT_INTERNAL_FLASH + ".elf"])
     secondLine = s.split('\n')[1]
     numbers = [int(s) for s in secondLine.split() if s.isdigit()]
@@ -388,5 +389,9 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
     runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".hex"])
     print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())
+  elif GOAL == "view-hex":
+    print (makefile.BOLD_GREEN () + "View hex..." + makefile.ENDC ())
+    scriptDir = os.path.dirname (os.path.abspath (__file__))
+    runProcess (["python", scriptDir+ "/view-hex.py", PRODUCT_INTERNAL_FLASH + ".hex"])
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
