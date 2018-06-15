@@ -44,10 +44,10 @@ reset.handler: @ Cortex M4 boots with interrupts enabled, in Thread mode
   svc   #0
 @---------------------------------- This is the background task: turn off activity led
 @  Activity led is connected to PORTC:5 (#13)
-background.task:
+background.task: @ Only use R0, R1, R2, R3 and R12. Other registers are not preserved
   ldr   r0, =0x400FF088  @ Address of GPIOC_PCOR control register
   movs  r1, # (1 << 5)   @ Port D13 is PORTC:5
-  str   r1, [r0]         @ turn off
+  str   r1, [r0]         @ Turn off
   b     background.task
 
 @----------------------------------------------------------------------------------------------------------------------*
