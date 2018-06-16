@@ -141,6 +141,15 @@ runProcess (["cp", "documentation/apnt209.pdf", DOCUMENT_DIR + "/10-files"])
 runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.cpp", DOCUMENT_DIR + "/10-files"])
 runProcess (["cp", "solutions/10-fault-handler--assertion/sources/fault-handlers--assertion.h", DOCUMENT_DIR + "/10-files"])
 compress (DOCUMENT_DIR, "10-files")
+#--- Step 12
+runProcess (["mkdir", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/reset-handler-xtr.s", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/task-list--32-tasks.h", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/task-list--32-tasks.cpp", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/xtr.h", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/xtr.cpp", DOCUMENT_DIR + "/12-files"])
+runProcess (["cp", "solutions/12-first-real-time-kernel/sources/user-tasks.cpp", DOCUMENT_DIR + "/12-files"])
+compress (DOCUMENT_DIR, "12-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
