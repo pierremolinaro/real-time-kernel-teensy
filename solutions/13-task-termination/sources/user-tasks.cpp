@@ -26,8 +26,8 @@ static void task2 (USER_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void initTasks (INIT_MODE) {
-  kernel_create_task (MODE_ gStack1, sizeof (gStack1), task1) ;
-  kernel_create_task (MODE_ gStack2, sizeof (gStack2), task2) ;
+  kernel_createTask (MODE_ gStack1, sizeof (gStack1), task1) ;
+  kernel_createTask (MODE_ gStack2, sizeof (gStack2), task2) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

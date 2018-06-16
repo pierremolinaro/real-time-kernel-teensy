@@ -4,7 +4,6 @@
 
 #include "software-modes.h"
 
-
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   Task routine type                                                                                                 *
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -12,13 +11,13 @@
 typedef void (* RoutineTaskType) (USER_MODE) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   kernel_create_task                                                                                                *
+//   kernel_createTask                                                                                                *
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void kernel_create_task (INIT_MODE_
-                         uint64_t * inStackBufferAddress,
-                         uint32_t inStackBufferSize,
-                         RoutineTaskType inTaskRoutine) ;
+void kernel_createTask (INIT_MODE_
+                        uint64_t * inStackBufferAddress,
+                        uint32_t inStackBufferSize,
+                        RoutineTaskType inTaskRoutine) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 

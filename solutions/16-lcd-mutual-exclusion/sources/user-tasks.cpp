@@ -4,10 +4,21 @@
 
 static uint64_t gStack1 [64] ;
 static uint64_t gStack2 [64] ;
+static uint64_t gStack3 [64] ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static Semaphore s (0) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static void task3 (USER_MODE) {
+  while (1) {
+    digitalToggle (L2_LED) ;
+    waitDuring (MODE_ 249) ;
+  }
+}
+
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void task1 (USER_MODE) {
@@ -30,8 +41,9 @@ static void task2 (USER_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void initTasks (INIT_MODE) {
-  kernel_create_task (MODE_ gStack1, sizeof (gStack1), task1) ;
-  kernel_create_task (MODE_ gStack2, sizeof (gStack2), task2) ;
+  kernel_createTask (MODE_ gStack1, sizeof (gStack1), task1) ;
+  kernel_createTask (MODE_ gStack2, sizeof (gStack2), task2) ;
+  kernel_createTask (MODE_ gStack3, sizeof (gStack3), task3) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

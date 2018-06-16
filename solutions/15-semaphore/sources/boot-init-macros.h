@@ -4,7 +4,6 @@
 
 #include "software-modes.h"
 
-
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //
 // Construction d'un identificateur unique par le préprocesseur

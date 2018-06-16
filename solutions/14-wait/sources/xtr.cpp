@@ -191,14 +191,14 @@ void kernelSelectTaskToRun (IRQ_MODE) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   kernel_create_task
+//   kernel_createTask
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static uint8_t gTaskIndex ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void kernel_create_task (INIT_MODE_
+void kernel_createTask (INIT_MODE_
                          uint64_t * inStackBufferAddress,
                          uint32_t inStackBufferSize,
                          RoutineTaskType inTaskRoutine) {
