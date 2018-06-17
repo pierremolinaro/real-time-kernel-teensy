@@ -84,12 +84,12 @@ enum class DigitalMode {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void pinMode (const DigitalPort inPort, const DigitalMode inMode) ;
+STATIC void pinMode (const DigitalPort inPort, const DigitalMode inMode) ;
 
-bool digitalRead (const DigitalPort inPort) ;
+STATIC bool digitalRead (const DigitalPort inPort) ;
 
-void digitalWrite (const DigitalPort inPort, const bool inValue) ;
+STATIC void digitalWrite (const DigitalPort inPort, const bool inValue) ;
 
-void digitalToggle (const DigitalPort inPort) ;
+STATIC void digitalToggle (const DigitalPort inPort) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
