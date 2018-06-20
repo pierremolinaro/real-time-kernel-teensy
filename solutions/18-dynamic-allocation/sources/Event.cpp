@@ -26,11 +26,11 @@ void Event::sys_wait (KERNEL_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void Event::sys_signal (IRQ_MODE) {
-  const bool found = irq_makeTaskReadyFromBlockingList (MODE_ mWaitingTaskList) ;
+  const bool found = irq_makeTaskReadyFromList (MODE_ mWaitingTaskList) ;
   if (! found) {
     mState = false ;
   }else{
-    while (irq_makeTaskReadyFromBlockingList (MODE_ mWaitingTaskList)) {}
+    while (irq_makeTaskReadyFromList (MODE_ mWaitingTaskList)) {}
   }
 }
 

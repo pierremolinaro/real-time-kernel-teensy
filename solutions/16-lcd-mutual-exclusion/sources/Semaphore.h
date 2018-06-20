@@ -28,7 +28,7 @@ class Semaphore {
 //--- P
 //$service semaphore.P
   public: void P (USER_MODE) asm ("semaphore.P") ;
-  private: void sys_P (KERNEL_MODE) asm ("service.semaphore.P") ;
+  public: void sys_P (KERNEL_MODE) asm ("service.semaphore.P") ;
 
 //--- No copy
   private: Semaphore (const Semaphore &) ;

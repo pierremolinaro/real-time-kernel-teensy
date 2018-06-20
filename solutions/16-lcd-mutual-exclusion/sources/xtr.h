@@ -51,6 +51,6 @@ class TaskList ;
 
 void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) ;
 
-bool irq_makeTaskReadyFromBlockingList (IRQ_MODE_ TaskList & ioWaitingList) ;
+bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

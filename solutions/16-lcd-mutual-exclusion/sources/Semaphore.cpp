@@ -24,10 +24,10 @@ mValue (inInitialValue) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void Semaphore::sys_P (KERNEL_MODE) {
-  if (mValue > 0) {
-    mValue -= 1 ;
-  }else{
+  if (mValue == 0) {
     kernel_blockRunningTaskInList (MODE_ mWaitingTaskList) ;
+  }else{
+    mValue -= 1 ;
   }
 }
 
@@ -38,7 +38,7 @@ void Semaphore::sys_P (KERNEL_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void Semaphore::sys_V (IRQ_MODE) {
-  const bool found = irq_makeTaskReadyFromBlockingList (MODE_ mWaitingTaskList) ;
+  const bool found = irq_makeTaskReadyFromList (MODE_ mWaitingTaskList) ;
   if (! found) {
     mValue += 1 ;
   }

@@ -273,7 +273,7 @@ MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
 
 void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
-//--- Insert in tool list
+//--- Insert in task list
   ioWaitingList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
 //--- Block task
   kernel_makeNoTaskRunning (MODE) ;
@@ -281,7 +281,7 @@ void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-bool irq_makeTaskReadyFromBlockingList (IRQ_MODE_ TaskList & ioWaitingList) {
+bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) {
   TaskControlBlock * taskPtr = ioWaitingList.removeFirstTask (MODE) ;
   const bool found = taskPtr != nullptr ;
   if (found) {
