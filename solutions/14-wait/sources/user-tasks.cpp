@@ -9,6 +9,9 @@ static uint64_t gStack3 [64] ;
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void task1 (USER_MODE) {
+  printHex8 (MODE_ Debug_DEMCR) ;
+  gotoLineColumn (MODE_ 1,0) ;
+  printHex8 (MODE_ Debug_DHCSR_RO) ;
   for (uint32_t i=0 ; i < 10 ; i++) {
     digitalToggle (L0_LED) ;
     waitDuring (MODE_ 250) ;
