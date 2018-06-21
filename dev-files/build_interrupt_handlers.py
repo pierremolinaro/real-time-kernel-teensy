@@ -424,6 +424,7 @@ sFile += "  .thumb\n\n"
 #------------------------------ Explore header files
 interruptServiceList = []
 interruptSectionList = []
+boolServiceSet = set ()
 serviceList = []
 sectionList = []
 for header in headerFiles:
@@ -451,6 +452,11 @@ for header in headerFiles:
       if len (splitStr) == 2 :
         serviceName = splitStr [1].strip ()
         serviceList.append (serviceName)
+      splitStr = line.strip ().split ("//$bool-service ")
+      if len (splitStr) == 2 :
+        serviceName = splitStr [1].strip ()
+        serviceList.append (serviceName)
+        boolServiceSet.add (serviceName)
       splitStr = line.strip ().split ("//$section ")
       if len (splitStr) == 2 :
         sectionName = splitStr [1].strip ()
@@ -472,7 +478,6 @@ if (len (sectionList) > 0) and (sectionScheme == "") :
 #------------------------------ Services
 if serviceScheme == "svc" :
   sFile += generateSVChandler ()
-#   interruptNameSet.remove ("SVC")
   del interruptDictionary ["SVC"]
   sFile += asSeparator ()
   sFile += "@   SERVICES\n"
@@ -486,7 +491,10 @@ if serviceScheme == "svc" :
     sFile += service +":\n"
     sFile += "  .fnstart\n"
     sFile += "  svc #" + str (idx) + "\n"
-    sFile += "  bx  lr\n\n"
+    if service in boolServiceSet :
+      sFile += "  b   get.user.result\n\n"
+    else:
+      sFile += "  bx  lr\n\n"
     sFile += ".Lfunc_end_" + service +":\n"
     sFile += "  .size " + service +", .Lfunc_end_" + service +" - " + service +"\n"
     sFile += "  .cantunwind\n"
@@ -509,7 +517,6 @@ if sectionScheme == "bkpt" :
   cppFile += generateCppForBreakpointSection ()
   sFile += generateBreakpointHandler ()
   del interruptDictionary ["DebugMonitor"]
-#   interruptNameSet.remove ("DebugMonitor")
   sFile += asSeparator ()
   sFile += "@   SECTIONS\n"
   idx = 0
@@ -530,7 +537,6 @@ elif sectionScheme == "swint" :
   cppFile += generateCppForSoftwareInterruptSection ()
   sFile += generateSoftwareInterruptandler ()
   del interruptDictionary ["SWINT"]
- # interruptNameSet.remove ("SWINT")
   sFile += asSeparator ()
   sFile += "@   SECTIONS\n"
   idx = 0

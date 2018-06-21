@@ -121,16 +121,8 @@ static void kernel_set_task_context (INIT_MODE_
 typedef struct TaskControlBlock {
 //--- Context buffer
   TaskContext mTaskContext ; // SHOULD BE THE FIRST FIELD
-//--- This field is used for deadline (not used in this step)
-//  uint32_t mDeadline ;
-//--- Guards (not used in this step)
-//   GuardDescriptor mGuardDescriptor ;
-//   GuardState mGuardState ;
 //--- Task index
   uint8_t mTaskIndex ;
-//--- User result (not used in this step)
-//   bool mUserResult ;
-//---
 } TaskControlBlock ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -165,16 +157,9 @@ static TaskList gReadyTaskList ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-// static void kernel_makeNoTaskRunning (KERNEL_MODE) {
-//   gRunningTaskControlBlockPtr = nullptr ; // No running task
-// }
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
 static void kernel_makeTaskReady (IRQ_MODE_ TaskControlBlock * inTaskPtr) {
   XTR_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
   gReadyTaskList.enterTask (MODE_ inTaskPtr) ;
-//   inTaskPtr->mUserResult = 1 ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
