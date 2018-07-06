@@ -45,3 +45,19 @@ void Semaphore::sys_V (IRQ_MODE) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//
+//   P _ U N T I L     O P E R A T I O N
+//
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void Semaphore::sys_P_until (KERNEL_MODE_ const uint32_t inDeadline) {
+  const bool userResult = mValue > 0 ;
+  kernel_setUserResult (MODE_ userResult) ; // SOULD BE CALLED BEFORE TASK BLOCKING
+  if (userResult) {
+    mValue -= 1 ;
+  }else if (inDeadline > millis ()) {
+    kernel_blockRunningTaskInListAndDeadline (MODE_ mWaitingTaskList, inDeadline) ;
+  }
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

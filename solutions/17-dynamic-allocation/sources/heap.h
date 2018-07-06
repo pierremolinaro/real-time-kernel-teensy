@@ -52,8 +52,8 @@ uint32_t freeObjectCountForListIndex (const uint32_t inFreeListIndex) ;
 //   BLOCK SIZES
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static const size_t kMaxSizePowerOfTwo = 16 ; // Biggest block being allocated = 2 ** kMaxSizePowerOfTwo
-static const size_t kMinSizePowerOfTwo =  4 ; // Smallest block being allocated = 2 ** kMinSizePowerOfTwo (SHOULD BE >= 3)
+static const size_t kMaxSizePowerOfTwo = 10 ; // Biggest block being allocated = 2 ** kMaxSizePowerOfTwo
+static const size_t kMinSizePowerOfTwo =  3 ; // Smallest block being allocated = 2 ** kMinSizePowerOfTwo (SHOULD BE >= 3)
 static const size_t kSegregatedAllocationListCount = kMaxSizePowerOfTwo - kMinSizePowerOfTwo + 1 ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

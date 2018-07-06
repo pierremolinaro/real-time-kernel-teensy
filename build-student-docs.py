@@ -150,6 +150,11 @@ runProcess (["cp", "solutions/12-first-real-time-kernel/sources/xtr.h", DOCUMENT
 runProcess (["cp", "solutions/12-first-real-time-kernel/sources/xtr.cpp", DOCUMENT_DIR + "/12-files"])
 runProcess (["cp", "solutions/12-first-real-time-kernel/sources/user-tasks.cpp", DOCUMENT_DIR + "/12-files"])
 compress (DOCUMENT_DIR, "12-files")
+#--- Step 17
+runProcess (["mkdir", DOCUMENT_DIR + "/17-files"])
+runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.h", DOCUMENT_DIR + "/17-files"])
+runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.cpp", DOCUMENT_DIR + "/17-files"])
+compress (DOCUMENT_DIR, "17-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*

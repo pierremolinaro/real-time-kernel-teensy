@@ -216,7 +216,7 @@ void kernel_createTask (INIT_MODE_
                            inStackBufferSize,
                            inTaskRoutine) ;
 //--- Make task ready
-  kernel_makeTaskReady (MODE_ taskControlBlockPtr, 1) ;
+  kernel_makeTaskReady (MODE_ taskControlBlockPtr, true) ;
 //---
   gTaskIndex += 1 ;
 }
@@ -277,7 +277,7 @@ static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurren
     //--- Remove task from deadline list
       gDeadlineWaitingTaskList.removeTask (MODE_ taskPtr) ;
     //--- Make task ready
-      kernel_makeTaskReady (MODE_ taskPtr, 0) ;
+      kernel_makeTaskReady (MODE_ taskPtr, false) ;
     }
   }
 }
@@ -309,7 +309,7 @@ bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) {
   //--- Remove from deadline list
     gDeadlineWaitingTaskList.removeTask (MODE_ taskPtr) ;
   //--- Make task ready
-    kernel_makeTaskReady (MODE_ taskPtr, 0) ;
+    kernel_makeTaskReady (MODE_ taskPtr, true) ;
   }
   return found ;
 }
@@ -327,7 +327,6 @@ void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaiting
   gDeadlineWaitingTaskList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
 //--- Block task
   kernel_makeNoTaskRunning (MODE) ;
-
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

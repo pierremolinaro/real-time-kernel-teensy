@@ -119,9 +119,10 @@ void * section_memoryAlloc (SECTION_MODE_ const size_t inBlockSize) {
         gAllocationCount ++ ;
       }else{ // Allocate from heap
         result = (HeaderType *) gFirstFreeAddress ;
-        gFirstFreeAddress += (1U << smallestPowerOfTwo) + sizeof (HeaderType) ;
-        if (gFirstFreeAddress >= (size_t) & __heap_end) {
-          gFirstFreeAddress = (size_t) & __heap_end ;
+        const size_t size = (1U << smallestPowerOfTwo) + sizeof (HeaderType) ;
+        gFirstFreeAddress += size ;
+        if (gFirstFreeAddress >= (size_t) & __heap_end) { // Not enough space
+          gFirstFreeAddress -= size ;
           result = nullptr ;
         }else{
           result->mFreeListIndex = freeListIndex ;

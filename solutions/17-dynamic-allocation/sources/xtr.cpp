@@ -125,8 +125,12 @@ typedef struct TaskControlBlock {
   TaskContext mTaskContext ; // SHOULD BE THE FIRST FIELD
 //--- This field is used for deadline
   uint32_t mDeadline ;
+//--- Task blocking list (nullptr if task is not blocked)
+  TaskList * mBlockingList ;
 //--- Task index
   uint8_t mTaskIndex ;
+//--- User result
+  bool mUserResult ;
 } TaskControlBlock ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -167,9 +171,10 @@ static void kernel_makeNoTaskRunning (KERNEL_MODE) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static void kernel_makeTaskReady (IRQ_MODE_ TaskControlBlock * inTaskPtr) {
+static void kernel_makeTaskReady (IRQ_MODE_ TaskControlBlock * inTaskPtr, const bool inUserResult) {
   XTR_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
   gReadyTaskList.enterTask (MODE_ inTaskPtr) ;
+  inTaskPtr->mUserResult = inUserResult ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -211,7 +216,7 @@ void kernel_createTask (INIT_MODE_
                            inStackBufferSize,
                            inTaskRoutine) ;
 //--- Make task ready
-  kernel_makeTaskReady (MODE_ taskControlBlockPtr) ;
+  kernel_makeTaskReady (MODE_ taskControlBlockPtr, true) ;
 //---
   gTaskIndex += 1 ;
 }
@@ -222,6 +227,22 @@ void kernel_createTask (INIT_MODE_
 
 void service_taskSelfTerminates (KERNEL_MODE) {
   kernel_makeNoTaskRunning (MODE) ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  USER RESULT
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void kernel_setUserResult (KERNEL_MODE_ const bool inUserResult) {
+  XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
+  gRunningTaskControlBlockPtr->mUserResult = inUserResult ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool getUserResult (USER_MODE) {
+  XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
+  return gRunningTaskControlBlockPtr->mUserResult ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -245,13 +266,18 @@ void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
 
 static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurrentDate) {
   TaskList::Iterator iterator (MODE_ gDeadlineWaitingTaskList) ;
-  TaskControlBlock * task ;
-  while ((task = iterator.nextTask (MODE))) {
-    if (inCurrentDate >= task->mDeadline) {
+  TaskControlBlock * taskPtr ;
+  while ((taskPtr = iterator.nextTask (MODE))) {
+    if (inCurrentDate >= taskPtr->mDeadline) {
+    //--- Remove task from blocking list
+      if (nullptr != taskPtr->mBlockingList) {
+        taskPtr->mBlockingList->removeTask (MODE_ taskPtr) ;
+        taskPtr->mBlockingList = nullptr ;
+      }
     //--- Remove task from deadline list
-      gDeadlineWaitingTaskList.removeTask (MODE_ task) ;
-   //--- Make task ready
-      kernel_makeTaskReady (MODE_ task) ;
+      gDeadlineWaitingTaskList.removeTask (MODE_ taskPtr) ;
+    //--- Make task ready
+      kernel_makeTaskReady (MODE_ taskPtr, false) ;
     }
   }
 }
@@ -266,8 +292,9 @@ MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
 
 void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
-//--- Insert in tool list
+//--- Insert in task list
   ioWaitingList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
+  gRunningTaskControlBlockPtr->mBlockingList = & ioWaitingList ;
 //--- Block task
   kernel_makeNoTaskRunning (MODE) ;
 }
@@ -278,9 +305,28 @@ bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) {
   TaskControlBlock * taskPtr = ioWaitingList.removeFirstTask (MODE) ;
   const bool found = taskPtr != nullptr ;
   if (found) {
-    kernel_makeTaskReady (MODE_ taskPtr) ;
+    taskPtr->mBlockingList = nullptr ;
+  //--- Remove from deadline list
+    gDeadlineWaitingTaskList.removeTask (MODE_ taskPtr) ;
+  //--- Make task ready
+    kernel_makeTaskReady (MODE_ taskPtr, true) ;
   }
   return found ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  SYNCHRONIZATION AND DEADLINE
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaitingList, const uint32_t inDeadline) {
+  XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
+//--- Insert in task list
+  ioWaitingList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
+//--- Insert in deadline list
+  gRunningTaskControlBlockPtr->mDeadline = inDeadline ;
+  gDeadlineWaitingTaskList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
+//--- Block task
+  kernel_makeNoTaskRunning (MODE) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

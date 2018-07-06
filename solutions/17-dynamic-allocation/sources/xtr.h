@@ -54,3 +54,19 @@ void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) ;
 bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  SYNCHRONIZATION AND DEADLINE
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaitingList, const uint32_t inDeadline) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  USER RESULT
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void kernel_setUserResult (KERNEL_MODE_ const bool inUserResult) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool getUserResult (USER_MODE) asm ("get.user.result") ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
