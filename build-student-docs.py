@@ -155,6 +155,15 @@ runProcess (["mkdir", DOCUMENT_DIR + "/17-files"])
 runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.h", DOCUMENT_DIR + "/17-files"])
 runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.cpp", DOCUMENT_DIR + "/17-files"])
 compress (DOCUMENT_DIR, "17-files")
+#--- Step 18
+runProcess (["mkdir", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/task-list--32-tasks.h", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/task-list--32-tasks.cpp", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/time.h", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/time.cpp", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.h", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.cpp", DOCUMENT_DIR + "/18-files"])
+compress (DOCUMENT_DIR, "18-files")
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
