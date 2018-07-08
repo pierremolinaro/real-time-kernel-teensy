@@ -8,11 +8,9 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-template <uint32_t SIZE, typename TYPE>
-BoundedBuffer <SIZE, TYPE>::BoundedBuffer (void) :
-mInput (SIZE),
+BoundedBuffer::BoundedBuffer (void) :
+mInput (BOUNDED_BUFFER_SIZE),
 mOutput (0),
-mCriticalSection (1),
 mWriteIndex (0),
 mReadIndex (0),
 mCount (0),
@@ -21,28 +19,26 @@ mBuffer () {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-template <uint32_t SIZE, typename TYPE>
-void BoundedBuffer <SIZE, TYPE>::append (USER_MODE_ const TYPE inData) {
+void BoundedBuffer::append (USER_MODE_ const uint32_t inData) {
   mInput.P (MODE) ;
-  mCriticalSection.P (MODE) ;
-    mBuffer [mWriteIndex] = inData ;
-    mWriteIndex = (mWriteIndex + 1) % SIZE ;
-    mCount += 1 ;
-  mCriticalSection.V (MODE) ;
+  internalAppend (MODE_ inData) ;
   mOutput.V (MODE) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-template <uint32_t SIZE, typename TYPE>
-bool BoundedBuffer <SIZE, TYPE>::guarded_append (USER_MODE_ const TYPE inData) {
+void BoundedBuffer::section_internalAppend (SECTION_MODE_ const uint32_t inData) {
+  mBuffer [mWriteIndex] = inData ;
+  mWriteIndex = (mWriteIndex + 1) % BOUNDED_BUFFER_SIZE ;
+  mCount += 1 ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool BoundedBuffer::guarded_append (USER_MODE_ const uint32_t inData) {
   const bool result = mInput.guarded_P (MODE) ;
   if (result) {
-    mCriticalSection.P (MODE) ;
-      mBuffer [mWriteIndex] = inData ;
-      mWriteIndex = (mWriteIndex + 1) % SIZE ;
-      mCount += 1 ;
-    mCriticalSection.V (MODE) ;
+    internalAppend (MODE_ inData) ;
     mOutput.V (MODE) ;
   }
   return result ;
@@ -50,32 +46,47 @@ bool BoundedBuffer <SIZE, TYPE>::guarded_append (USER_MODE_ const TYPE inData) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-template <uint32_t SIZE, typename TYPE>
-TYPE BoundedBuffer <SIZE, TYPE>::remove (USER_MODE) {
+uint32_t BoundedBuffer::remove (USER_MODE) {
   mOutput.P (MODE) ;
-  mCriticalSection.P (MODE) ;
-    const TYPE data = mBuffer [mReadIndex] ;
-    mReadIndex = (mReadIndex + 1) % SIZE ;
-    mCount -= 1 ;
-  mCriticalSection.V (MODE) ;
+  uint32_t data = 0 ;
+  internalRemove (MODE_ data) ;
   mInput.V (MODE) ;
   return data ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-template <uint32_t SIZE, typename TYPE>
-bool BoundedBuffer <SIZE, TYPE>::guarded_remove (USER_MODE_ TYPE & outData) {
-  const bool result = mOutput.P (MODE) ;
+void BoundedBuffer::section_internalRemove (SECTION_MODE_ uint32_t & outData) {
+  outData = mBuffer [mReadIndex] ;
+  mReadIndex = (mReadIndex + 1) % BOUNDED_BUFFER_SIZE ;
+  mCount -= 1 ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool BoundedBuffer::guarded_remove (USER_MODE_ uint32_t & outData) {
+  const bool result = mOutput.guarded_P (MODE) ;
   if (result) {
-    mCriticalSection.P (MODE) ;
-      outData = mBuffer [mReadIndex] ;
-      mReadIndex = (mReadIndex + 1) % SIZE ;
-      mCount -= 1 ;
-    mCriticalSection.V (MODE) ;
+    internalRemove (MODE_ outData) ;
     mInput.V (MODE) ;
   }
   return result ;
 }
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool BoundedBuffer::irq_append (IRQ_MODE_ const uint32_t inData) {
+  const bool ok = mCount < BOUNDED_BUFFER_SIZE ;
+  if (ok) {
+    mBuffer [mWriteIndex] = inData ;
+    mWriteIndex = (mWriteIndex + 1) % BOUNDED_BUFFER_SIZE ;
+    mCount += 1 ;
+    mOutput.sys_V (MODE) ;
+  }
+  return ok ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
