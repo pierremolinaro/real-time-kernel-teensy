@@ -82,7 +82,7 @@ def downloadReportHook (a,b,fileSize):
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def downloadArchive (archiveURL, archivePath):
-  print "URL: "+ archiveURL
+  print ("URL: "+ archiveURL)
   print "Downloading..."
   urllib.urlretrieve (archiveURL,  archivePath, downloadReportHook)
   print ""

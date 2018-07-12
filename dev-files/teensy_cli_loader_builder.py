@@ -40,7 +40,7 @@ def runCommand (cmd) :
   str = "+"
   for s in cmd:
     str += " " + s
-  print bcolors.BOLD_BLUE + str + bcolors.ENDC
+  print (bcolors.BOLD_BLUE + str + bcolors.ENDC)
   returncode = subprocess.call (cmd)
   if returncode != 0 :
     sys.exit (returncode)
@@ -50,7 +50,7 @@ def runCommand (cmd) :
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
 
 def installTeensyCLILoader (INSTALL_PATH) :
-  print bcolors.BOLD_GREEN + "Install Teensy CLI Loader..." + bcolors.ENDC
+  print (bcolors.BOLD_GREEN + "Install Teensy CLI Loader..." + bcolors.ENDC)
   CURRENT_DIR = os.path.abspath (os.path.dirname (__file__))
   PLATFORM = dev_platform.getPlatform ()
   #------------------------------------------------------------------ Compile command

@@ -8,7 +8,7 @@ import sys, os
 separator = "//" + ("—" * 118) + "\n"
 #------------------------------ Destination file
 destinationFile = sys.argv [1]
-# print "Dest " + destinationFile
+# print ("Dest " + destinationFile)
 #------------------------------ Header files
 s = separator + "\n"
 for i in range (2, len (sys.argv)):
