@@ -27,6 +27,6 @@ AS_DIR = scriptDir + "/" + common_definitions.asDirectory ()
 if os.path.exists (AS_DIR):
   shutil.rmtree (AS_DIR)
 #---
-print "Cleaning " + os.path.basename (scriptDir) + " done"
+print ("Cleaning " + os.path.basename (scriptDir) + " done")
 
 #----------------------------------------------------------------------------------------------------------------------*

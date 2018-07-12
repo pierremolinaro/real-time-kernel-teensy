@@ -4,6 +4,8 @@
 // Led L2 is connected to PORTD:7 (active high)
 
 void setup (USER_MODE) {
+//--- Configure Systick
+  startSystick (MODE) ;
 //--- Configure PTD7 as digital port (input or output)
   PORTD_PCR (7) = PORT_PCR_MUX (1) ;
 //--- Configure PTD7 as digital output port (output level is low --> led is off)

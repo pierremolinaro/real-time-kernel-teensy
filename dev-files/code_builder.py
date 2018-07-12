@@ -170,7 +170,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   baseHeader_file = GENERATED_SOURCE_DIR + "/base.h"
   H_SOURCE_LIST.insert (0, baseHeader_file)
   rule = makefile.Rule ([baseHeader_file], "Build base header file")
-  rule.mOpenSourceOnError = True
+  rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
   rule.mCommand += ["../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
   rule.mPriority = -1
@@ -179,7 +179,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   allHeadersSecondaryDependenceFile = BUILD_DIR + "/all-headers.dep"
   allHeaders_file = GENERATED_SOURCE_DIR + "/all-headers.h"
   rule = makefile.Rule ([allHeaders_file, allHeadersSecondaryDependenceFile], "Build all headers file")
-  rule.mOpenSourceOnError = True
+  rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
   rule.mDependences += H_SOURCE_LIST
   rule.mCommand += ["../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
@@ -193,7 +193,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   S_SOURCE_LIST.append (interruptHandlerSFile)
   CPP_SOURCE_LIST.append (interruptHandlerCppFile)
   rule = makefile.Rule ([interruptHandlerSFile, interruptHandlerCppFile], "Build interrupt files")
-  rule.mOpenSourceOnError = True
+  rule.mOpenSourceOnError = False
   rule.mDependences += H_SOURCE_LIST
   rule.mDependences.append ("makefile.json")
   rule.mDependences.append ("../../dev-files/build_interrupt_handlers.py")
@@ -209,7 +209,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   if GROUP_SOURCES :
     allSourceFile = GENERATED_SOURCE_DIR + "/all-sources.cpp"
     rule = makefile.Rule ([allSourceFile], "Group all sources")
-    rule.mOpenSourceOnError = True
+    rule.mOpenSourceOnError = False
     rule.mDependences += CPP_SOURCE_LIST
     rule.mDependences.append ("makefile.json")
     rule.mCommand += ["../../dev-files/build_grouped_sources.py", allSourceFile]
@@ -228,7 +228,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     asObjectFile = BUILD_DIR + "/" + source + ".s"
   #--- Checking source
     rule = makefile.Rule ([objectFileForChecking], "Checking " + source)
-    rule.mOpenSourceOnError = True
+    rule.mOpenSourceOnError = False
     rule.mDependences.append (allHeaders_file)
     rule.mDependences.append (sourcePath)
     rule.mDependences.append ("makefile.json")
@@ -247,7 +247,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     allGoal.append (objectFileForChecking)
  #--- Compile source
     rule = makefile.Rule ([objectFile], "Compiling " + source)
-    rule.mOpenSourceOnError = True
+    rule.mOpenSourceOnError = False
     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
     rule.mCommand += common_definitions.Cpp_actualOptions (usesLTO)
@@ -274,7 +274,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     allGoal.append (objdumpPythonFile)
   #--- AS rule
     rule = makefile.Rule ([asObjectFile], "Compiling -> s " + source)
-    rule.mOpenSourceOnError = True
+    rule.mOpenSourceOnError = False
     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
     rule.mCommand += common_definitions.Cpp_actualOptions (usesLTO)
@@ -291,7 +291,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   #--- AS rule, getting output assembler file
     listingFile = ASBUILD_DIR + "/" + source + ".s.list"
     rule = makefile.Rule ([listingFile], "Assembling -> listing " + source)
-    rule.mOpenSourceOnError = True
+    rule.mOpenSourceOnError = False
     rule.mCommand += AS_TOOL_WITH_OPTIONS
     rule.mCommand += [asObjectFile]
     rule.mCommand += ["-o", "/dev/null"]
@@ -309,7 +309,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     asObjectFile = ASBUILD_DIR + "/" + source + ".s"
     if sourcePath != "" :
       rule = makefile.Rule ([objectFile], "Assembling " + source)
-      rule.mOpenSourceOnError = True
+      rule.mOpenSourceOnError = False
       rule.mCommand += AS_TOOL_WITH_OPTIONS
       rule.mCommand += [sourcePath]
       rule.mCommand += ["-o", objectFile]
@@ -323,7 +323,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     #--- Add listing file
       listingFile = ASBUILD_DIR + "/" + source + ".list"
       rule = makefile.Rule ([listingFile], "Assembling -> listing " + source)
-      rule.mOpenSourceOnError = True
+      rule.mOpenSourceOnError = False
       rule.mCommand += AS_TOOL_WITH_OPTIONS
       rule.mCommand += [sourcePath]
       rule.mCommand += ["-o", "/dev/null"]
