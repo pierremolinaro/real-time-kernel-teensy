@@ -120,6 +120,9 @@ static void handleFault (FAULT_MODE_ const char * inTitle,  const uint32_t inLin
           gotoLineColumn_faultMode (MODE_ 2, 0) ;
           printString_faultMode (MODE_ "BFAR: 0x") ;
           printHex8_faultMode (MODE_ BFAR) ;
+          gotoLineColumn_faultMode (MODE_ 3, 0) ;
+          printString_faultMode (MODE_ "CCR: 0x") ;
+          printHex8_faultMode (MODE_ SCB_CCR) ;
           break ;
         case 2 :
           printString_faultMode (MODE_ "AFSR: 0x") ;

@@ -8,12 +8,22 @@ static void startSystick (BOOT_MODE) {
 //------------------------------------ Configure Systick
   SYST_RVR = CPU_MHZ * 1000 - 1 ; // Underflow every ms
   SYST_CVR = 0 ;
-  SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE | SYST_CSR_TICKINT ;
+  SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 MACRO_BOOT_ROUTINE (startSystick) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static void activateSystickInterrupt (INIT_MODE) {
+  SYST_CSR |= SYST_CSR_TICKINT ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+MACRO_INIT_ROUTINE (activateSystickInterrupt) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   systick — ANY MODE
