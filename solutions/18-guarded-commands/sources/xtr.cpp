@@ -334,7 +334,6 @@ void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
 //--- Insert in task list
   ioWaitingList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
-  gRunningTaskControlBlockPtr->mBlockingList = & ioWaitingList ;
 //--- Block task
   kernel_makeNoTaskRunning (MODE) ;
 }
@@ -362,6 +361,7 @@ void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaiting
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
 //--- Insert in task list
   ioWaitingList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
+  gRunningTaskControlBlockPtr->mBlockingList = & ioWaitingList ;
 //--- Insert in deadline list
   gRunningTaskControlBlockPtr->mDeadline = inDeadline ;
   gDeadlineWaitingTaskList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
