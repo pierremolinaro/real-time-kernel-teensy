@@ -22,12 +22,31 @@ class TaskList {
 //--- Remove first task (returns nullptr if list is empty)
   public: TaskControlBlock * removeFirstTask (IRQ_MODE) ;
 
+//--- Remove a task from list
+  public: void removeTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) ;
+
 //--- Private property
   private: uint32_t mList ;
 
 //--- No copy
   private: TaskList (const TaskList &) ;
   private: TaskList & operator = (const TaskList &) ;
+
+//-------------------------------------------- Iterator
+  public: class Iterator {
+    public: inline Iterator (IRQ_MODE_ const TaskList & inTaskList) :
+    mIteratedList (inTaskList.mList) {
+    }
+
+    public: TaskControlBlock * nextTask (IRQ_MODE) ;
+
+  //--- Private property
+    private: uint32_t mIteratedList ;
+
+  //--- No copy
+    private: Iterator (const Iterator &) ;
+    private: Iterator & operator = (const Iterator &) ;
+  } ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

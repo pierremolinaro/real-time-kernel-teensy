@@ -28,7 +28,7 @@ void waitDuring (USER_MODE_ const uint32_t inDelayMS) ;
 
 void waitUntil (USER_MODE_ const uint32_t inDeadlineMS) asm ("wait.until") ;
 
-void kernel_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) asm ("service.wait.until") ;
+void service_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) asm ("service.wait.until") ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   ANY MODE

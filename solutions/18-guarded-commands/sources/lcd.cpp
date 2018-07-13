@@ -179,34 +179,42 @@ MACRO_INIT_ROUTINE (setupLCD) ;
 //   UTILITY ROUTINES — USER MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+static Semaphore mutex (1) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
 static void write8bitCommand (USER_MODE_ const uint8_t inCommand) {
-  waitDuring (MODE_ 1) ;
-  driveLowRS () ;
-  programLcd4BitDataBusOutput ((uint8_t) (inCommand >> 4)) ;
-  driveHighE () ;
-  waitDuring (MODE_ 1) ;
-  driveLowE () ;
-  waitDuring (MODE_ 1) ;
-  programLcd4BitDataBusOutput (inCommand) ;
-  driveHighE () ;
-  waitDuring (MODE_ 1) ;
-  driveLowE () ;
+  mutex.P (MODE) ;
+    waitDuring (MODE_ 1) ;
+    driveLowRS () ;
+    programLcd4BitDataBusOutput ((uint8_t) (inCommand >> 4)) ;
+    driveHighE () ;
+    waitDuring (MODE_ 1) ;
+    driveLowE () ;
+    waitDuring (MODE_ 1) ;
+    programLcd4BitDataBusOutput (inCommand) ;
+    driveHighE () ;
+    waitDuring (MODE_ 1) ;
+    driveLowE () ;
+  mutex.V (MODE) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static void writeData (USER_MODE_ const uint8_t inData) {
-  waitDuring (MODE_ 1) ;
-  driveHighRS () ;
-  programLcd4BitDataBusOutput (inData >> 4) ;
-  driveHighE () ;
-  waitDuring (MODE_ 1) ;
-  driveLowE () ;
-  waitDuring (MODE_ 1) ;
-  programLcd4BitDataBusOutput (inData) ;
-  driveHighE () ;
-  waitDuring (MODE_ 1) ;
-  driveLowE () ;
+  mutex.P (MODE) ;
+    waitDuring (MODE_ 1) ;
+    driveHighRS () ;
+    programLcd4BitDataBusOutput (inData >> 4) ;
+    driveHighE () ;
+    waitDuring (MODE_ 1) ;
+    driveLowE () ;
+    waitDuring (MODE_ 1) ;
+    programLcd4BitDataBusOutput (inData) ;
+    driveHighE () ;
+    waitDuring (MODE_ 1) ;
+    driveLowE () ;
+  mutex.V (MODE) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

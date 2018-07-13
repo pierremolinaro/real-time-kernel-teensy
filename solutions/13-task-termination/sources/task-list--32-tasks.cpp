@@ -49,3 +49,31 @@ TaskControlBlock * TaskList::removeFirstTask (IRQ_MODE) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  REMOVE A TASK FROM LIST
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void TaskList::removeTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) {
+  TASK_LIST_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
+  const uint32_t taskIndex = indexForDescriptorTask (inTaskPtr) ;
+  TASK_LIST_ASSERT (taskIndex < TASK_COUNT, taskIndex) ;
+  const uint32_t mask = 1U << taskIndex ;
+  mList &= ~ mask ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  REMOVE FIRST TASK FROM LIST: returns nullptr if list is empty                                                      *
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+TaskControlBlock * TaskList::Iterator::nextTask (IRQ_MODE) {
+  TaskControlBlock * taskPtr = nullptr ;
+  if (mIteratedList != 0) {
+    const uint32_t taskIndex = (uint32_t) __builtin_ctz (mIteratedList) ;
+    TASK_LIST_ASSERT (taskIndex < TASK_COUNT, taskIndex) ;
+    const uint32_t mask = 1U << taskIndex ;
+    mIteratedList &= ~ mask ;
+    taskPtr = descriptorPointerForTaskIndex (taskIndex) ;
+  }
+  return taskPtr ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

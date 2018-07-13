@@ -135,7 +135,7 @@ void waitDuring (USER_MODE_ const uint32_t inDelayMS) {
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void kernel_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) {
+void service_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) {
   if (inDeadlineMS > gUptime) {
     kernel_blockOnDeadline (MODE_ inDeadlineMS) ;
   }
