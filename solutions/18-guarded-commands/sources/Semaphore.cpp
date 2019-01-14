@@ -57,7 +57,7 @@ void Semaphore::sys_P_until (KERNEL_MODE_ const uint32_t inDeadline) {
   kernel_setUserResult (MODE_ userResult) ; // SOULD BE CALLED BEFORE TASK BLOCKING
   if (userResult) {
     mValue -= 1 ;
-  }else if (inDeadline > millis ()) {
+  }else if (inDeadline > millis (MODE)) {
     kernel_blockRunningTaskInListAndDeadline (MODE_ mWaitingTaskList, inDeadline) ;
   }
 }

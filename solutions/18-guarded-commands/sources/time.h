@@ -34,9 +34,9 @@ void service_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) asm ("service.
 //   ANY MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-uint32_t systick (void) ;
+uint32_t systick (ANY_MODE) ;
 
-uint32_t millis (void) ;
+uint32_t millis (ANY_MODE) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   micros current value

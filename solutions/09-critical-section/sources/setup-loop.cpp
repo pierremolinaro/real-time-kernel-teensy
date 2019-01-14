@@ -36,7 +36,7 @@ void loop (USER_MODE) {
     gCount2 += 1 ;
     gCount3 += 1 ;
     gCount4 += 1 ;
-    if (5000 <= millis ()) {
+    if (5000 <= millis (MODE)) {
       gPerformCount = false ;
       gotoLineColumn (MODE_ 0, 0) ;
       printUnsigned (MODE_ gCount1) ;

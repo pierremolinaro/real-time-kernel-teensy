@@ -177,3 +177,31 @@
 #endif
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   A N Y    M O D E
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+#ifdef CHECK_SOFTWARE_MODES
+  class ANY_mode_class {
+    private: ANY_mode_class (void) ;
+    private: ANY_mode_class & operator = (const ANY_mode_class &) ;
+
+    public: ANY_mode_class (const ANY_mode_class &) ;
+    public: ANY_mode_class (const SECTION_mode_class &) ;
+    public: ANY_mode_class (const IRQ_mode_class &) ;
+    public: ANY_mode_class (const KERNEL_mode_class &) ;
+    public: ANY_mode_class (const INIT_mode_class &) ;
+    public: ANY_mode_class (const USER_mode_class &) ;
+  } ;
+#endif
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+#ifdef CHECK_SOFTWARE_MODES
+  #define ANY_MODE  const ANY_mode_class MODE
+  #define ANY_MODE_ const ANY_mode_class MODE,
+#else
+  #define ANY_MODE  void
+  #define ANY_MODE_
+#endif
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

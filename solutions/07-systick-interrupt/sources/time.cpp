@@ -29,7 +29,7 @@ MACRO_INIT_ROUTINE (activateSystickInterrupt) ;
 //   systick — ANY MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-uint32_t systick (void) {
+uint32_t systick (ANY_MODE) {
   return SYST_CVR ;
 }
 
@@ -60,7 +60,7 @@ void systickInterruptServiceRoutine (SECTION_MODE) {
 //   millis — ANY MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-uint32_t millis (void) {
+uint32_t millis (ANY_MODE) {
   return gUptime ;
 }
 

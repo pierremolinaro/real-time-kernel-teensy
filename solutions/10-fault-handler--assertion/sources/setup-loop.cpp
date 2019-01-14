@@ -22,7 +22,7 @@ void loop (USER_MODE) {
   gotoLineColumn (MODE_ 0, 7) ;
   printUnsigned (MODE_ gDownCounter) ;
   printSpaces (MODE_ 1) ;
-  printUnsigned (MODE_ millis () / gDownCounter) ; // DIVISION PAR ZÉRO
+  printUnsigned (MODE_ millis (MODE) / gDownCounter) ; // DIVISION PAR ZÉRO
   gDownCounter -- ;
   gotoLineColumn (MODE_ 1, 0) ;
   printUnsigned (MODE_ gClicCount) ;

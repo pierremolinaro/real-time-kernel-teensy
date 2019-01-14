@@ -531,7 +531,7 @@ MACRO_REAL_TIME_ISR (tickHandlerForGuardedWaitUntil) ;
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 bool kernel_guard_waitUntil (SECTION_MODE_ const uint32_t inDeadlineMS) {
-  const bool accepted = inDeadlineMS <= millis () ;
+  const bool accepted = inDeadlineMS <= millis (MODE) ;
   guard_handleWaitUntil (MODE_ inDeadlineMS, accepted) ;
   return accepted ;
 }

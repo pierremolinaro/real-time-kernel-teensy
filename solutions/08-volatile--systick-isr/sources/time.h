@@ -22,9 +22,9 @@ void busyWaitUntil (USER_MODE_ const uint32_t inDeadlineMS) ;
 //   ANY MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-uint32_t systick (void) ;
+uint32_t systick (ANY_MODE) ;
 
-uint32_t millis (void) ;
+uint32_t millis (ANY_MODE) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   INTERRUPT ROUTINE
