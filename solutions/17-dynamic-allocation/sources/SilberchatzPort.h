@@ -31,8 +31,8 @@ class SilberchatzPort {
   public: void sys_output (KERNEL_MODE) asm ("service.silberschatz.port.output") ;
 
 //--- No copy
-  private: SilberchatzPort (const SilberchatzPort &) ;
-  private: SilberchatzPort & operator = (const SilberchatzPort &) ;
+  private: SilberchatzPort (const SilberchatzPort &) = delete ;
+  private: SilberchatzPort & operator = (const SilberchatzPort &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

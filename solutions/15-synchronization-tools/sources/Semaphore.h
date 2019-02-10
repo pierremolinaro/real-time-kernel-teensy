@@ -31,8 +31,8 @@ class Semaphore {
   public: void sys_P (KERNEL_MODE) asm ("service.semaphore.P") ;
 
 //--- No copy
-  private: Semaphore (const Semaphore &) ;
-  private: Semaphore & operator = (const Semaphore &) ;
+  private: Semaphore (const Semaphore &) = delete ;
+  private: Semaphore & operator = (const Semaphore &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

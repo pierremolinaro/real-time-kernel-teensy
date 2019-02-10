@@ -33,6 +33,7 @@ void loop (USER_MODE) {
 void clicInterrupt (SECTION_MODE) {
 //--- Acquitter l'interruption
   PORTD_PCR (0) |= PORT_PCR_ISF ;
+  PORTD_PCR (0) ;
 //---
   gClicCount += 1 ;
 }

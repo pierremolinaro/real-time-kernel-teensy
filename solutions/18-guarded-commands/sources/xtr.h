@@ -95,8 +95,8 @@ class GuardList {
   private: uint32_t mGuardList ;
 
 //--- No copy
-  private: GuardList (const GuardList &) ;
-  private: GuardList & operator = (const GuardList &) ;
+  private: GuardList (const GuardList &) = delete ;
+  private: GuardList & operator = (const GuardList &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

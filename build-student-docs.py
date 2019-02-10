@@ -54,7 +54,7 @@ def compress (DIRECTORY, ARCHIVE) :
 #--- Set current dir
   os.chdir (DIRECTORY)
 #--- Compress
-  runProcess (["tar", "-c", "--exclude", ".*", "-jvf", ARCHIVE + ".tar", ARCHIVE])
+  runProcess (["tar", "--exclude", "./.*", "-c", "-jvf", ARCHIVE + ".tar", ARCHIVE])
   runProcess (["bzip2", "--compress", ARCHIVE + ".tar"])
   runProcess (["rm", "-fR", ARCHIVE])
 #--- Restore dir

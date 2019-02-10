@@ -46,8 +46,8 @@ class BoundedBuffer {
   private: void section_internalRemove (SECTION_MODE_ uint32_t & outData) asm ("section.bounded.buffer.remove") ;
 
 //--- No copy
-  private: BoundedBuffer (const BoundedBuffer &) ;
-  private: BoundedBuffer & operator = (const BoundedBuffer &) ;
+  private: BoundedBuffer (const BoundedBuffer &) = delete ;
+  private: BoundedBuffer & operator = (const BoundedBuffer &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

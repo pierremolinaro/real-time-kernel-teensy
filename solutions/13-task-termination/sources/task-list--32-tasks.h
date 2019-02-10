@@ -29,8 +29,8 @@ class TaskList {
   private: uint32_t mList ;
 
 //--- No copy
-  private: TaskList (const TaskList &) ;
-  private: TaskList & operator = (const TaskList &) ;
+  private: TaskList (const TaskList &) = delete ;
+  private: TaskList & operator = (const TaskList &) = delete ;
 
 //-------------------------------------------- Iterator
   public: class Iterator {
@@ -44,8 +44,8 @@ class TaskList {
     private: uint32_t mIteratedList ;
 
   //--- No copy
-    private: Iterator (const Iterator &) ;
-    private: Iterator & operator = (const Iterator &) ;
+    private: Iterator (const Iterator &) = delete ;
+    private: Iterator & operator = (const Iterator &) = delete ;
   } ;
 } ;
 

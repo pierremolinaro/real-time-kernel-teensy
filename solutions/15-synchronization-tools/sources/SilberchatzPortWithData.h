@@ -30,8 +30,8 @@ class SilberchatzPortWithData {
   public: void output (USER_MODE_ const uint32_t inData) ;
 
 //--- No copy
-  private: SilberchatzPortWithData (const SilberchatzPortWithData &) ;
-  private: SilberchatzPortWithData & operator = (const SilberchatzPortWithData &) ;
+  private: SilberchatzPortWithData (const SilberchatzPortWithData &) = delete ;
+  private: SilberchatzPortWithData & operator = (const SilberchatzPortWithData &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

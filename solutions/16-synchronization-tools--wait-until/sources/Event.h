@@ -30,8 +30,8 @@ class Event {
   public: void sys_signal (IRQ_MODE) asm ("service.event.signal") ;
 
 //--- No copy
-  private: Event (const Event &) ;
-  private: Event & operator = (const Event &) ;
+  private: Event (const Event &) = delete ;
+  private: Event & operator = (const Event &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

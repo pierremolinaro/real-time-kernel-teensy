@@ -33,7 +33,7 @@ class Semaphore {
   public: void sys_P (KERNEL_MODE) asm ("service.semaphore.P") ;
 
 //--- P_until
-//$bool-service semaphore.P_until
+//Bool-service semaphore.P_until
   public: bool P_until (USER_MODE_ const uint32_t inDeadline) asm ("semaphore.P_until") ;
   public: void sys_P_until (KERNEL_MODE_ const uint32_t inDeadline) asm ("service.semaphore.P_until") ;
 
@@ -43,8 +43,8 @@ class Semaphore {
   private : bool sys_guarded_P (SECTION_MODE) asm ("section.semaphore.guardedP") ;
 
 //--- No copy
-  private: Semaphore (const Semaphore &) ;
-  private: Semaphore & operator = (const Semaphore &) ;
+  private: Semaphore (const Semaphore &) = delete ;
+  private: Semaphore & operator = (const Semaphore &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

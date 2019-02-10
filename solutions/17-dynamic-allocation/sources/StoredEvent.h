@@ -31,8 +31,8 @@ class StoredEvent {
   public: void sys_signal (IRQ_MODE) asm ("service.stored.event.signal") ;
 
 //--- No copy
-  private: StoredEvent (const StoredEvent &) ;
-  private: StoredEvent & operator = (const StoredEvent &) ;
+  private: StoredEvent (const StoredEvent &) = delete ;
+  private: StoredEvent & operator = (const StoredEvent &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

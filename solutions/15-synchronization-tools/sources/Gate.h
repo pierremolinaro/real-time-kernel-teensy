@@ -36,8 +36,8 @@ class Gate {
   public: void sys_close (IRQ_MODE) asm ("service.gate.close") ;
 
 //--- No copy
-  private: Gate (const Gate &) ;
-  private: Gate & operator = (const Gate &) ;
+  private: Gate (const Gate &) = delete ;
+  private: Gate & operator = (const Gate &) = delete ;
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
