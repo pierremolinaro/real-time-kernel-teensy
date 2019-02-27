@@ -31,11 +31,10 @@ void loop (USER_MODE) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void clicInterrupt (SECTION_MODE) {
+  gClicCount += 1 ;
 //--- Acquitter l'interruption
   PORTD_PCR (0) |= PORT_PCR_ISF ;
-  PORTD_PCR (0) ;
-//---
-  gClicCount += 1 ;
+  const uint32_t x __attribute__((unused)) = PORTD_PCR (0) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
