@@ -176,11 +176,11 @@ runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.cpp", DOCUMENT_DIR
 compress (DOCUMENT_DIR, "18-files")
 #--- Step 19
 runProcess (["mkdir", DOCUMENT_DIR + "/19-files"])
-runProcess (["cp", "solutions/19-can-network--active-wait/sources/can/can-driver.cpp", DOCUMENT_DIR + "/19-files"])
-runProcess (["cp", "solutions/19-can-network--active-wait/sources/can/can-driver.h", DOCUMENT_DIR + "/19-files"])
-runProcess (["cp", "solutions/19-can-network--active-wait/sources/can/can-settings.cpp", DOCUMENT_DIR + "/19-files"])
-runProcess (["cp", "solutions/19-can-network--active-wait/sources/can/can-settings.h", DOCUMENT_DIR + "/19-files"])
-runProcess (["cp", "solutions/19-can-network--active-wait/sources/can/CANMessage.h", DOCUMENT_DIR + "/19-files"])
+runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/can-driver.cpp", DOCUMENT_DIR + "/19-files"])
+runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/can-driver.h", DOCUMENT_DIR + "/19-files"])
+runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/can-settings.cpp", DOCUMENT_DIR + "/19-files"])
+runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/can-settings.h", DOCUMENT_DIR + "/19-files"])
+runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/CANMessage.h", DOCUMENT_DIR + "/19-files"])
 compress (DOCUMENT_DIR, "19-files")
 
 
