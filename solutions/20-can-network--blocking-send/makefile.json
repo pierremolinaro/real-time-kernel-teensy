@@ -1,0 +1,12 @@
+{ "SOURCE-DIR" : ["sources"],
+
+  "TEENSY" : "3.6",
+
+  "CPU-MHZ" : 180,
+
+  "TASK-COUNT" : 4,
+
+  "SERVICE-SCHEME" : "svc",
+
+  "SECTION-SCHEME" : "disableInterrupt"
+}
