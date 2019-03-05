@@ -64,6 +64,7 @@ static void tacheTest1 (USER_MODE) {
         sentCount0 += 1 ;
       }
       message.mIdentifier = 0x01 ; // Standard frame, identifier equal to 1, no data
+      message.mFormat = kExtended ;
       if (ACAN::can1.tryToSend (MODE_ message)) {
         sentCount1 += 1 ;
       }

@@ -11,45 +11,7 @@
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static const uint32_t TRANSMIT_BUFFER_SIZE = 16 ;
-
-typedef void (*ACANCallBackRoutine) (const CANMessage & inMessage) ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-class ACANPrimaryFilter {
-  public: uint32_t mFilterMask ;
-  public: uint32_t mAcceptanceFilter ;
-  public: ACANCallBackRoutine mCallBackRoutine ;
-
-  public: inline ACANPrimaryFilter (const ACANCallBackRoutine inCallBackRoutine) :  // Accept any frame
-  mFilterMask (0),
-  mAcceptanceFilter (0),
-  mCallBackRoutine (inCallBackRoutine) {
-  }
-
-  public: ACANPrimaryFilter (const tFrameFormat inFormat, // Accept any identifier
-                             const ACANCallBackRoutine inCallBackRoutine = NULL) ;
-
-  public: ACANPrimaryFilter (const tFrameFormat inFormat,
-                             const uint32_t inIdentifier,
-                             const ACANCallBackRoutine inCallBackRoutine = NULL) ;
-
-  public: ACANPrimaryFilter (const tFrameFormat inFormat,
-                             const uint32_t inMask,
-                             const uint32_t inAcceptance,
-                             const ACANCallBackRoutine inCallBackRoutine = NULL) ;
-} ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-class ACANSecondaryFilter {
-  public: uint32_t mSingleAcceptanceFilter ;
-  public: ACANCallBackRoutine mCallBackRoutine ;
-
-  public: ACANSecondaryFilter (const tFrameFormat inFormat,
-                               const uint32_t inIdentifier,
-                               const ACANCallBackRoutine inCallBackRoutine = NULL) ;
-} ;
+static const uint32_t RECEIVE_BUFFER_SIZE  = 32 ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -67,11 +29,7 @@ class ACAN {
   public: static const uint32_t kCANBitConfiguration       = 1 << 18 ;
 
   public: uint32_t begin (INIT_MODE_
-                          const ACANSettings & inSettings,
-                          const ACANPrimaryFilter inPrimaryFilters [] = NULL ,
-                          const uint32_t inPrimaryFilterCount = 0,
-                          const ACANSecondaryFilter inSecondaryFilters [] = NULL,
-                          const uint32_t inSecondaryFilterCount = 0) ;
+                          const ACANSettings & inSettings) ;
 
 //-------------------------------------- Base address
   private: const uint32_t mFlexcanBaseAddress ; // Initialized in constructor
@@ -91,26 +49,17 @@ class ACAN {
   private: void writeTxRegisters (SECTION_MODE_ const CANMessage & inMessage, const uint32_t inMBIndex) ;
 
 //-------------------------------------- Receiving messages
-  public: bool receive (USER_MODE_ CANMessage & outMessage) ;
-
-//--- Call back function array
-  private: ACANCallBackRoutine * mCallBackFunctionArray = NULL ;
-  private: uint32_t mCallBackFunctionArraySize = 0 ;
-
+//$section can.receive
+  public: bool receive (USER_MODE_ CANMessage & outMessage) asm ("can.receive") ;
+  public: bool section_receive (SECTION_MODE_ CANMessage & outMessage) asm ("section.can.receive") ;
 
 //--- Driver receive buffer
-  private: CANMessage * volatile mReceiveBuffer = NULL ;
-  private: uint32_t mReceiveBufferSize = 0 ;
-  private: uint32_t mReceiveBufferReadIndex = 0 ; // Only used in user mode --> no volatile
-  private: volatile uint32_t mReceiveBufferCount = 0 ; // Used in isr and user mode --> volatile
-  private: volatile uint32_t mReceiveBufferPeakCount = 0 ; // == mReceiveBufferSize + 1 if overflow did occur
-  private : uint8_t mFlexcanRxFIFOFlags = 0 ;
-  private : void readRxRegisters (IRQ_MODE_ const uint32_t inFlexcanBaseAddress, CANMessage & outMessage) ;
-
-//--- Primary filters
-  private : uint8_t mActualPrimaryFilterCount = 0 ;
-  private : uint8_t mMaxPrimaryFilterCount = 0 ;
-
+  private: CANMessage mReceiveBuffer [RECEIVE_BUFFER_SIZE] ;
+  private: uint32_t mReceiveBufferReadIndex ;
+  private: uint32_t mReceiveBufferCount ;
+  private: uint32_t mReceiveBufferPeakCount ; // == mReceiveBufferSize + 1 if overflow did occur
+  private: uint8_t mFlexcanRxFIFOFlags ;
+  private: void readRxRegisters (IRQ_MODE_ CANMessage & outMessage) ;
 
 //-------------------------------------- Message interrupt service routine
   private: void message_isr (IRQ_MODE) ;

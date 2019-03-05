@@ -13,7 +13,6 @@ typedef enum {kStandard, kExtended} tFrameFormat ;
 class CANMessage {
   public: uint32_t mIdentifier = 0 ;  // Frame identifier
   public: tFrameFormat mFormat = kStandard ; // kStandard -> standard frame, kExtended -> extended frame
-  public: uint8_t idx = 0 ;  // This field is used by the driver
   public: uint8_t mLength = 0 ;  // Length of data (0 ... 8)
   public: union {
     uint64_t mData64     ; // Caution: subject to endianness
