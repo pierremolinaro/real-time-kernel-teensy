@@ -128,6 +128,49 @@ typedef volatile uint32_t vuint32_t ;
 #define FLEXCAN_MB_ID_EXT_BIT_NO      (0)
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//    CAN Filter
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static uint32_t defaultMask (const tFrameFormat inFormat) {
+  return (inFormat == kExtended) ? 0x1FFFFFFF : 0x7FF ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static uint32_t computeFilterMask (const tFrameFormat inFormat,
+                                   const uint32_t inMask) {
+  return
+    (1U << 31) | // Test RTR bit
+    (1U << 30) | // Test IDE bit
+    ((inFormat == kStandard) ? (inMask << 19) : (inMask << 1)) // Test identifier
+  ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static uint32_t computeAcceptanceFilter (const tFrameFormat inFormat,
+                                         const uint32_t inMask,
+                                         const uint32_t inAcceptance) {
+  const uint32_t acceptanceConformanceError = (inFormat == kStandard)
+    ? (inAcceptance > 0x7FF)
+    : (inAcceptance > 0x1FFFFFFF)
+  ;
+  const uint32_t maskConformanceError = (inFormat == kStandard)
+    ? (inMask > 0x7FF)
+    : (inMask > 0x1FFFFFFF)
+  ;
+//--- inMask & inAcceptance sould be equal to inAcceptance
+  const uint32_t maskAndAcceptanceCompabilityError = (inMask & inAcceptance) != inAcceptance ;
+//---
+  return
+    ((inFormat == kExtended) ? (1U << 30) : 0) | // Accepts standard or extended frames ?
+    ((inFormat == kExtended) ? (inAcceptance << 1) : (inAcceptance << 19)) |
+    acceptanceConformanceError | // Bit 0 is not used by hardware --> we use it for conformance error
+    maskConformanceError | maskAndAcceptanceCompabilityError
+  ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //    FlexCAN Mailboxes configuration
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -179,11 +222,8 @@ mTransmitSemaphore (TRANSMIT_BUFFER_SIZE),
 mTransmitBuffer (),
 mTransmitBufferReadIndex (0),
 mTransmitBufferCount (0),
-mReceiveBuffer (),
-mReceiveBufferReadIndex (0),
-mReceiveBufferCount (0),
-mReceiveBufferPeakCount (0),
-mFlexcanRxFIFOFlags (0) {
+mFlexcanRxFIFOFlags (0),
+mActualPrimaryFilterCount (0) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -285,21 +325,52 @@ uint32_t ACAN::begin (INIT_MODE_
 //······················································································································
 
 uint32_t ACAN::setupReceptionFilters (INIT_MODE) {
-//---------- Setup RxFIFO filters
-  const uint32_t MAX_PRIMARY_FILTER_COUNT = primaryFilterCountForConfiguration (kFilterConfiguration) ;
-  const uint32_t MAX_SECONDARY_FILTER_COUNT = secondaryFilterCountForConfiguration (kFilterConfiguration) ;
+  uint32_t errorCode = 0 ;
+  //---------- Get receive port array start and end pointers
+  extern CANReceivePort __teensy_can0_receive_ports_array_start ;
+  extern CANReceivePort __teensy_can0_receive_ports_array_end ;
+  extern CANReceivePort __teensy_can1_receive_ports_array_start ;
+  extern CANReceivePort __teensy_can1_receive_ports_array_end ;
+  CANReceivePort * portPtr = (mFlexcanBaseAddress == FLEXCAN0_BASE)
+    ? & __teensy_can0_receive_ports_array_start
+    : & __teensy_can1_receive_ports_array_start
+  ;
+  CANReceivePort * portPtrEnd = (mFlexcanBaseAddress == FLEXCAN0_BASE)
+    ? & __teensy_can0_receive_ports_array_end
+    : & __teensy_can1_receive_ports_array_end
+  ;
 //--- Default mask
-  uint32_t defaultFilterMask = 0 ; // By default, accept any frame
-  uint32_t defaultAcceptanceFilter = 0 ;
-//--- Setup primary filters (individual filters in FlexCAN vocabulary)
-  for (uint32_t i=0 ; i<MAX_PRIMARY_FILTER_COUNT ; i++) {
-    FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = defaultFilterMask ;
-    FLEXCANb_IDAF (mFlexcanBaseAddress, i) = defaultAcceptanceFilter ;
+  uint32_t filterMask = 0 ; // By default, accept any frame
+  uint32_t acceptanceFilter = 0 ;
+//--- Loop on receive ports for setting RxFIFO filters
+  const uint32_t MAX_PRIMARY_FILTER_COUNT = primaryFilterCountForConfiguration (kFilterConfiguration) ;
+  uint32_t portIndex = 0 ;
+  while ((portPtr != portPtrEnd) && (portIndex < MAX_PRIMARY_FILTER_COUNT)) {
+    filterMask = computeFilterMask (portPtr->mFormat, (portPtr->mFormat == kExtended) ? 0x1FFFFFFF : 0x7FF) ;
+    acceptanceFilter = computeAcceptanceFilter (portPtr->mFormat, defaultMask (portPtr->mFormat), portPtr->mIdentifier) ;
+    if ((acceptanceFilter & 1) != 0) {
+      errorCode |= kNotConformPrimaryFilter ;
+    }
+    FLEXCANb_MB_MASK (mFlexcanBaseAddress, portIndex) = filterMask ;
+    FLEXCANb_IDAF (mFlexcanBaseAddress, portIndex) = acceptanceFilter ;
+    portIndex += 1 ;
+    portPtr ++ ;
+  }
+  if (portPtr != portPtrEnd) {
+    errorCode |= kTooMuchPrimaryFilters ;
+  }
+//--- Store primary filter count
+  mActualPrimaryFilterCount = (uint32_t) portIndex ;
+//--- Fill up remaining primary filters (individual filters in FlexCAN vocabulary)
+  for (uint32_t i=portIndex ; i<MAX_PRIMARY_FILTER_COUNT ; i++) {
+    FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = filterMask ;
+    FLEXCANb_IDAF (mFlexcanBaseAddress, i) = acceptanceFilter ;
   }
 //--- Setup secondary filters (filter mask for Rx individual acceptance filter)
-  FLEXCANb_RXFGMASK (mFlexcanBaseAddress) = defaultFilterMask ;
+  const uint32_t MAX_SECONDARY_FILTER_COUNT = secondaryFilterCountForConfiguration (kFilterConfiguration) ;
+  FLEXCANb_RXFGMASK (mFlexcanBaseAddress) = filterMask ;
   for (uint32_t i=0 ; i<MAX_SECONDARY_FILTER_COUNT ; i++) {
-    FLEXCANb_IDAF (mFlexcanBaseAddress, i + MAX_PRIMARY_FILTER_COUNT) = defaultAcceptanceFilter ;
+    FLEXCANb_IDAF (mFlexcanBaseAddress, i + MAX_PRIMARY_FILTER_COUNT) = acceptanceFilter ;
   }
 //---------- Make all other MB inactive
   for (uint32_t i = MAX_PRIMARY_FILTER_COUNT ; i < MB_COUNT ; i++) {
@@ -307,21 +378,7 @@ uint32_t ACAN::setupReceptionFilters (INIT_MODE) {
     FLEXCANb_MBn_CS (mFlexcanBaseAddress, i) = FLEXCAN_MB_CS_CODE (FLEXCAN_MB_CODE_TX_INACTIVE) ;
   }
 //---
-  return 0 ;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   RECEPTION
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-bool ACAN::section_receive (SECTION_MODE_ CANMessage & outMessage) {
-  const bool hasMessage = mReceiveBufferCount > 0 ;
-  if (hasMessage) {
-    outMessage = mReceiveBuffer [mReceiveBufferReadIndex] ;
-    mReceiveBufferReadIndex = (mReceiveBufferReadIndex + 1) % RECEIVE_BUFFER_SIZE ;
-    mReceiveBufferCount -= 1 ;
-  }
-  return hasMessage ;
+  return errorCode ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -376,25 +433,41 @@ void ACAN::writeTxRegisters (SECTION_MODE_ const CANMessage & inMessage, const u
 //   MESSAGE INTERRUPT SERVICE ROUTINES
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void ACAN::readRxRegisters (IRQ_MODE_ CANMessage & outMessage) {
+void ACAN::dispatchReceivedFrame (IRQ_MODE) {
+  CANMessage message ;
 //--- Get identifier, ext, rtr and len
   const uint32_t dlc = FLEXCANb_MBn_CS (mFlexcanBaseAddress, 0) ;
-  outMessage.mLength = FLEXCAN_get_length (dlc) ;
-  if (outMessage.mLength > 8) {
-    outMessage.mLength = 8 ;
+  message.mLength = FLEXCAN_get_length (dlc) ;
+  if (message.mLength > 8) {
+    message.mLength = 8 ;
   }
-  outMessage.mFormat = ((dlc & FLEXCAN_MB_CS_IDE) != 0) ? kExtended : kStandard ;
-  outMessage.mIdentifier = FLEXCANb_MBn_ID (mFlexcanBaseAddress, 0) & FLEXCAN_MB_ID_EXT_MASK ;
-  if (outMessage.mFormat == kStandard) {
-    outMessage.mIdentifier >>= FLEXCAN_MB_ID_STD_BIT_NO ;
+  message.mFormat = ((dlc & FLEXCAN_MB_CS_IDE) != 0) ? kExtended : kStandard ;
+  message.mIdentifier = FLEXCANb_MBn_ID (mFlexcanBaseAddress, 0) & FLEXCAN_MB_ID_EXT_MASK ;
+  if (message.mFormat == kStandard) {
+    message.mIdentifier >>= FLEXCAN_MB_ID_STD_BIT_NO ;
   }
 //-- Get data (registers are big endian, values should be swapped)
-  outMessage.mData32 [0] = __builtin_bswap32 (FLEXCANb_MBn_WORD0 (mFlexcanBaseAddress, 0)) ;
-  outMessage.mData32 [1] = __builtin_bswap32 (FLEXCANb_MBn_WORD1 (mFlexcanBaseAddress, 0)) ;
+  message.mData32 [0] = __builtin_bswap32 (FLEXCANb_MBn_WORD0 (mFlexcanBaseAddress, 0)) ;
+  message.mData32 [1] = __builtin_bswap32 (FLEXCANb_MBn_WORD1 (mFlexcanBaseAddress, 0)) ;
 //--- Zero unused data entries
-  for (uint32_t i = outMessage.mLength ; i < 8 ; i++) {
-    outMessage.mData [i] = 0 ;
+  for (uint32_t i = message.mLength ; i < 8 ; i++) {
+    message.mData [i] = 0 ;
   }
+//--- Get reception port index
+ const uint32_t MAX_PRIMARY_FILTER_COUNT = primaryFilterCountForConfiguration (kFilterConfiguration) ;
+  uint32_t portIndex = FLEXCANb_RXFIR (mFlexcanBaseAddress) ;
+  if (portIndex >= MAX_PRIMARY_FILTER_COUNT) {
+    portIndex -= MAX_PRIMARY_FILTER_COUNT - mActualPrimaryFilterCount ;
+  }
+//---------- Get receive port array start and end pointers
+  extern CANReceivePort __teensy_can0_receive_ports_array_start ;
+  extern CANReceivePort __teensy_can1_receive_ports_array_start ;
+  CANReceivePort * portPtr = (mFlexcanBaseAddress == FLEXCAN0_BASE)
+    ? & __teensy_can0_receive_ports_array_start
+    : & __teensy_can1_receive_ports_array_start
+  ;
+//--- Dispatch received frame into matching receiving port
+  portPtr [portIndex].append (MODE_ message) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -403,21 +476,7 @@ void ACAN::message_isr (IRQ_MODE) {
   const uint32_t status = FLEXCANb_IFLAG1 (mFlexcanBaseAddress) ;
 //--- A trame has been received in RxFIFO ?
   if ((status & (1 << 5)) != 0) {
-    CANMessage message ;
-    readRxRegisters (MODE_ message) ;
-    if (mReceiveBufferCount == RECEIVE_BUFFER_SIZE) { // Overflow! Receive buffer is full
-      mReceiveBufferPeakCount = RECEIVE_BUFFER_SIZE + 1 ; // Mark overflow
-    }else{
-      uint32_t receiveBufferWriteIndex = mReceiveBufferReadIndex + mReceiveBufferCount ;
-      if (receiveBufferWriteIndex >= RECEIVE_BUFFER_SIZE) {
-        receiveBufferWriteIndex -= RECEIVE_BUFFER_SIZE ;
-      }
-      mReceiveBuffer [receiveBufferWriteIndex] = message ;
-      mReceiveBufferCount += 1 ;
-      if (mReceiveBufferCount > mReceiveBufferPeakCount) {
-        mReceiveBufferPeakCount = mReceiveBufferCount ;
-      }
-    }
+    dispatchReceivedFrame (MODE) ;
   }
 //--- RxFIFO warning ? It occurs when the number of messages goes from 4 to 5
   if ((status & (1 << 6)) != 0) {

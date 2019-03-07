@@ -117,6 +117,18 @@ SECTIONS {
     . = ALIGN (4) ;
     __data_start = . ;
     * (.data*) ;
+  /*-------------------- Teensy CAN 0 receive ports */
+    . = ALIGN (4) ;
+    __teensy_can0_receive_ports_array_start = . ;
+    * (teensy.CAN0.receive.ports.section) ;
+    . = ALIGN (4) ;
+    __teensy_can0_receive_ports_array_end = . ;
+  /*-------------------- Teensy CAN 1 receive ports */
+    . = ALIGN (4) ;
+    __teensy_can1_receive_ports_array_start = . ;
+    * (teensy.CAN1.receive.ports.section) ;
+    . = ALIGN (4) ;
+    __teensy_can1_receive_ports_array_end = . ;
     . = ALIGN (4) ;
     __data_end = . ;
   } > sram

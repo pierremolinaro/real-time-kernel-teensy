@@ -1,83 +1,71 @@
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
 #pragma once
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#include <stdint.h>
+#include "CANMessageBuffer.h"
+#include "Semaphore.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-class ACANSettings {
+#define IN_CAN0_RECEIVE_PORT_SECTION __attribute__((section ("teensy.CAN0.receive.ports.section")))
+#define IN_CAN1_RECEIVE_PORT_SECTION __attribute__((section ("teensy.CAN1.receive.ports.section")))
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+class CANReceivePort {
 
 //······················································································································
-//    Constructor for a given baud rate
+//    Constructor
 //······················································································································
 
-  public: explicit ACANSettings (INIT_MODE_
-                                 const uint32_t inWhishedBitRate,
-                                 const uint32_t inTolerancePPM = 1000) ;
+  public: CANReceivePort (const uint32_t inIdentifier,
+                          const tFrameFormat inFormat,
+                          const uint16_t inBufferSize) ;
 
 //······················································································································
-//   CAN bit timing (default values correspond to 250 kb/s)
+//    Private properties
 //······················································································································
 
-  public: uint32_t mWhishedBitRate = 250 * 1000 ; // In kb/s
-  public: uint16_t mBitRatePrescaler = 4 ; // 1...256
-  public: uint8_t mPropagationSegment = 5 ; // 1...8
-  public: uint8_t mPhaseSegment1 = 5 ; // 1...8
-  public: uint8_t mPhaseSegment2 = 5 ;  // 2...8
-  public: uint8_t mRJW = 4 ; // 1...4
-  public: bool mTripleSampling = false ; // true --> triple sampling, false --> single sampling
-  public: bool mBitSettingOk = true ; // The above configuration is correct
+  private: CANMessageBuffer mMessageBuffer ;
+  private: Semaphore mSemaphore ;
+  public: const uint32_t mIdentifier ;
+  public: const uint16_t mBufferSize ;
+  public: const tFrameFormat mFormat ;
+  private: bool mOverflow ; // true if overflow occurs on append
 
 //······················································································································
-//    Loop Back mode
+//    Init
 //······················································································································
 
-  public: bool mLoopBack = false ; // true --> loop back mode, false --> no loop back
+  public: void init (INIT_MODE) ;
 
 //······················································································································
-//    Compute actual bit rate
+//    Append a value (done by CAN driver)
 //······················································································································
 
-  public: uint32_t actualBitRate (void) const ;
+  public: void append (IRQ_MODE_ const CANMessage & inMessage) ;
 
 //······················································································································
-//    Exact bit rate ?
+//    Append did overflowed ?
 //······················································································································
 
-  public: bool exactBitRate (void) const ;
+  public: bool appendDidOverflowed (void) const { return mOverflow ; }
 
 //······················································································································
-//    Distance between actual bit rate and requested bit rate (in ppm, part-per-million)
+//    Retrieve a message
 //······················································································································
 
-  public: uint32_t ppmFromWishedBitRate (void) const ;
+  public: void get (USER_MODE_ CANMessage & outMessage) ;
+  public: bool guarded_get (USER_MODE_ CANMessage & outMessage) ;
 
 //······················································································································
-//    Distance of sample point from bit start (in ppc, part-per-cent, denoted by %)
+//    No copy
 //······················································································································
 
-  public: uint32_t samplePointFromBitStart (void) const ;
-
-//······················································································································
-//    Bit settings are consistent ? (returns 0 if ok)
-//······················································································································
-
-  public: uint32_t CANBitSettingConsistency (void) const ;
-
-//--- Constants returned by CANBitSettingConsistency
-  public: static const uint32_t kBitRatePrescalerIsZero            = 1 <<  0 ;
-  public: static const uint32_t kBitRatePrescalerIsGreaterThan256  = 1 <<  1 ;
-  public: static const uint32_t kPropagationSegmentIsZero          = 1 <<  2 ;
-  public: static const uint32_t kPropagationSegmentIsGreaterThan8  = 1 <<  3 ;
-  public: static const uint32_t kPhaseSegment1IsZero               = 1 <<  4 ;
-  public: static const uint32_t kPhaseSegment1IsGreaterThan8       = 1 <<  5 ;
-  public: static const uint32_t kPhaseSegment2IsZero               = 1 <<  6 ;
-  public: static const uint32_t kPhaseSegment2IsGreaterThan8       = 1 <<  7 ;
-  public: static const uint32_t kRJWIsZero                         = 1 <<  8 ;
-  public: static const uint32_t kRJWIsGreaterThan4                 = 1 <<  9 ;
-  public: static const uint32_t kRJWIsGreaterThanPhaseSegment2     = 1 << 10 ;
-  public: static const uint32_t kPhaseSegment1Is1AndTripleSampling = 1 << 11 ;
+  private: CANReceivePort (const CANReceivePort &) = delete ;
+  private: CANReceivePort & operator = (const CANReceivePort &) = delete ;
 
 //······················································································································
 

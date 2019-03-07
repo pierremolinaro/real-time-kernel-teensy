@@ -7,12 +7,19 @@
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 class ACANSettings {
-//--- Constructor for a given baud rate
+
+//······················································································································
+//    Constructor for a given baud rate
+//······················································································································
+
   public: explicit ACANSettings (INIT_MODE_
                                  const uint32_t inWhishedBitRate,
                                  const uint32_t inTolerancePPM = 1000) ;
 
-//--- CAN bit timing (default values correspond to 250 kb/s)
+//······················································································································
+//   CAN bit timing (default values correspond to 250 kb/s)
+//······················································································································
+
   public: uint32_t mWhishedBitRate = 250 * 1000 ; // In kb/s
   public: uint16_t mBitRatePrescaler = 4 ; // 1...256
   public: uint8_t mPropagationSegment = 5 ; // 1...8
@@ -22,30 +29,40 @@ class ACANSettings {
   public: bool mTripleSampling = false ; // true --> triple sampling, false --> single sampling
   public: bool mBitSettingOk = true ; // The above configuration is correct
 
-//--- Loop Back mode
+//······················································································································
+//    Loop Back mode
+//······················································································································
+
   public: bool mLoopBack = false ; // true --> loop back mode, false --> no loop back
 
-//--- RxFIFO Configuration
-  public: typedef enum {k8_0_Filters, k10_6_Filters, k12_12_Filters, k14_18_Filters} tConfiguration ;
-  public: tConfiguration mConfiguration = k12_12_Filters ;
+//······················································································································
+//    Compute actual bit rate
+//······················································································································
 
-
-//--- Receive buffer size
-  public: uint16_t mReceiveBufferSize = 32 ;
-
-//--- Compute actual bit rate
   public: uint32_t actualBitRate (void) const ;
 
-//--- Exact bit rate ?
+//······················································································································
+//    Exact bit rate ?
+//······················································································································
+
   public: bool exactBitRate (void) const ;
 
-//--- Distance between actual bit rate and requested bit rate (in ppm, part-per-million)
+//······················································································································
+//    Distance between actual bit rate and requested bit rate (in ppm, part-per-million)
+//······················································································································
+
   public: uint32_t ppmFromWishedBitRate (void) const ;
 
-//--- Distance of sample point from bit start (in ppc, part-per-cent, denoted by %)
+//······················································································································
+//    Distance of sample point from bit start (in ppc, part-per-cent, denoted by %)
+//······················································································································
+
   public: uint32_t samplePointFromBitStart (void) const ;
 
-//--- Bit settings are consistent ? (returns 0 if ok)
+//······················································································································
+//    Bit settings are consistent ? (returns 0 if ok)
+//······················································································································
+
   public: uint32_t CANBitSettingConsistency (void) const ;
 
 //--- Constants returned by CANBitSettingConsistency
@@ -61,6 +78,9 @@ class ACANSettings {
   public: static const uint32_t kRJWIsGreaterThan4                 = 1 <<  9 ;
   public: static const uint32_t kRJWIsGreaterThanPhaseSegment2     = 1 << 10 ;
   public: static const uint32_t kPhaseSegment1Is1AndTripleSampling = 1 << 11 ;
+
+//······················································································································
+
 } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

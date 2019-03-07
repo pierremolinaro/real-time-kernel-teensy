@@ -1,86 +1,114 @@
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
 #pragma once
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#include <stdint.h>
+#include "software-modes.h"
+#include "can-settings.h"
+#include "CANMessage.h"
+#include "Semaphore.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-class ACANSettings {
+static const uint32_t TRANSMIT_BUFFER_SIZE = 16 ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+class ACAN {
 
 //······················································································································
-//    Constructor for a given baud rate
+//   Constructor
 //······················································································································
 
-  public: explicit ACANSettings (INIT_MODE_
-                                 const uint32_t inWhishedBitRate,
-                                 const uint32_t inTolerancePPM = 1000) ;
+  private: ACAN (const uint32_t inFlexcanBaseAddress) ;
 
 //······················································································································
-//   CAN bit timing (default values correspond to 250 kb/s)
+//   begin
 //······················································································································
 
-  public: uint32_t mWhishedBitRate = 250 * 1000 ; // In kb/s
-  public: uint16_t mBitRatePrescaler = 4 ; // 1...256
-  public: uint8_t mPropagationSegment = 5 ; // 1...8
-  public: uint8_t mPhaseSegment1 = 5 ; // 1...8
-  public: uint8_t mPhaseSegment2 = 5 ;  // 2...8
-  public: uint8_t mRJW = 4 ; // 1...4
-  public: bool mTripleSampling = false ; // true --> triple sampling, false --> single sampling
-  public: bool mBitSettingOk = true ; // The above configuration is correct
+  public: uint32_t begin (INIT_MODE_
+                          const ACANSettings & inSettings) ;
+
+//--- begin; returns a result code :
+//  0 : Ok
+//  other: every bit denotes an error
+  public: static const uint32_t kTooMuchPrimaryFilters     = 1 << 12 ;
+  public: static const uint32_t kNotConformPrimaryFilter   = 1 << 13 ;
+  public: static const uint32_t kTooMuchSecondaryFilters   = 1 << 14 ;
+  public: static const uint32_t kNotConformSecondaryFilter = 1 << 15 ;
+  public: static const uint32_t kCANBitConfiguration       = 1 << 18 ;
 
 //······················································································································
-//    Loop Back mode
+//   Base address
 //······················································································································
 
-  public: bool mLoopBack = false ; // true --> loop back mode, false --> no loop back
+  private: const uint32_t mFlexcanBaseAddress ; // Initialized in constructor
 
 //······················································································································
-//    Compute actual bit rate
+//   Transmitting messages
 //······················································································································
 
-  public: uint32_t actualBitRate (void) const ;
+  public: void send (USER_MODE_ const CANMessage & inMessage) ;
+
+//$service internal.send
+  private: void internalSend (USER_MODE_ const CANMessage & inMessage) asm ("internal.send") ;
+  private: void kernel_internalSend (KERNEL_MODE_ const CANMessage & inMessage) asm ("service.internal.send") ;
+
+//--- Driver transmit buffer
+  private: Semaphore mTransmitSemaphore ;
+  private: CANMessage mTransmitBuffer [TRANSMIT_BUFFER_SIZE] ;
+  private: uint32_t mTransmitBufferReadIndex ; // 0 ... TRANSMIT_BUFFER_SIZE-1
+  private: uint32_t mTransmitBufferCount ; // 0 ... TRANSMIT_BUFFER_SIZE
+
+//--- Internal send method
+  private: void writeTxRegisters (SECTION_MODE_ const CANMessage & inMessage, const uint32_t inMBIndex) ;
 
 //······················································································································
-//    Exact bit rate ?
+//   Receiving messages
 //······················································································································
 
-  public: bool exactBitRate (void) const ;
+//--- Driver receive buffer
+  private: uint8_t mFlexcanRxFIFOFlags ;
+  private: uint8_t mActualPrimaryFilterCount ;
+  private: uint32_t setupReceptionFilters (INIT_MODE) ;
+  private: void dispatchReceivedFrame (IRQ_MODE) ;
 
 //······················································································································
-//    Distance between actual bit rate and requested bit rate (in ppm, part-per-million)
+//   Message interrupt service routines
 //······················································································································
 
-  public: uint32_t ppmFromWishedBitRate (void) const ;
+  private: void message_isr (IRQ_MODE) ;
+  friend void can0_message_isr (IRQ_MODE) ;
+  friend void can1_message_isr (IRQ_MODE) ;
 
 //······················································································································
-//    Distance of sample point from bit start (in ppc, part-per-cent, denoted by %)
+//   Driver instances
 //······················································································································
 
-  public: uint32_t samplePointFromBitStart (void) const ;
+  public: static ACAN can0 ;
+  public: static ACAN can1 ;
 
 //······················································································································
-//    Bit settings are consistent ? (returns 0 if ok)
+//   No copy
 //······················································································································
 
-  public: uint32_t CANBitSettingConsistency (void) const ;
-
-//--- Constants returned by CANBitSettingConsistency
-  public: static const uint32_t kBitRatePrescalerIsZero            = 1 <<  0 ;
-  public: static const uint32_t kBitRatePrescalerIsGreaterThan256  = 1 <<  1 ;
-  public: static const uint32_t kPropagationSegmentIsZero          = 1 <<  2 ;
-  public: static const uint32_t kPropagationSegmentIsGreaterThan8  = 1 <<  3 ;
-  public: static const uint32_t kPhaseSegment1IsZero               = 1 <<  4 ;
-  public: static const uint32_t kPhaseSegment1IsGreaterThan8       = 1 <<  5 ;
-  public: static const uint32_t kPhaseSegment2IsZero               = 1 <<  6 ;
-  public: static const uint32_t kPhaseSegment2IsGreaterThan8       = 1 <<  7 ;
-  public: static const uint32_t kRJWIsZero                         = 1 <<  8 ;
-  public: static const uint32_t kRJWIsGreaterThan4                 = 1 <<  9 ;
-  public: static const uint32_t kRJWIsGreaterThanPhaseSegment2     = 1 << 10 ;
-  public: static const uint32_t kPhaseSegment1Is1AndTripleSampling = 1 << 11 ;
+  private : ACAN (const ACAN &) = delete ;
+  private : ACAN & operator = (const ACAN &) = delete ;
 
 //······················································································································
 
 } ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   INTERRUPT ROUTINES
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+//$interrupt-service CAN0_ORed_Message_buffer
+void can0_message_isr (IRQ_MODE) asm ("interrupt.service.CAN0_ORed_Message_buffer") ;
+
+
+//$interrupt-service CAN1_ORed_Message_buffer
+void can1_message_isr (IRQ_MODE) asm ("interrupt.service.CAN1_ORed_Message_buffer") ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

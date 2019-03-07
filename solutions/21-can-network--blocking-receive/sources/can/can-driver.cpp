@@ -143,22 +143,29 @@ static const int MB_COUNT = 16 ; // MB count is fixed by hardware
 //    2 |   12 (0 ... 11)   | 12 (RXIMR0 ... RXIMR11) | 12 (12 ... 23)        | 24
 //    3 |   14 (0 ... 13)   | 14 (RXIMR0 ... RXIMR13) | 18 (14 ... 31)        | 32
 // Other RFFN values are not available for the Teensy microcontrollers.
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+typedef enum {k8_0_Filters, k10_6_Filters, k12_12_Filters, k14_18_Filters} FilterConfiguration ;
 
 //······················································································································
 
-static inline size_t RFFNForConfiguration (const ACANSettings::tConfiguration inConfiguration) {
+static const FilterConfiguration kFilterConfiguration = k14_18_Filters ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static inline size_t RFFNForConfiguration (const FilterConfiguration inConfiguration) {
   return (size_t) inConfiguration ;
 }
 
 //······················································································································
 
-static inline size_t primaryFilterCountForConfiguration (const ACANSettings::tConfiguration inConfiguration) {
+static inline size_t primaryFilterCountForConfiguration (const FilterConfiguration inConfiguration) {
   return 8 + 2 * (size_t) inConfiguration ;
 }
 
 //······················································································································
 
-static inline size_t secondaryFilterCountForConfiguration (const ACANSettings::tConfiguration inConfiguration) {
+static inline size_t secondaryFilterCountForConfiguration (const FilterConfiguration inConfiguration) {
   return 6 * (size_t) inConfiguration ;
 }
 
@@ -241,7 +248,7 @@ uint32_t ACAN::begin (INIT_MODE_
       (inSettings.mLoopBack ? FLEXCAN_CTRL_LPB : 0)
     ;
   //---------- FIFO configuration
-    const uint32_t RFFN = RFFNForConfiguration (inSettings.mConfiguration) ;
+    const uint32_t RFFN = RFFNForConfiguration (kFilterConfiguration) ;
   //---------- CTRL2
     FLEXCANb_CTRL2 (mFlexcanBaseAddress) =
       (RFFN << 24) | // Number of RxFIFO
@@ -250,28 +257,8 @@ uint32_t ACAN::begin (INIT_MODE_
       (   1 << 17) | // RRS: Remote request frame is stored
       (   1 << 16)   // EACEN: RTR bit in mask is always compared
     ;
-  //---------- Setup RxFIFO filters
-  //---------- Setup RxFIFO filters
-    const uint32_t MAX_PRIMARY_FILTER_COUNT = primaryFilterCountForConfiguration (inSettings.mConfiguration) ;
-    const uint32_t MAX_SECONDARY_FILTER_COUNT = secondaryFilterCountForConfiguration (inSettings.mConfiguration) ;
-  //--- Default mask
-    uint32_t defaultFilterMask = 0 ; // By default, accept any frame
-    uint32_t defaultAcceptanceFilter = 0 ;
-  //--- Setup primary filters (individual filters in FlexCAN vocabulary)
-    for (uint32_t i=0 ; i<MAX_PRIMARY_FILTER_COUNT ; i++) {
-      FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = defaultFilterMask ;
-      FLEXCANb_IDAF (mFlexcanBaseAddress, i) = defaultAcceptanceFilter ;
-    }
-  //--- Setup secondary filters (filter mask for Rx individual acceptance filter)
-    FLEXCANb_RXFGMASK (mFlexcanBaseAddress) = defaultFilterMask ;
-    for (uint32_t i=0 ; i<MAX_SECONDARY_FILTER_COUNT ; i++) {
-      FLEXCANb_IDAF (mFlexcanBaseAddress, i + MAX_PRIMARY_FILTER_COUNT) = defaultAcceptanceFilter ;
-    }
-  //---------- Make all other MB inactive
-    for (uint32_t i = MAX_PRIMARY_FILTER_COUNT ; i < MB_COUNT ; i++) {
-      FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = 0 ;
-      FLEXCANb_MBn_CS (mFlexcanBaseAddress, i) = FLEXCAN_MB_CS_CODE (FLEXCAN_MB_CODE_TX_INACTIVE) ;
-    }
+  //---------- Setup reception filters
+    errorCode |= setupReceptionFilters (MODE) ;
   //---------- Start CAN
     FLEXCANb_MCR (mFlexcanBaseAddress) &= ~FLEXCAN_MCR_HALT ;
   //---------- Wait till exit of freeze mode
@@ -294,6 +281,34 @@ uint32_t ACAN::begin (INIT_MODE_
   }
 //--- Return error code (0 --> no error)
   return errorCode ;
+}
+
+//······················································································································
+
+uint32_t ACAN::setupReceptionFilters (INIT_MODE) {
+//---------- Setup RxFIFO filters
+  const uint32_t MAX_PRIMARY_FILTER_COUNT = primaryFilterCountForConfiguration (kFilterConfiguration) ;
+  const uint32_t MAX_SECONDARY_FILTER_COUNT = secondaryFilterCountForConfiguration (kFilterConfiguration) ;
+//--- Default mask
+  uint32_t defaultFilterMask = 0 ; // By default, accept any frame
+  uint32_t defaultAcceptanceFilter = 0 ;
+//--- Setup primary filters (individual filters in FlexCAN vocabulary)
+  for (uint32_t i=0 ; i<MAX_PRIMARY_FILTER_COUNT ; i++) {
+    FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = defaultFilterMask ;
+    FLEXCANb_IDAF (mFlexcanBaseAddress, i) = defaultAcceptanceFilter ;
+  }
+//--- Setup secondary filters (filter mask for Rx individual acceptance filter)
+  FLEXCANb_RXFGMASK (mFlexcanBaseAddress) = defaultFilterMask ;
+  for (uint32_t i=0 ; i<MAX_SECONDARY_FILTER_COUNT ; i++) {
+    FLEXCANb_IDAF (mFlexcanBaseAddress, i + MAX_PRIMARY_FILTER_COUNT) = defaultAcceptanceFilter ;
+  }
+//---------- Make all other MB inactive
+  for (uint32_t i = MAX_PRIMARY_FILTER_COUNT ; i < MB_COUNT ; i++) {
+    FLEXCANb_MB_MASK (mFlexcanBaseAddress, i) = 0 ;
+    FLEXCANb_MBn_CS (mFlexcanBaseAddress, i) = FLEXCAN_MB_CS_CODE (FLEXCAN_MB_CODE_TX_INACTIVE) ;
+  }
+//---
+  return 0 ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -372,8 +387,8 @@ void ACAN::readRxRegisters (IRQ_MODE_ CANMessage & outMessage) {
   if (outMessage.mLength > 8) {
     outMessage.mLength = 8 ;
   }
-  outMessage.mIdentifier = (dlc & FLEXCAN_MB_CS_IDE) != 0 ;
-  outMessage.mIdentifier  = FLEXCANb_MBn_ID (mFlexcanBaseAddress, 0) & FLEXCAN_MB_ID_EXT_MASK ;
+  outMessage.mFormat = ((dlc & FLEXCAN_MB_CS_IDE) != 0) ? kExtended : kStandard ;
+  outMessage.mIdentifier = FLEXCANb_MBn_ID (mFlexcanBaseAddress, 0) & FLEXCAN_MB_ID_EXT_MASK ;
   if (outMessage.mFormat == kStandard) {
     outMessage.mIdentifier >>= FLEXCAN_MB_ID_STD_BIT_NO ;
   }
