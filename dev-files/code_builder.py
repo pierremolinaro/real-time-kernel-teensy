@@ -28,12 +28,12 @@ def runProcess (command) :
 
 def runProcessAndGetOutput (command) :
   result = ""
-  childProcess = subprocess.Popen (command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  childProcess = subprocess.Popen (command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
   while True:
     out = childProcess.stdout.read(1)
     if out == '' and childProcess.poll() != None:
       break
-    if out != '':
+    if out != '' :
       result += out
 #--- Wait for subprocess termination
   if childProcess.poll () == None :

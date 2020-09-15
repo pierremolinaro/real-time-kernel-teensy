@@ -61,9 +61,16 @@ def C_Cpp_commonOptions (usesLTO):
   result.append ("-Wswitch-enum")
   result.append ("-Wuninitialized")
   result.append ("-Wsign-conversion")
-#  result.append ("-Wconversion")
+
+#--- Ordre de ne pas engendrer l'appel des destructeurs des variables globales C++
+# et donc d'utiliser des symboles tels que __cxa_exit, __lock___atexit_recursive_mutex, …
+  result.append ("-fno-use-cxa-atexit")
+
+#--- Engendrer fonctions et variables globales dans des sections spécifiques
+#    Ceci permet à l'éditeur de liens d'éliminer fonctions et variables inutilisées
   result.append ("-ffunction-sections")
   result.append ("-fdata-sections")
+
 #   result.append ("-fno-stack-protector") # CLANG
 #   result.append ("-fshort-enums") # CLANG
   if usesLTO :

@@ -99,12 +99,12 @@ runProcess (["rm", "-fR", DOCUMENT_DIR])
 #--- Create archive
 runProcess (["mkdir", DOCUMENT_DIR])
 #--- Copy PDF files
-for root, dirs, files in os.walk ("keynotes-2018-2019") :
+for root, dirs, files in os.walk ("keynotes-2019-2020") :
   for name in files:
     keynotePath = os.path.join (root, name)
     (base, extension) = os.path.splitext (name)
     if extension == ".key" :
-      pdfSourcePath = "pdf-2018-2019/" + base + ".pdf"
+      pdfSourcePath = "pdf-2019-2020/" + base + ".pdf"
       if not os.path.exists (pdfSourcePath) :
         print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'existe pas" + bcolors.ENDC)
         sys.exit (1)

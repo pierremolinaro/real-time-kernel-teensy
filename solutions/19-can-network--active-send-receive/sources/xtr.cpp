@@ -132,11 +132,11 @@ static void guardDescriptor_appendGuard (SECTION_MODE_ GuardDescriptor & ioGuard
   const uint32_t guardCount = ioGuardDescriptor.mCount ;
   if (guardCount == ioGuardDescriptor.mSize) {
     ioGuardDescriptor.mSize += 4 ;
-    GuardList ** newList = (GuardList **) section_memoryAlloc (MODE_ ioGuardDescriptor.mSize * sizeof (GuardList *)) ;
+    GuardList ** newList = (GuardList **) section_fatPointerAlloc (MODE_ ioGuardDescriptor.mSize * sizeof (GuardList *)) ;
     for (size_t i =0 ; i<guardCount ; i++) {
       newList [i] = ioGuardDescriptor.mListArray [i] ;
     }
-    section_memoryFree (MODE_ ioGuardDescriptor.mListArray) ;
+    section_fatPointerFree (MODE_ ioGuardDescriptor.mListArray) ;
     ioGuardDescriptor.mListArray = newList ;
   }
   ioGuardDescriptor.mListArray [guardCount] = ioGuardListPtr ;
