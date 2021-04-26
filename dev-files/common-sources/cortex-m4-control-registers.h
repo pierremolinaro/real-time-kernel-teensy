@@ -1,12 +1,40 @@
 #pragma once
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 #include <stdint.h>
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
+// Peripheral SYST
+//--------------------------------------------------------------------------------------------------
+
+//-------------------- SysTick Control and Status
+#define SYST_CSR (* ((volatile uint32_t *) (0xE000E000 + 0x10)))
+
+  // Boolean field: Enable the Counter
+    static const uint32_t SYST_CSR_ENABLE = 1U << 0 ;
+
+  // Boolean field: Enables SysTick exception request
+    static const uint32_t SYST_CSR_TICKINT = 1U << 1 ;
+
+  // Boolean field: Clock Source Selection
+    static const uint32_t SYST_CSR_CLKSOURCE = 1U << 2 ;
+
+  // Boolean field: Returns 1 if timer counted to 0 since last time this was read
+    static const uint32_t SYST_CSR_COUNTFLAG = 1U << 16 ;
+
+//-------------------- SysTick Reload Value Register
+#define SYST_RVR (* ((volatile uint32_t *) (0xE000E000 + 0x14)))
+
+//-------------------- SysTick Current Value Register
+#define SYST_CVR (* ((volatile uint32_t *) (0xE000E000 + 0x18)))
+
+//-------------------- SysTick Calibration Value Register
+#define SYST_CALIB (* ((const volatile uint32_t *) (0xE000E000 + 0x1C)))
+
+//--------------------------------------------------------------------------------------------------
 // Peripheral NVIC
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- Interrupt Set-Enable Registers (idx = 0 ... 7)
 #define NVIC_ISER(idx) (* ((const volatile uint32_t *) (0xE000E100 + 0x00 + 4 * (idx))))
@@ -32,9 +60,9 @@
   // Field (width: 9 bits): Interrupt ID of the interrupt to trigger, in the range 0-239.
     inline uint32_t NVIC_STIR_INTID (const uint32_t inValue) { return (inValue & 511) << 0 ; }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 // Peripheral SCB
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- Auxiliary Control Register
 #define SCB_ACTLR (* ((volatile uint32_t *) (0xE000E000 + 0x8)))
@@ -354,52 +382,52 @@
 //-------------------- BusFault Address Register
 #define SCB_BFAR (* ((volatile uint32_t *) (0xE000E000 + 0xD38)))
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 // Peripheral SysTick
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- SysTick Control and Status Register
-#define SysTick_CSR (* ((volatile uint32_t *) (0xE000E010 + 0)))
+// #define SysTick_CSR (* ((volatile uint32_t *) (0xE000E010 + 0)))
+//
+//   // Boolean field: Enable SysTick Timer
+//     static const uint32_t SysTick_CSR_ENABLE = 1U << 0 ;
+//
+//   // Boolean field: Generate Tick Interrupt
+//     static const uint32_t SysTick_CSR_TICKINT = 1U << 1 ;
+//
+//   // Boolean field: Source to count from
+//     static const uint32_t SysTick_CSR_CLKSOURCE = 1U << 2 ;
+//
+//   // Boolean field: SysTick counted to zero
+//     static const uint32_t SysTick_CSR_COUNTFLAG = 1U << 16 ;
+//
+// //-------------------- SysTick Reload Value Register
+// #define SysTick_RVR (* ((volatile uint32_t *) (0xE000E010 + 0x4)))
+//
+//   // Field (width: 24 bits): Value to auto reload SysTick after reaching zero
+//     inline uint32_t SysTick_RVR_RELOAD (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
+//
+// //-------------------- SysTick Current Value Register
+// #define SysTick_CVR (* ((volatile uint32_t *) (0xE000E010 + 0x8)))
+//
+//   // Field (width: 24 bits): Current value
+//     inline uint32_t SysTick_CVR_CURRENT (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
+//
+// //-------------------- SysTick Calibration Value Register
+// #define SysTick_CALIB (* ((const volatile uint32_t *) (0xE000E010 + 0xC)))
+//
+//   // Field (width: 24 bits): Reload value to use for 10ms timing
+//     inline uint32_t SysTick_CALIB_TENMS (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
+//
+//   // Boolean field: Clock Skew
+//     static const uint32_t SysTick_CALIB_SKEW = 1U << 30 ;
+//
+//   // Boolean field: No Ref
+//     static const uint32_t SysTick_CALIB_NOREF = 1U << 31 ;
 
-  // Boolean field: Enable SysTick Timer
-    static const uint32_t SysTick_CSR_ENABLE = 1U << 0 ;
-
-  // Boolean field: Generate Tick Interrupt
-    static const uint32_t SysTick_CSR_TICKINT = 1U << 1 ;
-
-  // Boolean field: Source to count from
-    static const uint32_t SysTick_CSR_CLKSOURCE = 1U << 2 ;
-
-  // Boolean field: SysTick counted to zero
-    static const uint32_t SysTick_CSR_COUNTFLAG = 1U << 16 ;
-
-//-------------------- SysTick Reload Value Register
-#define SysTick_RVR (* ((volatile uint32_t *) (0xE000E010 + 0x4)))
-
-  // Field (width: 24 bits): Value to auto reload SysTick after reaching zero
-    inline uint32_t SysTick_RVR_RELOAD (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
-
-//-------------------- SysTick Current Value Register
-#define SysTick_CVR (* ((volatile uint32_t *) (0xE000E010 + 0x8)))
-
-  // Field (width: 24 bits): Current value
-    inline uint32_t SysTick_CVR_CURRENT (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
-
-//-------------------- SysTick Calibration Value Register
-#define SysTick_CALIB (* ((const volatile uint32_t *) (0xE000E010 + 0xC)))
-
-  // Field (width: 24 bits): Reload value to use for 10ms timing
-    inline uint32_t SysTick_CALIB_TENMS (const uint32_t inValue) { return (inValue & 16777215) << 0 ; }
-
-  // Boolean field: Clock Skew
-    static const uint32_t SysTick_CALIB_SKEW = 1U << 30 ;
-
-  // Boolean field: No Ref
-    static const uint32_t SysTick_CALIB_NOREF = 1U << 31 ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 // Peripheral MPU
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- MPU Type Register
 #define MPU_TYPE (* ((const volatile uint32_t *) (0xE000ED90 + 0x0)))
@@ -512,9 +540,9 @@
 //-------------------- Uses (MPU_RNR[7:2]<<2) + 3
 #define MPU_RASR_A3 (* ((volatile uint32_t *) (0xE000ED90 + 0x28)))
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 // Peripheral Debug
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- Debug Fault Status Register
 #define Debug_DFSR (* ((volatile uint32_t *) (0xE000ED00 + 0x30)))
@@ -645,9 +673,9 @@
   // Boolean field: Global enable for all DWT and ITM features.
     static const uint32_t Debug_DEMCR_TRCENA = 1U << 24 ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 // Peripheral DWT
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------
 
 //-------------------- Control Register
 #define DWT_CTRL (* ((volatile uint32_t *) (0xE0001000 + 0)))
@@ -769,32 +797,4 @@
 //-------------------- Function Register 3
 #define DWT_FUNCTION3 (* ((volatile uint32_t *) (0xE0001000 + 0x58)))
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-// Peripheral SYST
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-//-------------------- SysTick Control and Status
-#define SYST_CSR (* ((volatile uint32_t *) (0xE000E000 + 0x10)))
-
-  // Boolean field: Enable the Counter
-    static const uint32_t SYST_CSR_ENABLE = 1U << 0 ;
-
-  // Boolean field: Enables SysTick exception request
-    static const uint32_t SYST_CSR_TICKINT = 1U << 1 ;
-
-  // Boolean field: Clock Source Selection
-    static const uint32_t SYST_CSR_CLKSOURCE = 1U << 2 ;
-
-  // Boolean field: Returns 1 if timer counted to 0 since last time this was read
-    static const uint32_t SYST_CSR_COUNTFLAG = 1U << 16 ;
-
-//-------------------- SysTick Reload Value Register
-#define SYST_RVR (* ((volatile uint32_t *) (0xE000E000 + 0x14)))
-
-//-------------------- SysTick Current Value Register
-#define SYST_CVR (* ((volatile uint32_t *) (0xE000E000 + 0x18)))
-
-//-------------------- SysTick Calibration Value Register
-#define SYST_CALIB (* ((const volatile uint32_t *) (0xE000E000 + 0x1C)))
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--------------------------------------------------------------------------------------------------

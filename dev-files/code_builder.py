@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: UTF-8 -*-
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 import sys, os, subprocess, shutil, json
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 import makefile
 import common_definitions
@@ -12,9 +12,9 @@ import download_and_install_gccarm
 import teensy_cli_loader_builder
 import dev_platform
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 #   Run process and wait for termination                                                                               *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 def runProcess (command) :
   returncode = subprocess.call (command)
@@ -22,9 +22,9 @@ def runProcess (command) :
     print (makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ())
     sys.exit (returncode)
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 #   Run process, get output and wait for termination                                                                   *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 def runProcessAndGetOutput (command) :
   result = ""
@@ -43,9 +43,9 @@ def runProcessAndGetOutput (command) :
     sys.exit (childProcess.returncode)
   return result
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 #   dictionaryFromJsonFile                                                                                             *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 def dictionaryFromJsonFile (file) :
   result = {}
@@ -62,9 +62,9 @@ def dictionaryFromJsonFile (file) :
   return result
 
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 #   buildCode                                                                                                          *
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
 
 def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #--------------------------------------------------------------------------- Prepare
@@ -93,23 +93,23 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   print (makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ())
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")
 #--- TEENSY
-  linkerScript = ""
-  teensyName = ""
-  if dictionaire.has_key ("TEENSY") :
-    TeensyKey = dictionaire ["TEENSY"]
-    if (TeensyKey == "3.1") or (TeensyKey == "3.2") :
-      teensyName = "TEENSY31"
-      linkerScript = "teensy-3-1.ld"
-    elif (TeensyKey == "3.5") :
-      teensyName = "TEENSY35"
-      linkerScript = "teensy-3-5.ld"
-    elif (TeensyKey == "3.6") :
-      teensyName = "TEENSY36"
-      linkerScript = "teensy-3-6.ld"
-    else:
-      make.enterError ('In the makefile.json file, the "TEENSY" key value is invalid (possible values: "3.1", "3.2", "3.5" or "3.6").')
-  else:
-    make.enterError ('The makefile.json file does not have a "TEENSY" key (possible values: "3.1", "3.2", "3.5" or "3.6").')
+  linkerScript = "common-sources/teensy-3-6.ld"
+  teensyName = "TEENSY36"
+#   if dictionaire.has_key ("TEENSY") :
+#     TeensyKey = dictionaire ["TEENSY"]
+#     if (TeensyKey == "3.1") or (TeensyKey == "3.2") :
+#       teensyName = "TEENSY31"
+#       linkerScript = "teensy-3-1.ld"
+#     elif (TeensyKey == "3.5") :
+#       teensyName = "TEENSY35"
+#       linkerScript = "teensy-3-5.ld"
+#     elif (TeensyKey == "3.6") :
+#       teensyName = "TEENSY36"
+#       linkerScript = "teensy-3-6.ld"
+#     else:
+#       make.enterError ('In the makefile.json file, the "TEENSY" key value is invalid (possible values: "3.1", "3.2", "3.5" or "3.6").')
+#   else:
+#     make.enterError ('The makefile.json file does not have a "TEENSY" key (possible values: "3.1", "3.2", "3.5" or "3.6").')
 #--- ASSERTION_GENERATION
   ASSERTION_GENERATION = False
   if dictionaire.has_key ("ASSERTION-GENERATION") and dictionaire ["ASSERTION-GENERATION"] :
@@ -164,6 +164,8 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
           H_SOURCE_LIST.append (sourcePath)
         elif extension == ".s" :
           S_SOURCE_LIST.append (sourcePath)
+        elif extension == ".ld" :
+          pass # Ignored file
         elif extension != "" : # Ceci permet d'ignorer les fichés cachés (dont les noms commencent par un point)
           print (makefile.MAGENTA () + makefile.BOLD () + "Note: unhandled file " + sourcePath + makefile.ENDC ())
 #--------------------------------------------------------------------------- Build base header file
@@ -394,4 +396,4 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     scriptDir = os.path.dirname (os.path.abspath (__file__))
     runProcess (["python", scriptDir+ "/view-hex.py", PRODUCT_INTERNAL_FLASH + ".hex"])
 
-#——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
+#---------------------------------------------------------------------------------------------------
