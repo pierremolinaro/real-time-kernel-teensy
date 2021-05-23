@@ -13,7 +13,7 @@ import os
 #--- Get script absolute path
 scriptDir = os.path.dirname (os.path.abspath (sys.argv [0]))
 #--- Enumerate directories
-for name in os.listdir (scriptDir):
+for name in sorted (os.listdir (scriptDir)) :
    fname = os.path.join (scriptDir, name, "clean.py")
    if os.path.isfile (fname) :
      returncode = subprocess.call ([fname])
