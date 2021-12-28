@@ -25,6 +25,9 @@ class TaskList {
 //--- Remove a task from list
   public: void removeTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) ;
 
+//--- Contains task
+  public: bool containsTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) const ;
+
 //--- Private property
   private: uint32_t mList ;
 

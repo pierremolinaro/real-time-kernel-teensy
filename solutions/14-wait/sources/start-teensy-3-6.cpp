@@ -394,31 +394,31 @@ void startPhase1 (void) {
 //  SCB_CPACR = 0x00F0_0000; // Enable floating point unit
   LMEM_PCCCR = LMEM_PCCCR_GO | LMEM_PCCCR_INVW1 | LMEM_PCCCR_INVW0 | LMEM_PCCCR_ENWRBUF | LMEM_PCCCR_ENCACHE ;
 //--- If the RTC oscillator isn't enabled, get it started early
-	if ((RTC_CR & RTC_CR_OSCE) != 0) {
-		RTC_SR = 0;
-		RTC_CR = RTC_CR_SC16P | RTC_CR_SC4P | RTC_CR_OSCE;
-	}
+  if ((RTC_CR & RTC_CR_OSCE) != 0) {
+    RTC_SR = 0;
+    RTC_CR = RTC_CR_SC16P | RTC_CR_SC4P | RTC_CR_OSCE;
+  }
 //--- Release I/O pins hold, if we woke up from VLLS mode
-	if (PMC_REGSC & PMC_REGSC_ACKISO) {
+  if (PMC_REGSC & PMC_REGSC_ACKISO) {
     PMC_REGSC |= PMC_REGSC_ACKISO;
   }
 //---------------------------------------------------
 //--- Since this is a write once register, make it visible to all F_CPU's
 //    so we can into other sleep modes in the future at any speed
-	SMC_PMPROT = SMC_PMPROT_AHSRUN | SMC_PMPROT_AVLP | SMC_PMPROT_ALLS | SMC_PMPROT_AVLLS;
+  SMC_PMPROT = SMC_PMPROT_AHSRUN | SMC_PMPROT_AVLP | SMC_PMPROT_ALLS | SMC_PMPROT_AVLLS;
 //--------------------------------------------------- PLL initialization (start in FEI mode)
 //--- Enable capacitors for crystal
   OSC_CR = OSC_CR_SC8P | OSC_CR_SC2P | OSC_CR_ERCLKEN;
 //--- Enable osc, 8-32 MHz range, low power mode
-	MCG_C2 = MCG_C2_RANGE (2) | MCG_C2_EREFS;
+  MCG_C2 = MCG_C2_RANGE (2) | MCG_C2_EREFS;
 //--- Switch to crystal as clock source, FLL input = 16 MHz / 512
-	MCG_C1 =  MCG_C1_CLKS(2) | MCG_C1_FRDIV(4);
+  MCG_C1 =  MCG_C1_CLKS(2) | MCG_C1_FRDIV(4);
 //--- Wait for crystal oscillator to begin
-	while ((MCG_S & MCG_S_OSCINIT0) == 0) {}
+  while ((MCG_S & MCG_S_OSCINIT0) == 0) {}
 //--- Wait for FLL to use oscillator
-	while ((MCG_S & MCG_S_IREFST) != 0) {}
+  while ((MCG_S & MCG_S_IREFST) != 0) {}
 //--- Wait for MCGOUT to use oscillator
-	while ((MCG_S & MCG_S_CLKST (3)) != MCG_S_CLKST(2)) {}
+  while ((MCG_S & MCG_S_CLKST (3)) != MCG_S_CLKST(2)) {}
 //--- Now we're in FBE mode
 //------------------------------------ Read microcontroller serial number
 //   This SHOULD be done in normal mode (not in HSRUN mode)
@@ -426,14 +426,14 @@ void startPhase1 (void) {
   const uint32_t serialNumber = readMicrocontrollerSerialNumber () ;
 //------------------------------------ Turn on the PLL
   SMC_PMCTRL = SMC_PMCTRL_RUNM (3); // enter HSRUN mode
-	while (SMC_PMSTAT != SMC_PMPROT_AHSRUN) {} // wait for HSRUN
+  while (SMC_PMSTAT != SMC_PMPROT_AHSRUN) {} // wait for HSRUN
 //--- Configure CPU clock
   MCG_C5 = K_MCG_C5_PRDIV ;
   MCG_C6 = MCG_C6_PLLS | K_MCG_C6_VDIV ;
 //--- Wait for PLL to start using xtal as its input
-	while (!(MCG_S & MCG_S_PLLST)) {}
+  while (!(MCG_S & MCG_S_PLLST)) {}
 //--- Wait for PLL to lock
-	while (!(MCG_S & MCG_S_LOCK0)) {}
+  while (!(MCG_S & MCG_S_LOCK0)) {}
 //------------------------------------ Now we're in PBE mode: program the clock dividers
   SIM_CLKDIV1 =
     SIM_CLKDIV1_OUTDIV1(K_SIM_CLKDIV1_OUTDIV1)

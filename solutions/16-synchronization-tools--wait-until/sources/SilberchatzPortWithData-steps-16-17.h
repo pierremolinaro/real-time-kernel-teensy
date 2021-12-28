@@ -1,19 +1,37 @@
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//
+//   SilberchatzPortWithData
+//
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
 #pragma once
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-#include "software-modes.h"
+#include "SilberchatzPort.h"
+#include "Semaphore-steps-16-17.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void setup (USER_MODE) asm ("setup.function") ;
+class SilberchatzPortWithData {
+//--- Properties
+  protected: SilberchatzPort mPort ;
+  protected: Semaphore mSemaphoreWrite ;
+  protected: Semaphore mSemaphoreRead ;
+  protected: volatile uint32_t mData ;
 
-void loop (USER_MODE) asm ("loop.function") ;
+//--- Constructor
+  public: SilberchatzPortWithData (void) ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//--- Input
+  public: void input (USER_MODE_ uint32_t & outData) ;
 
-//$interrupt-section PORTD
+//--- Output
+  public: void output (USER_MODE_ const uint32_t inData) ;
 
-void clicInterrupt (SECTION_MODE) asm ("interrupt.section.PORTD") ;
+//--- No copy
+  private: SilberchatzPortWithData (const SilberchatzPortWithData &) = delete ;
+  private: SilberchatzPortWithData & operator = (const SilberchatzPortWithData &) = delete ;
+} ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

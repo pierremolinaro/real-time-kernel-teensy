@@ -1,6 +1,6 @@
-	.syntax unified
-	.cpu cortex-m4
-	.thumb
+  .syntax unified
+  .cpu cortex-m4
+  .thumb
 
 @-----------------------------------------------------------------------------------------------------------------------
 @   UNUSED INTERRUPT

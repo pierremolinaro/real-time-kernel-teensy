@@ -1,6 +1,6 @@
-	.syntax unified
-	.cpu cortex-m4
-	.thumb
+  .syntax unified
+  .cpu cortex-m4
+  .thumb
 
 @----------------------------------------------------------------------------------------------------------------------*
 @                                                                                                                      *
@@ -11,16 +11,16 @@
 @--- This is stack for background task
    BACKGROUND.STACK.SIZE = 32
 
-	.section	.bss.background.task.stack, "aw", %nobits
-  .align	  3   @ Stack should be aligned on a 8-byte boundary
+  .section  .bss.background.task.stack, "aw", %nobits
+  .align    3   @ Stack should be aligned on a 8-byte boundary
 
 background.task.stack:
-  .space	BACKGROUND.STACK.SIZE
+  .space  BACKGROUND.STACK.SIZE
 
 @----------------------------------------------------------------------------------------------------------------------*
 @ See https://developer.arm.com/docs/dui0553/latest/2-the-cortex-m4-processor/21-programmers-model/213-core-registers
 
-	.section	".text.reset.handler", "ax", %progbits
+  .section  ".text.reset.handler", "ax", %progbits
 
   .global reset.handler
   .type reset.handler, %function

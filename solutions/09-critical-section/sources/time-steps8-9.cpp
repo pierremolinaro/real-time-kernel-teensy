@@ -9,20 +9,6 @@ static void startSystick (BOOT_MODE) {
   SYST_RVR = CPU_MHZ * 1000 - 1 ; // Underflow every ms
   SYST_CVR = 0 ;
   SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_ENABLE ;
-//------------------------------------ Configure and chain PIT0 and PIT1 for 64-bit counting
-//--- Power on PIT
-  SIM_SCGC6 |= SIM_SCGC6_PIT ;
-//--- Enable PIT module
-  PIT_MCR = 0 ;
-//--- Disable PIT0 and PIT1
-  PIT_TCTRL (0) = 0 ;
-  PIT_TCTRL (1) = 0 ;
-//--- PIT0 and PIT1 down-count: initialize them with all 1's
-  PIT_LDVAL (0) = UINT32_MAX ;
-  PIT_LDVAL (1) = UINT32_MAX ;
-//--- Enable PIT0 and PIT1: start counting, chain PI1 to PIT0, no interrupt
-  PIT_TCTRL (1) = PIT_TCTRL_CHN | PIT_TCTRL_TEN ;
-  PIT_TCTRL (0) = PIT_TCTRL_TEN ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -40,18 +26,11 @@ static void activateSystickInterrupt (INIT_MODE) {
 MACRO_INIT_ROUTINE (activateSystickInterrupt) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   micros current value
+//   systick — ANY MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-uint64_t section_micros (SECTION_MODE) {
-//--- To obtain the correct value, first read LTMR64H and then LTMR64L
-  uint64_t result = PIT_LTMR64H ;
-  result <<= 32 ;
-  result |= PIT_LTMR64L ;
-//--- PIT0 and PIT1 actually downcount
-  result = ~ result ;
-//--- Divide by the clock frequency in MHz for getting microsecond count
-  return result / busMHZ () ;
+uint32_t systick (ANY_MODE) {
+  return SYST_CVR ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -66,27 +45,11 @@ void busyWaitDuring_initMode (INIT_MODE_ const uint32_t inDelayMS) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   millis — ANY MODE
+//   SYSTICK interrupt service routine
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static volatile uint32_t gUptime ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-uint32_t millis (ANY_MODE) {
-  return gUptime ;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   systick — ANY MODE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-uint32_t systick (ANY_MODE) {
-  return SYST_CVR ;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   SYSTICK interrupt service routine
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void systickInterruptServiceRoutine (SECTION_MODE) {
@@ -100,6 +63,14 @@ void systickInterruptServiceRoutine (SECTION_MODE) {
     (* ptr) (MODE_ newUptime) ;
     ptr ++ ;
   }
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   millis — ANY MODE
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+uint32_t millis (ANY_MODE) {
+  return gUptime ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

@@ -27,16 +27,6 @@ uint32_t systick (ANY_MODE) ;
 uint32_t millis (ANY_MODE) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   micros current value
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-//$section time.micros
-
-uint64_t micros (USER_MODE) asm ("time.micros") ;
-
-uint64_t section_micros (SECTION_MODE) asm ("section.time.micros") ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   INTERRUPT ROUTINE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -54,5 +44,6 @@ void systickInterruptServiceRoutine (SECTION_MODE) asm ("interrupt.section.SysTi
   __attribute__ ((section ("real.time.interrupt.routine.array"))) \
   __attribute__ ((unused)) \
   __attribute__ ((used)) = ROUTINE ;
+
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

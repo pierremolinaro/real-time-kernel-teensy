@@ -77,3 +77,15 @@ TaskControlBlock * TaskList::Iterator::nextTask (IRQ_MODE) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  CONTAINS TASK
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+bool TaskList::containsTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) const {
+  TASK_LIST_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
+  const uint32_t taskIndex = indexForDescriptorTask (inTaskPtr) ;
+  TASK_LIST_ASSERT (taskIndex < TASK_COUNT, taskIndex) ;
+  const uint32_t mask = 1U << taskIndex ;
+  return (mList & mask) != 0 ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
