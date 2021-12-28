@@ -1,10 +1,10 @@
 #include "all-headers.h"
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 #define ENABLE_XTR_ASSERTIONS
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 #ifdef ENABLE_XTR_ASSERTIONS
   #define XTR_ASSERT_NON_NULL_POINTER(ptr) assertNonNullPointer (ptr, __FILE__, __LINE__) ;
@@ -12,7 +12,7 @@
   #define XTR_ASSERT_NON_NULL_POINTER(ptr)
 #endif
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 #ifdef ENABLE_XTR_ASSERTIONS
   #define XTR_ASSERT(condition,value) assertion (condition, value, __FILE__, __LINE__) ;
@@ -20,9 +20,9 @@
   #define XTR_ASSERT(condition,value)
 #endif
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //    CORTEX-M4 EXCEPTION FRAME (WITHOUT FLOATING-POINT STORAGE)                                                       *
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //                                                                                                                     *
 //         PSP+32 -> |                            |                                                                    *
 //                   |----------------------------| \                                                                  *
@@ -93,7 +93,7 @@ typedef struct {
   uint32_t mLR_RETURN_CODE ;
 } TaskContext ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void kernel_set_task_context (INIT_MODE_
                                      TaskContext & ioTaskContext,
@@ -116,9 +116,9 @@ static void kernel_set_task_context (INIT_MODE_
   ptr->mLR = (uint32_t) taskSelfTerminates ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   GUARDS
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 typedef struct {
   uint32_t mCount ;
@@ -126,7 +126,7 @@ typedef struct {
   GuardList ** mListArray ;
 } GuardDescriptor ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void guardDescriptor_appendGuard (SECTION_MODE_ GuardDescriptor & ioGuardDescriptor, GuardList * ioGuardListPtr) {
   const uint32_t guardCount = ioGuardDescriptor.mCount ;
@@ -143,7 +143,7 @@ static void guardDescriptor_appendGuard (SECTION_MODE_ GuardDescriptor & ioGuard
   ioGuardDescriptor.mCount = guardCount + 1 ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void guardDescriptor_removeAllGuards (SECTION_MODE_ GuardDescriptor & ioGuardDescriptor, TaskControlBlock * inTask) {
   const uint32_t guardCount = ioGuardDescriptor.mCount ;
@@ -153,9 +153,9 @@ static void guardDescriptor_removeAllGuards (SECTION_MODE_ GuardDescriptor & ioG
   ioGuardDescriptor.mCount = 0 ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   T A S K    C O N T R O L    B L O C K                                                                             *
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 typedef struct TaskControlBlock {
 //--- Context buffer
@@ -173,43 +173,43 @@ typedef struct TaskControlBlock {
   bool mUserResult ;
 } TaskControlBlock ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static TaskControlBlock gTaskDescriptorArray [TASK_COUNT] ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 TaskControlBlock * descriptorPointerForTaskIndex (const uint8_t inTaskIndex) {
   XTR_ASSERT (inTaskIndex < TASK_COUNT, inTaskIndex) ;
   return & gTaskDescriptorArray [inTaskIndex] ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 uint8_t indexForDescriptorTask (const TaskControlBlock * inTaskPtr) { // should be not nullptr
   XTR_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
   return inTaskPtr->mTaskIndex ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   RUNNING TASK DESCRIPTOR POINTER
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 TaskControlBlock * gRunningTaskControlBlockPtr asm ("var.running.task.control.block.ptr") ; // Shared with assembly code
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   SCHEDULER
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static TaskList gReadyTaskList ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void kernel_makeNoTaskRunning (KERNEL_MODE) {
    gRunningTaskControlBlockPtr = nullptr ; // No running task
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void kernel_makeTaskReady (IRQ_MODE_ TaskControlBlock * inTaskPtr, const bool inUserResult) {
   XTR_ASSERT_NON_NULL_POINTER (inTaskPtr) ;
@@ -217,7 +217,7 @@ static void kernel_makeTaskReady (IRQ_MODE_ TaskControlBlock * inTaskPtr, const 
   inTaskPtr->mUserResult = inUserResult ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernelSelectTaskToRun (IRQ_MODE) asm ("kernel.select.task.to.run") ; // Invoked from assembly
 
@@ -228,13 +228,13 @@ void kernelSelectTaskToRun (IRQ_MODE) {
   gRunningTaskControlBlockPtr = gReadyTaskList.removeFirstTask (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   kernel_createTask
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static uint8_t gTaskIndex ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_createTask (INIT_MODE_
                         uint64_t * inStackBufferAddress,
@@ -261,37 +261,37 @@ void kernel_createTask (INIT_MODE_
   gTaskIndex += 1 ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //  TASK SELF TERMINATES
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void service_taskSelfTerminates (KERNEL_MODE) {
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //  USER RESULT
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_setUserResult (KERNEL_MODE_ const bool inUserResult) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
   gRunningTaskControlBlockPtr->mUserResult = inUserResult ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 bool getUserResult (USER_MODE) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
   return gRunningTaskControlBlockPtr->mUserResult ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   DEADLINE LIST
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static TaskList gDeadlineWaitingTaskList ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
@@ -302,7 +302,7 @@ void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurrentDate) {
   TaskList::Iterator iterator (MODE_ gDeadlineWaitingTaskList) ;
@@ -322,13 +322,13 @@ static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurren
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //  SYNCHRONIZATION
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
@@ -338,7 +338,7 @@ void kernel_blockRunningTaskInList (KERNEL_MODE_ TaskList & ioWaitingList) {
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) {
   TaskControlBlock * taskPtr = ioWaitingList.removeFirstTask (MODE) ;
@@ -353,9 +353,9 @@ bool irq_makeTaskReadyFromList (IRQ_MODE_ TaskList & ioWaitingList) {
   return found ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //  SYNCHRONIZATION AND DEADLINE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaitingList, const uint32_t inDeadline) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
@@ -369,7 +369,7 @@ void kernel_blockRunningTaskInListAndDeadline (KERNEL_MODE_ TaskList & ioWaiting
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //  G U A R D S                                                                                                        *
 //---------------------------------------------------------------------------------------------------------------------*
 // ENTER TASK IN LIST: inTask should be not null
@@ -411,18 +411,18 @@ void GuardList::removeTask (SECTION_MODE_ TaskControlBlock * inTaskPtr) {
   mGuardList &= ~ mask ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static TaskList gDeadlineWaitingInGuardTaskList ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void removeTaskFromGuards (SECTION_MODE_ TaskControlBlock * inTask) {
   guardDescriptor_removeAllGuards (MODE_ inTask->mGuardDescriptor, inTask) ;
   gDeadlineWaitingInGuardTaskList.removeTask (MODE_ inTask) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void guard_handleCommand (SECTION_MODE_ GuardList & ioGuardList, const bool inAccepted) {
   if (inAccepted) {
@@ -434,7 +434,7 @@ void guard_handleCommand (SECTION_MODE_ GuardList & ioGuardList, const bool inAc
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 bool section_guard_booleanExpression (SECTION_MODE_ const bool inAccepted) {
   if (inAccepted) {
@@ -444,14 +444,14 @@ bool section_guard_booleanExpression (SECTION_MODE_ const bool inAccepted) {
   return inAccepted ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 bool guard_waitForChange (USER_MODE) {
   internalWaitForGuardChange (MODE) ;
   return getUserResult (MODE) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void kernel_internalWaitForGuardChange (KERNEL_MODE) {
   gRunningTaskControlBlockPtr->mUserResult = gRunningTaskControlBlockPtr->mGuardState == GUARD_DID_CHANGE ;
@@ -471,7 +471,7 @@ void kernel_internalWaitForGuardChange (KERNEL_MODE) {
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void guard_commandStatesDidChange (IRQ_MODE_ GuardList & ioGuardList) {
   TaskControlBlock * task ;
@@ -488,7 +488,7 @@ void guard_commandStatesDidChange (IRQ_MODE_ GuardList & ioGuardList) {
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 void guard_handleWaitUntil (SECTION_MODE_ const uint32_t inDeadline, const bool inAccepted) {
   if (inAccepted) {
@@ -504,7 +504,7 @@ void guard_handleWaitUntil (SECTION_MODE_ const uint32_t inDeadline, const bool 
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 static void tickHandlerForGuardedWaitUntil (IRQ_MODE_ const uint32_t inUptime) {
   TaskList::Iterator iterator (MODE_ gDeadlineWaitingInGuardTaskList) ;
@@ -526,9 +526,9 @@ static void tickHandlerForGuardedWaitUntil (IRQ_MODE_ const uint32_t inUptime) {
 
 MACRO_REAL_TIME_ISR (tickHandlerForGuardedWaitUntil) ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 //   Wait until deadline in guard
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------
 
 bool kernel_guard_waitUntil (SECTION_MODE_ const uint32_t inDeadlineMS) {
   const bool accepted = inDeadlineMS <= millis (MODE) ;
@@ -536,4 +536,4 @@ bool kernel_guard_waitUntil (SECTION_MODE_ const uint32_t inDeadlineMS) {
   return accepted ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//-----------------------------------------------------------------------------

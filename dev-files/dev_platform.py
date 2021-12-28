@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
@@ -30,8 +29,8 @@ def getPlatform () :
 #--- Determine platform
   PLATFORM = ""
   (SYSTEM_NAME, MODE_NAME, RELEASE, VERSION, MACHINE) = os.uname ()
-  #print "SYSTEM_NAME '" + SYSTEM_NAME + "'"
-  #print "MACHINE '" + MACHINE + "'"
+  #print ("SYSTEM_NAME '" + SYSTEM_NAME + "'")
+  #print ("MACHINE '" + MACHINE + "'")
   if (MACHINE == "i386") & (SYSTEM_NAME == "Darwin") :
     PLATFORM = "mac"
   elif (MACHINE == "x86_64") & (SYSTEM_NAME == "Darwin") :

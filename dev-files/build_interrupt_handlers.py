@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -61,23 +61,23 @@ def generateSVChandler ():
   sFile += "@     |              |----------------------------| /\n"
   sFile += "@     |              |                            |\n"
   sFile += "@     |\n"
-  sFile += "@     |                                          *---------------------*\n"
+  sFile += "@     |                          ---------------------*\n"
   sFile += "@     |                                          | LR return code      | +36 [ 9]\n"
-  sFile += "@     |                                          *---------------------*\n"
+  sFile += "@     |                          ---------------------*\n"
   sFile += "@     \----------------------------------------- | R13 (PSP)           | +32 [ 8]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R11                 | +28 [ 7]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R10                 | +24 [ 6]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R9                  | +20 [ 5]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R8                  | +16 [ 4]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R7                  | +12 [ 3]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R6                  | + 8 [ 2]\n"
-  sFile += "@                                                *---------------------*\n"
+  sFile += "@                                ---------------------*\n"
   sFile += "@                                                | R5                  | + 4 [ 1]\n"
   sFile += "@  *------------------------------------*        *---------------------*\n"
   sFile += "@  | var.running.task.control.block.ptr +------> | R4                  | + 0 [ 0]\n"
@@ -400,13 +400,13 @@ def generateDisableInterruptSection (sectionName):
 
 #------------------------------ Interrupt dictionary
 interruptDictionary = interrupt_names_teensy_3_6.interruptNames ()
-# print "Dest " + destinationFile
+# print ("Dest " + destinationFile)
 #------------------------------ Assembly destination file
 destinationCppFile = sys.argv [1]
-# print "Dest " + destinationAssemblerFile
+# print ("Dest " + destinationAssemblerFile)
 #------------------------------ Assembly destination file
 destinationAssemblerFile = sys.argv [2]
-# print "Dest " + destinationAssemblerFile
+# print ("Dest " + destinationAssemblerFile)
 #------------------------------ Service scheme
 serviceScheme = sys.argv [3]
 #------------------------------ Section scheme

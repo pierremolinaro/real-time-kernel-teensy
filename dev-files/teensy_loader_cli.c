@@ -40,7 +40,7 @@ void usage(const char *err)
 		"Usage: teensy_loader_cli --mcu=<MCU> [-w] [-h] [-n] [-b] [-v] <file.hex>\n"
 		"\t-w : Wait for device to appear\n"
 		"\t-r : Use hard reboot if device not online\n"
-		"\t-s : Use soft reboot if device not online (Teensy3.x only)\n"
+		"\t-s : Use soft reboot if device not online (Teensy 3.x & 4.x)\n"
 		"\t-n : No reboot after programming\n"
 		"\t-b : Boot only, do not program\n"
 		"\t-v : Verbose output\n"
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 	if (!code_size) {
 		usage("MCU type must be specified");
 	}
-	printf_verbose("Teensy Loader, Command Line, Version 2.1\n");
+	printf_verbose("Teensy Loader, Command Line, Version 2.2\n");
 
 	if (block_size == 512 || block_size == 1024) {
 		write_size = block_size + 64;
@@ -110,22 +110,14 @@ int main(int argc, char **argv)
 		write_size = block_size + 2;
 	};
 
-	if (boot_only) {
-		if (! teensy_open()) {
-			die("Could not find HalfKay");
-		}
-		printf_verbose("Found HalfKay Bootloader\n");
-
-		boot(buf, write_size);
-		exit(0);
+	if (!boot_only) {
+		// read the intel hex file
+		// this is done first so any error is reported before using USB
+		num = read_intel_hex(filename);
+		if (num < 0) die("error reading intel hex file \"%s\"", filename);
+		printf_verbose("Read \"%s\": %d bytes, %.1f%% usage\n",
+			filename, num, (double)num / (double)code_size * 100.0);
 	}
-
-	// read the intel hex file
-	// this is done first so any error is reported before using USB
-	num = read_intel_hex(filename);
-	if (num < 0) die("error reading intel hex file \"%s\"", filename);
-	printf_verbose("Read \"%s\": %d bytes, %.1f%% usage\n",
-		filename, num, (double)num / (double)code_size * 100.0);
 
 	// open the USB device
 	while (1) {
@@ -143,7 +135,7 @@ int main(int argc, char **argv)
 			soft_reboot_device = 0;
 			wait_for_device_to_appear = 1;
 		}
-		if (!wait_for_device_to_appear) die("Unable to open device\n");
+		if (!wait_for_device_to_appear) die("Unable to open device (hint: try -w option)\n");
 		if (!waited) {
 			printf_verbose("Waiting for Teensy device...\n");
 			printf_verbose(" (hint: press the reset button)\n");
@@ -152,6 +144,12 @@ int main(int argc, char **argv)
 		delay(0.25);
 	}
 	printf_verbose("Found HalfKay Bootloader\n");
+
+	if (boot_only) {
+		boot(buf, write_size);
+		teensy_close();
+		return 0;
+	}
 
 	// if we waited for the device, read the hex file again
 	// perhaps it changed while we were waiting?
@@ -277,7 +275,7 @@ usb_dev_handle * open_usb_device(int vid, int pid)
 				continue;
 			}
 			#endif
-      
+
 			return h;
 		}
 	}
@@ -343,8 +341,8 @@ int soft_reboot(void)
 		return 0;
 	}
 
-	char reboot_command = 134;
-	int response = usb_control_msg(serial_handle, 0x21, 0x20, 0, 0, &reboot_command, 1, 10000);
+	char reboot_command[] = {0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08};
+	int response = usb_control_msg(serial_handle, 0x21, 0x20, 0, 0, reboot_command, sizeof reboot_command, 10000);
 
 	usb_release_interface(serial_handle, 0);
 	usb_close(serial_handle);
@@ -461,13 +459,13 @@ int write_usb_device(HANDLE h, void *buf, int len, int timeout)
 
 void print_win32_err(void)
 {
-        char buf[256];
-        DWORD err;
+	char buf[256];
+	DWORD err;
 
-        err = GetLastError();
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-                0, buf, sizeof(buf), NULL);
-        printf("err %ld: %s\n", err, buf);
+	err = GetLastError();
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
+		0, buf, sizeof(buf), NULL);
+	printf("err %ld: %s\n", err, buf);
 }
 
 static HANDLE win32_teensy_handle = NULL;
@@ -622,6 +620,70 @@ void init_hid_manager(void)
 	IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, NULL);
 	ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
 	if (ret != kIOReturnSuccess) {
+				printf_verbose("Error opening HID Manager: ");
+
+		switch(ret) {
+		case kIOReturnSuccess:          printf_verbose("kIOReturnSuccess\n");          break;
+		case kIOReturnError:            printf_verbose("kIOReturnError\n");            break;
+		case kIOReturnNoMemory:         printf_verbose("kIOReturnNoMemory\n");         break;
+		case kIOReturnNoResources:      printf_verbose("kIOReturnNoResources\n");      break;
+		case kIOReturnIPCError:         printf_verbose("kIOReturnIPCError\n");         break;
+		case kIOReturnNoDevice:         printf_verbose("kIOReturnNoDevice\n");         break;
+		case kIOReturnNotPrivileged:    printf_verbose("kIOReturnNotPrivileged\n");    break;
+		case kIOReturnBadArgument:      printf_verbose("kIOReturnBadArgument\n");      break;
+		case kIOReturnLockedRead:       printf_verbose("kIOReturnLockedRead\n");       break;
+		case kIOReturnLockedWrite:      printf_verbose("kIOReturnLockedWrite\n");      break;
+		case kIOReturnExclusiveAccess:  printf_verbose("kIOReturnExclusiveAccess\n");  break;
+		case kIOReturnBadMessageID:     printf_verbose("kIOReturnBadMessageID\n");     break;
+		case kIOReturnUnsupported:      printf_verbose("kIOReturnUnsupported\n");      break;
+		case kIOReturnVMError:          printf_verbose("kIOReturnVMError\n");          break;
+		case kIOReturnInternalError:    printf_verbose("kIOReturnInternalError\n");    break;
+		case kIOReturnIOError:          printf_verbose("kIOReturnIOError\n");          break;
+		case kIOReturnCannotLock:       printf_verbose("kIOReturnCannotLock\n");       break;
+		case kIOReturnNotOpen:          printf_verbose("kIOReturnNotOpen\n");          break;
+		case kIOReturnNotReadable:      printf_verbose("kIOReturnNotReadable\n");      break;
+		case kIOReturnNotWritable:      printf_verbose("kIOReturnNotWritable\n");      break;
+		case kIOReturnNotAligned:       printf_verbose("kIOReturnNotAligned\n");       break;
+		case kIOReturnBadMedia:         printf_verbose("kIOReturnBadMedia\n");         break;
+		case kIOReturnStillOpen:        printf_verbose("kIOReturnStillOpen\n");        break;
+		case kIOReturnRLDError:         printf_verbose("kIOReturnRLDError\n");         break;
+		case kIOReturnDMAError:         printf_verbose("kIOReturnDMAError\n");         break;
+		case kIOReturnBusy:             printf_verbose("kIOReturnBusy\n");             break;
+		case kIOReturnTimeout:          printf_verbose("kIOReturnTimeout\n");          break;
+		case kIOReturnOffline:          printf_verbose("kIOReturnOffline\n");          break;
+		case kIOReturnNotReady:         printf_verbose("kIOReturnNotReady\n");         break;
+		case kIOReturnNotAttached:      printf_verbose("kIOReturnNotAttached\n");      break;
+		case kIOReturnNoChannels:       printf_verbose("kIOReturnNoChannels\n");       break;
+		case kIOReturnNoSpace:          printf_verbose("kIOReturnNoSpace\n");          break;
+		case kIOReturnPortExists:       printf_verbose("kIOReturnPortExists\n");       break;
+		case kIOReturnCannotWire:       printf_verbose("kIOReturnCannotWire\n");       break;
+		case kIOReturnNoInterrupt:      printf_verbose("kIOReturnNoInterrupt\n");      break;
+		case kIOReturnNoFrames:         printf_verbose("kIOReturnNoFrames\n");         break;
+		case kIOReturnMessageTooLarge:  printf_verbose("kIOReturnMessageTooLarge\n");  break;
+		case kIOReturnNotPermitted:     printf_verbose("kIOReturnNotPermitted\n");     break;
+		case kIOReturnNoPower:          printf_verbose("kIOReturnNoPower\n");          break;
+		case kIOReturnNoMedia:          printf_verbose("kIOReturnNoMedia\n");          break;
+		case kIOReturnUnformattedMedia: printf_verbose("kIOReturnUnformattedMedia\n"); break;
+		case kIOReturnUnsupportedMode:  printf_verbose("kIOReturnUnsupportedMode\n");  break;
+		case kIOReturnUnderrun:         printf_verbose("kIOReturnUnderrun\n");         break;
+		case kIOReturnOverrun:          printf_verbose("kIOReturnOverrun\n");          break;
+		case kIOReturnDeviceError:      printf_verbose("kIOReturnDeviceError\n");      break;
+		case kIOReturnNoCompletion:     printf_verbose("kIOReturnNoCompletion\n");     break;
+		case kIOReturnAborted:          printf_verbose("kIOReturnAborted\n");          break;
+		case kIOReturnNoBandwidth:      printf_verbose("kIOReturnNoBandwidth\n");      break;
+		case kIOReturnNotResponding:    printf_verbose("kIOReturnNotResponding\n");    break;
+		case kIOReturnIsoTooOld:        printf_verbose("kIOReturnIsoTooOld\n");        break;
+		case kIOReturnIsoTooNew:        printf_verbose("kIOReturnIsoTooNew\n");        break;
+		case kIOReturnNotFound:         printf_verbose("kIOReturnNotFound\n");         break;
+		case kIOReturnInvalid:          printf_verbose("kIOReturnInvalid\n");          break;
+		default:			printf_verbose("Unrecognized error.\n");       break;
+		}
+
+		if (ret == kIOReturnNotPermitted) {
+			printf_verbose("Unable to verify status of the USB HID system (for security reasons).\n");
+			printf_verbose("Nonetheless, may still be able to read and write to teensy devices. Continuing.\n");
+			return;
+		}
 		IOHIDManagerUnscheduleFromRunLoop(hid_manager,
 			CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 		CFRelease(hid_manager);
@@ -841,7 +903,7 @@ int soft_reboot(void)
 // the maximum flash image size we can support
 // chips with larger memory may be used, but only this
 // much intel-hex data can be loaded into memory!
-#define MAX_MEMORY_SIZE 0x100000
+#define MAX_MEMORY_SIZE 0x1000000
 
 static unsigned char firmware_image[MAX_MEMORY_SIZE];
 static unsigned char firmware_mask[MAX_MEMORY_SIZE];
@@ -899,23 +961,23 @@ int
 parse_hex_line(char *line)
 {
 	int addr, code, num;
-        int sum, len, cksum, i;
-        char *ptr;
+	int sum, len, cksum, i;
+	char *ptr;
 
-        num = 0;
-        if (line[0] != ':') return 0;
-        if (strlen(line) < 11) return 0;
-        ptr = line+1;
-        if (!sscanf(ptr, "%02x", &len)) return 0;
-        ptr += 2;
-        if ((int)strlen(line) < (11 + (len * 2)) ) return 0;
-        if (!sscanf(ptr, "%04x", &addr)) return 0;
-        ptr += 4;
-          /* printf("Line: length=%d Addr=%d\n", len, addr); */
-        if (!sscanf(ptr, "%02x", &code)) return 0;
+	num = 0;
+	if (line[0] != ':') return 0;
+	if (strlen(line) < 11) return 0;
+	ptr = line+1;
+	if (!sscanf(ptr, "%02x", &len)) return 0;
+	ptr += 2;
+	if ((int)strlen(line) < (11 + (len * 2)) ) return 0;
+	if (!sscanf(ptr, "%04x", &addr)) return 0;
+	ptr += 4;
+	  /* printf("Line: length=%d Addr=%d\n", len, addr); */
+	if (!sscanf(ptr, "%02x", &code)) return 0;
 	if (addr + extended_addr + len >= MAX_MEMORY_SIZE) return 0;
-        ptr += 2;
-        sum = (len & 255) + ((addr >> 8) & 255) + (addr & 255) + (code & 255);
+	ptr += 2;
+	sum = (len & 255) + ((addr >> 8) & 255) + (addr & 255) + (code & 255);
 	if (code != 0) {
 		if (code == 1) {
 			end_record_seen = 1;
@@ -925,7 +987,7 @@ parse_hex_line(char *line)
 			if (!sscanf(ptr, "%04x", &i)) return 1;
 			ptr += 4;
 			sum += ((i >> 8) & 255) + (i & 255);
-        		if (!sscanf(ptr, "%02x", &cksum)) return 1;
+			if (!sscanf(ptr, "%02x", &cksum)) return 1;
 			if (((sum & 255) + (cksum & 255)) & 255) return 1;
 			extended_addr = i << 4;
 			//printf("ext addr = %05X\n", extended_addr);
@@ -934,27 +996,32 @@ parse_hex_line(char *line)
 			if (!sscanf(ptr, "%04x", &i)) return 1;
 			ptr += 4;
 			sum += ((i >> 8) & 255) + (i & 255);
-        		if (!sscanf(ptr, "%02x", &cksum)) return 1;
+			if (!sscanf(ptr, "%02x", &cksum)) return 1;
 			if (((sum & 255) + (cksum & 255)) & 255) return 1;
 			extended_addr = i << 16;
+			if (code_size > 1048576 && block_size >= 1024 &&
+			   extended_addr >= 0x60000000 && extended_addr < 0x60000000 + code_size) {
+				// Teensy 4.0 HEX files have 0x60000000 FlexSPI offset
+				extended_addr -= 0x60000000;
+			}
 			//printf("ext addr = %08X\n", extended_addr);
 		}
 		return 1;	// non-data line
 	}
 	byte_count += len;
-        while (num != len) {
-                if (sscanf(ptr, "%02x", &i) != 1) return 0;
+	while (num != len) {
+		if (sscanf(ptr, "%02x", &i) != 1) return 0;
 		i &= 255;
 		firmware_image[addr + extended_addr + num] = i;
 		firmware_mask[addr + extended_addr + num] = 1;
-                ptr += 2;
-                sum += i;
-                (num)++;
-                if (num >= 256) return 0;
-        }
-        if (!sscanf(ptr, "%02x", &cksum)) return 0;
-        if (((sum & 255) + (cksum & 255)) & 255) return 0; /* checksum error */
-        return 1;
+		ptr += 2;
+		sum += i;
+		(num)++;
+		if (num >= 256) return 0;
+	}
+	if (!sscanf(ptr, "%02x", &cksum)) return 0;
+	if (((sum & 255) + (cksum & 255)) & 255) return 0; /* checksum error */
+	return 1;
 }
 
 int ihex_bytes_within_range(int begin, int end)
@@ -1065,16 +1132,21 @@ static const struct {
 	{"mk20dx256",   262144,  1024},
 	{"mk66fx1m0",  1048576,  1024},
 	{"mk64fx512",   524288,  1024},
+	{"imxrt1062",  2031616,  1024},
 
 	// Add duplicates that match friendly Teensy Names
 	// Match board names in boards.txt
-	{"TEENSY2",   32256,   128},
-	{"TEENSY2PP", 130048,   256},
-	{"TEENSYLC",     63488,   512},
+	{"TEENSY2",     32256,   128},
+	{"TEENSY2PP",  130048,   256},
+	{"TEENSYLC",    63488,   512},
 	{"TEENSY30",   131072,  1024},
 	{"TEENSY31",   262144,  1024},
+	{"TEENSY32",   262144,  1024},
 	{"TEENSY35",   524288,  1024},
 	{"TEENSY36",  1048576,  1024},
+	{"TEENSY40",  2031616,  1024},
+	{"TEENSY41",  8126464,  1024},
+	{"TEENSY_MICROMOD", 16515072,  1024},
 #endif
 	{NULL, 0, 0},
 };

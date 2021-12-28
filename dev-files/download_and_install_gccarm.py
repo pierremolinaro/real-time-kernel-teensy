@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 #---------------------------------------------------------------------------------------------------
@@ -65,7 +64,7 @@ def runCommand (cmd) :
   str = "+"
   for s in cmd:
     str += " " + s
-  print bcolors.BOLD_BLUE + str + bcolors.ENDC
+  print (bcolors.BOLD_BLUE + str + bcolors.ENDC)
   returncode = subprocess.call (cmd)
   if returncode != 0 :
     sys.exit (returncode)
@@ -76,7 +75,7 @@ def runCommand (cmd) :
 
 def downloadArchive (archiveURL, archivePath):
   print ("URL: "+ archiveURL)
-  print "Downloading..."
+  print ("Downloading...")
   runCommand (["curl", "--fail", "-L", archiveURL, "-o", archivePath])
 
 #---------------------------------------------------------------------------------------------------
@@ -84,7 +83,7 @@ def downloadArchive (archiveURL, archivePath):
 #---------------------------------------------------------------------------------------------------
 
 def install_gcc (INSTALL_DIR) :
-  print bcolors.BOLD_GREEN + "Install GCC tools..." + bcolors.ENDC
+  print (bcolors.BOLD_GREEN + "Install GCC tools..." + bcolors.ENDC)
   DISTRIBUTION = distributionGCC ()
   #------------------------------------------------------------------ Archive dir
   COMPILER_ARCHIVE_DIR = archive_directory.createAndGetArchiveDirectory ()
@@ -104,7 +103,7 @@ def install_gcc (INSTALL_DIR) :
     runCommand (["cp", COMPILER_ARCHIVE_DIR + "/" + DISTRIBUTION + ".tar.bz2", INSTALL_DIR + "/" + DISTRIBUTION + ".tar.bz2"])
     savedCurrentDir = os.getcwd ()
     os.chdir (INSTALL_DIR)
-    print bcolors.BOLD_BLUE + "+ cd " + INSTALL_DIR + bcolors.ENDC
+    print (bcolors.BOLD_BLUE + "+ cd " + INSTALL_DIR + bcolors.ENDC)
     runCommand (["bunzip2", DISTRIBUTION + ".tar.bz2"])
     runCommand (["tar", "xf", DISTRIBUTION + ".tar"])
     runCommand (["rm", DISTRIBUTION + ".tar"])

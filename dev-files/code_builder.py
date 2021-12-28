@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: UTF-8 -*-
 #---------------------------------------------------------------------------------------------------
 
@@ -13,17 +12,22 @@ import teensy_cli_loader_builder
 import dev_platform
 
 #---------------------------------------------------------------------------------------------------
-#   Run process and wait for termination                                                                               *
+#   Run process and wait for termination
 #---------------------------------------------------------------------------------------------------
 
 def runProcess (command) :
+  str = makefile.BOLD_GREEN ()
+  for s in command :
+    str += " " + s
+  str += makefile.ENDC ()
+  print (str)
   returncode = subprocess.call (command)
   if returncode != 0 :
     print (makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ())
     sys.exit (returncode)
 
 #---------------------------------------------------------------------------------------------------
-#   Run process, get output and wait for termination                                                                   *
+#   Run process, get output and wait for termination
 #---------------------------------------------------------------------------------------------------
 
 def runProcessAndGetOutput (command) :
@@ -44,7 +48,7 @@ def runProcessAndGetOutput (command) :
   return result
 
 #---------------------------------------------------------------------------------------------------
-#   dictionaryFromJsonFile                                                                                             *
+#   dictionaryFromJsonFile
 #---------------------------------------------------------------------------------------------------
 
 def dictionaryFromJsonFile (file) :
@@ -63,7 +67,7 @@ def dictionaryFromJsonFile (file) :
 
 
 #---------------------------------------------------------------------------------------------------
-#   buildCode                                                                                                          *
+#   buildCode
 #---------------------------------------------------------------------------------------------------
 
 def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
@@ -95,52 +99,37 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #--- TEENSY
   linkerScript = "common-sources/teensy-3-6.ld"
   teensyName = "TEENSY36"
-#   if dictionaire.has_key ("TEENSY") :
-#     TeensyKey = dictionaire ["TEENSY"]
-#     if (TeensyKey == "3.1") or (TeensyKey == "3.2") :
-#       teensyName = "TEENSY31"
-#       linkerScript = "teensy-3-1.ld"
-#     elif (TeensyKey == "3.5") :
-#       teensyName = "TEENSY35"
-#       linkerScript = "teensy-3-5.ld"
-#     elif (TeensyKey == "3.6") :
-#       teensyName = "TEENSY36"
-#       linkerScript = "teensy-3-6.ld"
-#     else:
-#       make.enterError ('In the makefile.json file, the "TEENSY" key value is invalid (possible values: "3.1", "3.2", "3.5" or "3.6").')
-#   else:
-#     make.enterError ('The makefile.json file does not have a "TEENSY" key (possible values: "3.1", "3.2", "3.5" or "3.6").')
 #--- ASSERTION_GENERATION
   ASSERTION_GENERATION = False
-  if dictionaire.has_key ("ASSERTION-GENERATION") and dictionaire ["ASSERTION-GENERATION"] :
+  if ("ASSERTION-GENERATION" in dictionaire) and dictionaire ["ASSERTION-GENERATION"] :
     ASSERTION_GENERATION = True
 #--- CPU_MHZ
   CPU_MHZ = 0
-  if dictionaire.has_key ("CPU-MHZ") :
+  if "CPU-MHZ" in dictionaire :
     CPU_MHZ = dictionaire ["CPU-MHZ"]
 #--- SOURCE_FILE_DIRECTORIES
   SOURCE_FILE_DIRECTORIES = []
-  if dictionaire.has_key ("SOURCE-DIR") :
+  if "SOURCE-DIR" in dictionaire :
     SOURCE_FILE_DIRECTORIES = dictionaire ["SOURCE-DIR"]
 #--- GROUP_SOURCES
   GROUP_SOURCES = False
-  if dictionaire.has_key ("GROUP-SOURCES") :
+  if "GROUP-SOURCES" in dictionaire :
     GROUP_SOURCES = dictionaire ["GROUP-SOURCES"]
 #--- TASK_COUNT
   TASK_COUNT = "0" # Means TASK_COUNT is not defined by JSON file
-  if dictionaire.has_key ("TASK-COUNT") :
+  if "TASK-COUNT" in dictionaire :
     TASK_COUNT = str (dictionaire ["TASK-COUNT"])
 #--- LTO
   usesLTO = False
-  if dictionaire.has_key ("LTO") and dictionaire ["LTO"] :
+  if ("LTO" in dictionaire) and dictionaire ["LTO"] :
     usesLTO = True
 #--- SERVICE
   serviceScheme = ""
-  if dictionaire.has_key ("SERVICE-SCHEME") :
+  if "SERVICE-SCHEME"  in dictionaire :
     serviceScheme = dictionaire ["SERVICE-SCHEME"]
 #--- SECTION
   sectionScheme = ""
-  if dictionaire.has_key ("SECTION-SCHEME") :
+  if "SECTION-SCHEME" in dictionaire :
     sectionScheme = dictionaire ["SECTION-SCHEME"]
 #--------------------------------------------------------------------------- Directories
   BUILD_DIR = common_definitions.buildDirectory ()
@@ -174,7 +163,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule = makefile.Rule ([baseHeader_file], "Build base header file")
   rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
-  rule.mCommand += ["../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
+  rule.mCommand += ["python", "../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build all header file
@@ -184,7 +173,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
   rule.mDependences += H_SOURCE_LIST
-  rule.mCommand += ["../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
+  rule.mCommand += ["python", "../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
   rule.mCommand += H_SOURCE_LIST
   rule.enterSecondaryDependanceFile (allHeadersSecondaryDependenceFile, make)
   rule.mPriority = -1
@@ -199,7 +188,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mDependences += H_SOURCE_LIST
   rule.mDependences.append ("makefile.json")
   rule.mDependences.append ("../../dev-files/build_interrupt_handlers.py")
-  rule.mCommand += ["../../dev-files/build_interrupt_handlers.py"]
+  rule.mCommand += ["python", "../../dev-files/build_interrupt_handlers.py"]
   rule.mCommand += [interruptHandlerCppFile]
   rule.mCommand += [interruptHandlerSFile]
   rule.mCommand += [serviceScheme]
@@ -214,7 +203,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mOpenSourceOnError = False
     rule.mDependences += CPP_SOURCE_LIST
     rule.mDependences.append ("makefile.json")
-    rule.mCommand += ["../../dev-files/build_grouped_sources.py", allSourceFile]
+    rule.mCommand += ["python", "../../dev-files/build_grouped_sources.py", allSourceFile]
     rule.mCommand += CPP_SOURCE_LIST
     rule.mPriority = -1
     make.addRule (rule)
@@ -270,7 +259,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule = makefile.Rule ([objdumpPythonFile], "Building " + source + ".objdump.py")
     rule.mDependences.append (objectFile)
     rule.mDependences.append ("makefile.json")
-    rule.mCommand += ["../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
+    rule.mCommand += ["python", "../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
     rule.mPriority = -1
     make.addRule (rule)
     allGoal.append (objdumpPythonFile)
