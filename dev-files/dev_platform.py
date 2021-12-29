@@ -36,7 +36,7 @@ def getPlatform () :
   elif (MACHINE == "x86_64") & (SYSTEM_NAME == "Darwin") :
     PLATFORM = "mac"
   elif (MACHINE == "x86_64") & (SYSTEM_NAME == "Linux") :
-    PLATFORM = "linux"
+    PLATFORM = "x86_64-linux"
   elif (MACHINE == "i386") & (SYSTEM_NAME == "Linux") :
     PLATFORM = "linux32"
   elif (MACHINE == "i686") & (SYSTEM_NAME == "Linux") :
