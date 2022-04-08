@@ -11,7 +11,7 @@ import sys, os, subprocess
 scriptDir = os.path.dirname (os.path.abspath (sys.argv [0]))
 os.chdir (scriptDir)
 #---
-returncode = subprocess.call (["python", "1-build.py", "view-hex"])
+returncode = subprocess.call (["python3", "1-build.py", "view-hex"])
 if returncode != 0 :
   sys.exit (returncode)
 

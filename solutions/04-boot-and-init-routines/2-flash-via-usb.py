@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+"python3"#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 #------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ import sys, os, subprocess
 scriptDir = os.path.dirname (os.path.abspath (sys.argv [0]))
 os.chdir (scriptDir)
 #---
-returncode = subprocess.call (["python", "1-build.py", "run"])
+returncode = subprocess.call (["python3", "1-build.py", "run"])
 if returncode != 0 :
   sys.exit (returncode)
 

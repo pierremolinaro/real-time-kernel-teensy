@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 #------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ current_line = ""
 try:
     byte = "1" # initial placeholder
     while byte != "":
-        byte = hex_file.read(1)
+        byte = hex_file.read(1).decode("utf-8")
         if byte == ":":
             #   (1) Parse the current line!
             parse_hex_line( current_line )

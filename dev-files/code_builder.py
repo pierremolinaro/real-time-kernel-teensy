@@ -1,26 +1,23 @@
 # -*- coding: UTF-8 -*-
 #---------------------------------------------------------------------------------------------------
 
-import sys, os, subprocess, shutil, json
+import sys, os, subprocess, shutil, json, platform
 
 #---------------------------------------------------------------------------------------------------
 
 import makefile
 import common_definitions
-import download_and_install_gccarm
-import teensy_cli_loader_builder
-import dev_platform
 
 #---------------------------------------------------------------------------------------------------
 #   Run process and wait for termination
 #---------------------------------------------------------------------------------------------------
 
 def runProcess (command) :
-  str = makefile.BOLD_GREEN ()
+  string = makefile.BOLD_GREEN ()
   for s in command :
-    str += " " + s
-  str += makefile.ENDC ()
-  print (str)
+    string += " " + s
+  string += makefile.ENDC ()
+  print (string)
   returncode = subprocess.call (command)
   if returncode != 0 :
     print (makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ())
@@ -76,23 +73,32 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   make = makefile.Make (GOAL)
   make.mMacTextEditor = "TextWrangler" # "Atom"
   allGoal = []
-#--------------------------------------------------------------------------- Install Linux UDEV rules ?
-  platform = dev_platform.getPlatform ()
-  if (platform == "linux") or (platform == "linux32") :
-    import udev_on_linux
-    udev_on_linux.installUDEVrulesOnLinux ()
-#--------------------------------------------------------------------------- Install compiler ?
-  BASE_NAME = "arm-none-eabi"
-  TOOL_DIR = download_and_install_gccarm.installGCCARMandGetToolDirectory ()
-  AS_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-as", "-mthumb", "-mcpu=cortex-m4"]
-  COMPILER_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-gcc", "-mthumb", "-mcpu=cortex-m4"]
-  LD_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-ld"]
-  LD_TOOL_WITH_OPTIONS = COMPILER_TOOL_WITH_OPTIONS
-  OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + "/bin/" + BASE_NAME + "-objcopy"]
-  DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + "/bin/" + BASE_NAME + "-size"]
-  OBJDUMP_TOOL = TOOL_DIR + "/bin/" + BASE_NAME + "-objdump"
-#--------------------------------------------------------------------------- Install Teensy loader CLI ?
-  TEENSY_CLI_LOADER_PATH = teensy_cli_loader_builder.buildAndGetPath (TOOL_DIR + "/bin")
+#--------------------------------------------------------------------------- Get platform ?
+#  (SYSTEM_NAME, MODE_NAME, RELEASE, VERSION, MACHINE) = os.uname ()
+  SYSTEM_NAME = platform.system ()
+  if SYSTEM_NAME == "Darwin" :
+    BASE_NAME = "arm-none-eabi"
+    TOOL_DIR = "/Applications/Teensyduino.app/Contents/Java/hardware/tools/arm/bin/"
+    AS_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-as", "-mthumb", "-mcpu=cortex-m4"]
+    COMPILER_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-gcc", "-mthumb", "-mcpu=cortex-m4"]
+    OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-objcopy"]
+    DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + BASE_NAME + "-size"]
+    OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
+    TEENSY_POST_COMPILE = "/Applications/Teensyduino.app/Contents/Java/hardware/tools/teensy_post_compile"
+    TEENSY_TOOLS_DIR = "/Applications/Teensyduino.app/Contents/Java/hardware/tools/"
+  elif SYSTEM_NAME == "Windows" :
+    BASE_NAME = "arm-none-eabi"
+    TOOL_DIR = "c:/Program Files (x86)/Arduino/hardware/tools/arm/bin/"
+    AS_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-as", "-mthumb", "-mcpu=cortex-m4"]
+    COMPILER_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-gcc", "-mthumb", "-mcpu=cortex-m4"]
+    OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-objcopy"]
+    DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + BASE_NAME + "-size"]
+    OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
+    TEENSY_POST_COMPILE = "c:/Program Files (x86)/Arduino/hardware/tools/teensy_post_compile"
+    TEENSY_TOOLS_DIR = "c:/Program Files (x86)/Arduino/hardware/tools/"
+  else:
+    print (makefile.BOLD_RED () + "Unhandled platform: '" + SYSTEM_NAME + "'" + makefile.ENDC ())
+    sys.exit (1)
 #--------------------------------------------------------------------------- Analyze JSON file
   print (makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ())
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")
@@ -232,7 +238,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-o", objectFileForChecking]
     rule.mCommand += ["-DSTATIC="]
     rule.mCommand += includeDirsInCompilerCommand
-    rule.mCommand += ["-MD", "-MP", "-MF", objectFileForChecking + ".dep"]
+    rule.mCommand += ["-MMD", "-MP", "-MF", objectFileForChecking + ".dep"]
     make.addRule (rule)
     rule.mPriority = -1
     allGoal.append (objectFileForChecking)
@@ -247,7 +253,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-o", objectFile]
     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
     rule.mCommand += includeDirsInCompilerCommand
-    rule.mCommand += ["-MD", "-MP", "-MF", objectFile + ".dep"]
+    rule.mCommand += ["-MMD", "-MP", "-MF", objectFile + ".dep"]
     rule.mDependences.append (allHeaders_file)
     rule.mDependences.append (sourcePath)
     rule.mDependences.append ("makefile.json")
@@ -273,7 +279,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mCommand += ["-o", asObjectFile]
     rule.mCommand += ["-DSTATIC="]
     rule.mCommand += includeDirsInCompilerCommand
-    rule.mCommand += ["-MD", "-MP", "-MF", asObjectFile + ".dep"]
+    rule.mCommand += ["-MMD", "-MP", "-MF", asObjectFile + ".dep"]
     rule.mDependences.append (sourcePath)
     rule.mDependences.append (allHeaders_file)
     rule.mDependences.append ("makefile.json")
@@ -332,7 +338,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mDependences += objectFileList
   rule.mDependences.append (LINKER_SCRIPT_INTERNAL_FLASH)
   rule.mDependences.append ("makefile.json")
-  rule.mCommand += LD_TOOL_WITH_OPTIONS
+  rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
   rule.mCommand += objectFileList
   rule.mCommand += ["-T" + LINKER_SCRIPT_INTERNAL_FLASH]
   rule.mCommand.append ("-Wl,-Map=" + PRODUCT_INTERNAL_FLASH + ".map")
@@ -376,7 +382,15 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     print ("  RAM + STACK: " + str (numbers [2]) + " bytes")
 #----------------------------------------------- Run ?
   if GOAL == "run":
-    FLASH_TEENSY = [TEENSY_CLI_LOADER_PATH, "-w", "-v", "-mmcu=TEENSY36"]
+    #FLASH_TEENSY = [TEENSY_POST_COMPILE, "-w", "-v", "-mmcu=TEENSY36"]
+    FLASH_TEENSY = [
+      TEENSY_POST_COMPILE,
+      "-file=" + os.path.basename (PRODUCT_INTERNAL_FLASH),
+      "-path=" + projectDir + "/" + os.path.dirname (PRODUCT_INTERNAL_FLASH),
+      "-tools=" + TEENSY_TOOLS_DIR,
+      "-reboot",
+      "-board=TEENSY35"
+    ]
     print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
     runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".hex"])
     print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())

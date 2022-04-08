@@ -16,7 +16,7 @@ void loop (void) {
 //--- Drive PTD7 high --> led is on
   GPIOD_PSOR = 1 << 7 ;
 //--- Wait...
-  for (volatile uint32_t i=0 ; i< 10 * 1000 * 1000 ; i++) {}
+  for (volatile uint32_t i=0 ; i< 1 * 1000 * 1000 ; i++) {}
 //--- Drive PTD7 low --> led is off
   GPIOD_PCOR = 1 << 7 ;
 //--- Wait...
