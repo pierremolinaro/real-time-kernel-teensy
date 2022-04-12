@@ -388,12 +388,12 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       "-file=" + os.path.basename (PRODUCT_INTERNAL_FLASH),
       "-path=" + projectDir + "/" + os.path.dirname (PRODUCT_INTERNAL_FLASH),
       "-tools=" + TEENSY_TOOLS_DIR,
-      "-reboot",
+#      "-reboot",
       "-board=TEENSY35"
     ]
     print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
     runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".hex"])
-    print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())
+    #print (makefile.BOLD_GREEN () + "Success" + makefile.ENDC ())
   elif GOAL == "view-hex":
     print (makefile.BOLD_GREEN () + "View hex..." + makefile.ENDC ())
     scriptDir = os.path.dirname (os.path.abspath (__file__))
