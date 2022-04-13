@@ -16,9 +16,8 @@ void startSystick (void) {
 //-----------------------------------------------------------------------------
 
 void busyWaitDuring (const uint32_t inDelayMS) {
-  const uint32_t COUNTFLAG_MASK = 1 << 16 ;
   for (uint32_t i=0 ; i<inDelayMS ; i++) {
-    while ((SYST_CSR & COUNTFLAG_MASK) == 0) {} // Busy wait, polling COUNTFLAG
+    while ((SYST_CSR & SYST_CSR_COUNTFLAG) == 0) {} // Busy wait, polling COUNTFLAG
   }
 }
 

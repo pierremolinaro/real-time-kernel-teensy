@@ -20,9 +20,8 @@ MACRO_BOOT_ROUTINE (startSystick) ;
 //-----------------------------------------------------------------------------
 
 void busyWaitDuring_initMode (INIT_MODE_ const uint32_t inDelayMS) {
-  const uint32_t COUNTFLAG_MASK = 1 << 16 ;
   for (uint32_t i=0 ; i<inDelayMS ; i++) {
-    while ((SYST_CSR & COUNTFLAG_MASK) == 0) {} // Busy wait, polling COUNTFLAG
+    while ((SYST_CSR & SYST_CSR_COUNTFLAG) == 0) {} // Busy wait, polling COUNTFLAG
   }
 }
 
@@ -31,9 +30,8 @@ void busyWaitDuring_initMode (INIT_MODE_ const uint32_t inDelayMS) {
 //-----------------------------------------------------------------------------
 
 void busyWaitDuring (USER_MODE_ const uint32_t inDelayMS) {
-  const uint32_t COUNTFLAG_MASK = 1 << 16 ;
   for (uint32_t i=0 ; i<inDelayMS ; i++) {
-    while ((SYST_CSR & COUNTFLAG_MASK) == 0) {} // Busy wait, polling COUNTFLAG
+    while ((SYST_CSR & SYST_CSR_COUNTFLAG) == 0) {} // Busy wait, polling COUNTFLAG
   }
 }
 
