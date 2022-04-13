@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-static uint32_t gCount ; // Volontairement, volatile est absent: c'est un bug
+static uint32_t gCount ; // Volontairement, volatile est absent: C'EST UN BUG!
 
 //-----------------------------------------------------------------------------
 
