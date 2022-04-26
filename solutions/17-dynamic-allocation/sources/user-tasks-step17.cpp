@@ -8,9 +8,9 @@ static volatile uint32_t gNombreDansBufferAllocation = 0 ;
 
 //-----------------------------------------------------------------------------
 
-static uint64_t gStack1 [128] ;
-static uint64_t gStack2 [128] ;
-static uint64_t gStack3 [128] ;
+static uint64_t gStack1 [64] ;
+static uint64_t gStack2 [64] ;
+static uint64_t gStack3 [64] ;
 
 //-----------------------------------------------------------------------------
 
