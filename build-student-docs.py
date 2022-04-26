@@ -164,10 +164,10 @@ runProcess (["cp", "solutions/12-first-real-time-kernel/sources/xtr-step12.cpp",
 runProcess (["cp", "solutions/12-first-real-time-kernel/sources/user-task-step12.cpp", DOCUMENT_DIR + "/12-files"])
 compress (DOCUMENT_DIR, "12-files")
 #--- Step 17
-# runProcess (["mkdir", DOCUMENT_DIR + "/17-files"])
-# runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.h", DOCUMENT_DIR + "/17-files"])
-# runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.cpp", DOCUMENT_DIR + "/17-files"])
-# compress (DOCUMENT_DIR, "17-files")
+runProcess (["mkdir", DOCUMENT_DIR + "/17-files"])
+runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.h", DOCUMENT_DIR + "/17-files"])
+runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.cpp", DOCUMENT_DIR + "/17-files"])
+compress (DOCUMENT_DIR, "17-files")
 #--- Step 18
 # runProcess (["mkdir", DOCUMENT_DIR + "/18-files"])
 # runProcess (["cp", "solutions/18-guarded-commands/sources/task-list--32-tasks.h", DOCUMENT_DIR + "/18-files"])

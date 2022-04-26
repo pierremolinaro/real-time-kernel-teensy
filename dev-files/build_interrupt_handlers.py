@@ -549,7 +549,7 @@ elif sectionScheme == "disableInterrupt" :
 elif len (sectionList) > 0 :
   print (BOLD_RED ()
          + "In the makefile.json file, the \"SECTION-SCHEME\" key has an invalid \"" + sectionScheme + "\" value; "
-         + "(possible value: \"disableInterrupt\", \"bkpt\", \"swint\")"
+         + "(possible value: \"disableInterrupt\", \"swint\")"
          +  ENDC ())
   sys.exit (1)
 #------------------------------ Interrupts as service
