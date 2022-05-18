@@ -170,6 +170,10 @@ runProcess (["cp", "solutions/17-dynamic-allocation/sources/heap.cpp", DOCUMENT_
 compress (DOCUMENT_DIR, "17-files")
 #--- Step 18
 runProcess (["mkdir", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/BoundedBuffer.h", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/BoundedBuffer.cpp", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/Semaphore.h", DOCUMENT_DIR + "/18-files"])
+runProcess (["cp", "solutions/18-guarded-commands/sources/Semaphore.cpp", DOCUMENT_DIR + "/18-files"])
 runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.h", DOCUMENT_DIR + "/18-files"])
 runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.cpp", DOCUMENT_DIR + "/18-files"])
 compress (DOCUMENT_DIR, "18-files")
