@@ -245,8 +245,7 @@ void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
 
 static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurrentDate) {
   TaskList::Iterator iterator (MODE_ gDeadlineWaitingTaskList) ;
-  TaskControlBlock * task ;
-  while ((task = iterator.nextTask (MODE))) {
+  while (TaskControlBlock * task = iterator.nextTask (MODE)) {
     if (inCurrentDate >= task->mDeadline) {
     //--- Remove task from deadline list
       gDeadlineWaitingTaskList.removeTask (MODE_ task) ;
