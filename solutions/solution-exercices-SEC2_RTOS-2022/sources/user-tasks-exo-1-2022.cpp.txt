@@ -1,0 +1,79 @@
+#include "all-headers.h"
+
+//-----------------------------------------------------------------------------
+
+static uint64_t gStack1 [64] ;
+static uint64_t gStack2 [64] ;
+static uint64_t gStack3 [64] ;
+static uint64_t gStack4 [64] ;
+
+//-----------------------------------------------------------------------------
+
+static Port2 p1 ;
+static Port2 p2 ;
+static Port2 p3 ;
+static Port2 p4 ;
+
+//-----------------------------------------------------------------------------
+
+static void task1 (USER_MODE) {
+  while (1) {
+    digitalWrite (L0_LED, true) ;
+    waitDuring (MODE_ 1000) ;
+    digitalWrite (L0_LED, false) ;
+    p1.sortie (MODE) ;
+    p4.entree (MODE) ;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void task2 (USER_MODE) {
+  while (1) {
+    p1.entree (MODE) ;
+    digitalWrite (L1_LED, true) ;
+    waitDuring (MODE_ 1000) ;
+    digitalWrite (L1_LED, false) ;
+    p2.sortie (MODE) ;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void task3 (USER_MODE) {
+  while (1) {
+    p2.entree (MODE) ;
+    digitalWrite (L2_LED, true) ;
+    waitDuring (MODE_ 1000) ;
+    digitalWrite (L2_LED, false) ;
+    p3.sortie (MODE) ;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void task4 (USER_MODE) {
+  while (1) {
+    p3.entree (MODE) ;
+    digitalWrite (L3_LED, true) ;
+    waitDuring (MODE_ 1000) ;
+    digitalWrite (L3_LED, false) ;
+    p4.sortie (MODE) ;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void initTasks (INIT_MODE) {
+  kernel_createTask (MODE_ gStack1, sizeof (gStack1), task1) ;
+  kernel_createTask (MODE_ gStack2, sizeof (gStack2), task2) ;
+  kernel_createTask (MODE_ gStack3, sizeof (gStack3), task3) ;
+  kernel_createTask (MODE_ gStack4, sizeof (gStack4), task4) ;
+}
+
+//-----------------------------------------------------------------------------
+
+MACRO_INIT_ROUTINE (initTasks) ;
+
+//-----------------------------------------------------------------------------
+
