@@ -12,14 +12,14 @@ import common_definitions
 # GGC TOOL PATH
 #---------------------------------------------------------------------------------------------------
 
-MAC_OS_TOOL_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-compile/5.4.1/arm/bin"
+MAC_OS_TOOL_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
 WINDOWS_TOOL_DIR = "c:/Program Files (x86)/Arduino/hardware/tools/arm/bin"
 
 #---------------------------------------------------------------------------------------------------
 # TEENSY POST COMPILE TOOL
 #---------------------------------------------------------------------------------------------------
 
-MAC_OS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.57.2"
+MAC_OS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.58.0"
 
 #---------------------------------------------------------------------------------------------------
 #   Run process and wait for termination
@@ -182,7 +182,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule = makefile.Rule ([baseHeader_file], "Build base header file")
   rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
-  rule.mCommand += ["python", "../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
+  rule.mCommand += ["python3", "../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build all header file
@@ -192,7 +192,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mOpenSourceOnError = False
   rule.mDependences.append ("makefile.json")
   rule.mDependences += H_SOURCE_LIST
-  rule.mCommand += ["python", "../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
+  rule.mCommand += ["python3", "../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
   rule.mCommand += H_SOURCE_LIST
   rule.enterSecondaryDependanceFile (allHeadersSecondaryDependenceFile, make)
   rule.mPriority = -1
@@ -207,7 +207,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mDependences += H_SOURCE_LIST
   rule.mDependences.append ("makefile.json")
   rule.mDependences.append ("../../dev-files/build_interrupt_handlers.py")
-  rule.mCommand += ["python", "../../dev-files/build_interrupt_handlers.py"]
+  rule.mCommand += ["python3", "../../dev-files/build_interrupt_handlers.py"]
   rule.mCommand += [interruptHandlerCppFile]
   rule.mCommand += [interruptHandlerSFile]
   rule.mCommand += [serviceScheme]
@@ -222,7 +222,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mOpenSourceOnError = False
     rule.mDependences += CPP_SOURCE_LIST
     rule.mDependences.append ("makefile.json")
-    rule.mCommand += ["python", "../../dev-files/build_grouped_sources.py", allSourceFile]
+    rule.mCommand += ["python3", "../../dev-files/build_grouped_sources.py", allSourceFile]
     rule.mCommand += CPP_SOURCE_LIST
     rule.mPriority = -1
     make.addRule (rule)
@@ -278,7 +278,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule = makefile.Rule ([objdumpPythonFile], "Building " + source + ".objdump.py")
     rule.mDependences.append (objectFile)
     rule.mDependences.append ("makefile.json")
-    rule.mCommand += ["python", "../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
+    rule.mCommand += ["python3", "../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
     rule.mPriority = -1
     make.addRule (rule)
     allGoal.append (objdumpPythonFile)
@@ -396,13 +396,16 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #----------------------------------------------- Run ?
   if GOAL == "run":
     #FLASH_TEENSY = [TEENSY_POST_COMPILE, "-w", "-v", "-mmcu=TEENSY36"]
+    if not os.path.exists (TEENSY_POST_COMPILE) :
+      print ("*** Error, path '" + TEENSY_POST_COMPILE + "' invalid")
+      sys.exit (1)
     FLASH_TEENSY = [
       TEENSY_POST_COMPILE,
       "-file=" + os.path.basename (PRODUCT_INTERNAL_FLASH),
       "-path=" + projectDir + "/" + os.path.dirname (PRODUCT_INTERNAL_FLASH),
       "-tools=" + TEENSY_TOOLS_DIR,
-#      "-reboot",
-      "-board=TEENSY35"
+      "-reboot",
+      "-board=TEENSY36"
     ]
     print (makefile.BOLD_BLUE () + "Loading Teensy..." + makefile.ENDC ())
     runProcess (FLASH_TEENSY + [PRODUCT_INTERNAL_FLASH + ".hex"])
@@ -410,6 +413,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   elif GOAL == "view-hex":
     print (makefile.BOLD_GREEN () + "View hex..." + makefile.ENDC ())
     scriptDir = os.path.dirname (os.path.abspath (__file__))
-    runProcess (["python", scriptDir+ "/view-hex.py", PRODUCT_INTERNAL_FLASH + ".hex"])
+    runProcess (["python3", scriptDir+ "/view-hex.py", PRODUCT_INTERNAL_FLASH + ".hex"])
 
 #---------------------------------------------------------------------------------------------------
