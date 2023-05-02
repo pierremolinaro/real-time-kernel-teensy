@@ -14,7 +14,7 @@ import common_definitions
 
 MACOS_TOOL_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
 LINUX_TOOL_DIR = "~/.arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
-WINDOWS_TOOL_DIR = "c:/Program Files (x86)/Arduino/hardware/tools/arm/bin"
+WINDOWS_TOOL_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
 
 #---------------------------------------------------------------------------------------------------
 # TEENSY POST COMPILE TOOL
@@ -22,7 +22,7 @@ WINDOWS_TOOL_DIR = "c:/Program Files (x86)/Arduino/hardware/tools/arm/bin"
 
 MACOS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.58.0"
 LINUX_TEENSY_TOOLS_DIR = "~/.arduino15/packages/teensy/tools/teensy-tools/1.58.0"
-WINDOWS_TEENSY_TOOLS_DIR = "c:/Program Files (x86)/Arduino/hardware/tools"
+WINDOWS_TEENSY_TOOLS_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-tools/1.58.0"
 
 #---------------------------------------------------------------------------------------------------
 #   Run process and wait for termination
@@ -100,8 +100,8 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-objcopy"]
     DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + BASE_NAME + "-size"]
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
-    TEENSY_TOOLS_DIR = os.path.expanduser (MACOS_TEENSY_TOOLS_DIR)
-    TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "/teensy_post_compile"
+    TEENSY_TOOLS_DIR = os.path.expanduser (MACOS_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile"
   elif SYSTEM_NAME == "Linux" :
     BASE_NAME = "arm-none-eabi"
     TOOL_DIR = os.path.expanduser (LINUX_TOOL_DIR) + "/"
@@ -110,18 +110,18 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-objcopy"]
     DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + BASE_NAME + "-size"]
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
-    TEENSY_TOOLS_DIR = os.path.expanduser (LINUX_TEENSY_TOOLS_DIR)
-    TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "/teensy_post_compile"
+    TEENSY_TOOLS_DIR = os.path.expanduser (LINUX_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile"
   elif SYSTEM_NAME == "Windows" :
     BASE_NAME = "arm-none-eabi"
-    TOOL_DIR = WINDOWS_TOOL_DIR
+    TOOL_DIR = os.path.expanduser (WINDOWS_TOOL_DIR) + "/"
     AS_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-as", "-mthumb", "-mcpu=cortex-m4"]
     COMPILER_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-gcc", "-mthumb", "-mcpu=cortex-m4"]
     OBJCOPY_TOOL_WITH_OPTIONS = [TOOL_DIR + BASE_NAME + "-objcopy"]
     DISPLAY_OBJ_SIZE_TOOL = [TOOL_DIR + BASE_NAME + "-size"]
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
-    TEENSY_TOOLS_DIR = WINDOWS_TEENSY_TOOLS_DIR
-    TEENSY_POST_COMPILE = WINDOWS_TEENSY_TOOLS_DIR + "/teensy_post_compile"
+    TEENSY_TOOLS_DIR = os.path.expanduser (WINDOWS_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile.exe"
   else:
     print (makefile.BOLD_RED () + "Unhandled platform: '" + SYSTEM_NAME + "'" + makefile.ENDC ())
     sys.exit (1)
