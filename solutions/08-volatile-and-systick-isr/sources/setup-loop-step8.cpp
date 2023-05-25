@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-static uint32_t gCount ; // Volontairement, volatile est absent: C'EST UN BUG!
+static volatile uint32_t gCount ; // Volontairement, volatile est absent: C'EST UN BUG!
 
 //-----------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ MACRO_REAL_TIME_ISR (rtISR) ;
 
 void setup (USER_MODE) {
   printString (MODE_ "Hello!") ;
+  while (gCount < 3000) {}
 }
 
 //-----------------------------------------------------------------------------
