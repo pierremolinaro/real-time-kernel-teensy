@@ -1,23 +1,52 @@
+#! /usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
+#   Releases
+#-----------------------------------------------------------------------------------------
+# 1.0: march 18th, 2015
+#        first release
+# 2.0: october 2th, 2015
+#        added several target definition for rules
+# 2.1: october 5th, 2015
+#        added checking routine formal argument run-time types
+# 2.2: october 24th, 2015
+#        changed subprocess.Popen to subprocess.call in runCommand
+#        added command tool checking using 'find_executable' function
+#        added optional argument to Make class initializer to log command utility tool path
+# 2.3: april 16th, 2016
+#        added advance percentage
+# 3.0: may 30th, 2016
+#        compatibility with Python 3:
+#             print xyz ---> print (xyz)
+#             change isinstance function arguments ---> function argumentIsString
+#             subprocess.call: add "universal_newlines=True" argument
+#             added test (job.mReturnCode != None) lines 727 and 739
+# 3.1: may 26th, 2018
+#        Added tolerance in secondary dependency file syntax:
+# 3.2: december 16th, 2019
+#        added test (job.mReturnCode != None) lines 771 and 779
+#        post command displayed is aligned
+# 3.3: november 19th, 2021
+#        accelerated job construction
+# 4.0: february 18th, 2024
+#        new API
+#
+#-----------------------------------------------------------------------------------------
 # http://www.diveintopython3.net/porting-code-to-python-3-with-2to3.html
 
 import subprocess, sys, os, copy
 import urllib, shutil, subprocess
 import platform, json, operator
 import threading, types, traceback
-import pathlib, time
+import multiprocessing
 
-if sys.version_info >= (2, 6) :
-  import multiprocessing
-
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   find_executable
 # From:
 # https://gist.github.com/4368898
 # Public domain code by anatoly techtonik <techtonik@gmail.com>
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def find_executable(executable, path=None):
     """Try to find 'executable' in the directories listed in 'path' (a
@@ -52,88 +81,87 @@ def find_executable(executable, path=None):
     else:
         return None
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   processorCount
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def processorCount () :
-  if sys.version_info >= (2, 6) :
-    coreCount = multiprocessing.cpu_count ()
-  else:
-    coreCount = 1
+  coreCount = multiprocessing.cpu_count ()
   return coreCount
 
-#---------------------------------------------------------------------------------------------------
-#   argumentIsString
-#---------------------------------------------------------------------------------------------------
-
-def argumentIsString (argument) :
-  if sys.version_info < (3,0):
-    return isinstance (argument, types.StringTypes)
-  else:
-    return type (argument) is str
-
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   FOR PRINTING IN COLOR
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def BLACK () :
-  return '' # '\033[90m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[90m'
 
 #····································································································
 
 def RED () :
-  return '' # '\033[91m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[91m'
 
 #····································································································
 
 def GREEN () :
-  return '' # '\033[92m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[92m'
 
 #····································································································
 
 def YELLOW () :
-  return '' # '\033[93m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[93m'
 
 #····································································································
 
 def BLUE () :
-  return '' # '\033[94m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[94m'
 
 #····································································································
 
 def MAGENTA () :
-  return '' # '\033[95m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[95m'
 
 #····································································································
 
 def CYAN () :
-  return '' # '\033[96m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[96m'
 
 #····································································································
 
 def WHITE () :
-  return '' # '\033[97m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[97m'
 
 #····································································································
 
 def ENDC () :
-  return '' # '\033[0m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[0m'
 
 #····································································································
 
 def BOLD () :
-  return '' # '\033[1m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[1m'
 
 #····································································································
 
 def UNDERLINE () :
-  return '' # '\033[4m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[4m'
 
 #····································································································
 
 def BLINK () :
-  return '' # '\033[5m'
+  SYSTEM_NAME = platform.system ()
+  return "" if SYSTEM_NAME == "Windows" else '\033[5m'
 
 #····································································································
 
@@ -150,9 +178,9 @@ def BOLD_GREEN () :
 def BOLD_RED () :
   return BOLD () + RED ()
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   runHiddenCommand
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def runHiddenCommand (cmd, logUtilityTool=False) :
   executable = find_executable (cmd [0])
@@ -173,9 +201,9 @@ def runHiddenCommand (cmd, logUtilityTool=False) :
         sys.exit (childProcess.returncode)
       return result
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   runCommand
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def runCommand (cmd, title, showCommand, logUtilityTool) :
   if title != "":
@@ -198,24 +226,25 @@ def runCommand (cmd, title, showCommand, logUtilityTool) :
   if returncode != 0 :
     sys.exit (returncode)
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   runInThread
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def runInThread (job, displayLock, terminationSemaphore):
-  executable = find_executable (job.mCommand [0])
+  command = job.getCommand ()
+  executable = find_executable (command [0])
   if executable == None:
-    print (BOLD_RED () + "*** Cannot find '" + job.mCommand[0] + "' executable ***" + ENDC ())
+    print (BOLD_RED () + "*** Cannot find '" + command[0] + "' executable ***" + ENDC ())
     job.mReturnCode = 1
     terminationSemaphore.release ()
   else:
     if job.mLogUtilityTool :
       print ("Utility tool is '" + executable + "'")
-    childProcess = subprocess.Popen (job.mCommand, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    childProcess = subprocess.Popen (command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     while True:
       line = childProcess.stdout.readline ()
       if line != "":
-        job.mOutputLines.append (line)
+        job.appendToOutputLines (line)
         displayLock.acquire ()
         sys.stdout.write (line) # Print without newline
         displayLock.release ()
@@ -225,9 +254,9 @@ def runInThread (job, displayLock, terminationSemaphore):
         terminationSemaphore.release ()
         break
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   modificationDateForFile
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def modificationDateForFile (dateCacheDictionary, file):
   absFilePath = os.path.abspath (file)
@@ -239,64 +268,97 @@ def modificationDateForFile (dateCacheDictionary, file):
     return date
   else:
     date = os.path.getmtime (absFilePath)
-#     modificationTime = time.strftime ('%Y-%m-%d %H:%M:%S', time.localtime (date))
-#     print (absFilePath, " -> ", modificationTime )
     dateCacheDictionary [absFilePath] = date
     return date
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   class PostCommand
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 class PostCommand:
-  mCommand = []
-  mTitle = ""
+  __private_mCommand = []
+  __private_mTitle = ""
 
-  #·································································································
+  #·······················································································
 
   def __init__ (self, title = ""):
-    self.mCommand = []
-    self.mTitle = title
+    self.__private_mCommand = []
+    self.__private_mTitle = title
 
-#---------------------------------------------------------------------------------------------------
+  #·······················································································
+
+  def getCommand (self):
+    return self.__private_mCommand
+
+  #·······················································································
+
+  def getTitle (self):
+    return self.__private_mTitle
+
+#-----------------------------------------------------------------------------------------
 #   class Job
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 class Job:
   mTargets = []
-  mCommand = []
-  mTitle = ""
+  __private_mCommand = []
+  __private_mTitle = ""
   mRequiredFiles = []
   mPostCommands = []
   mReturnCode = None
   mPriority = 0
   mState = 0 # 0: waiting for execution
-  mOutputLines = []
-  mOpenSourceOnError = False # Do not try to open source file on error
+  __private_mOutputLines = []
+  __private_mOpenSourceOnError = False # Do not try to open source file on error
   mLogUtilityTool = False
 
-  #·································································································
+  #·······················································································
 
   def __init__ (self, targets, requiredFiles, command, postCommands, priority, title, openSourceOnError, logUtilityTool):
     self.mTargets = copy.deepcopy (targets)
-    self.mCommand = copy.deepcopy (command)
+    self.__private_mCommand = copy.deepcopy (command)
     self.mRequiredFiles = copy.deepcopy (requiredFiles)
-    self.mTitle = copy.deepcopy (title)
+    self.__private_mTitle = copy.deepcopy (title)
     self.mPostCommands = copy.deepcopy (postCommands)
     self.mPriority = priority
-    self.mOutputLines = []
-    self.mOpenSourceOnError = openSourceOnError
+    self.__private_mOutputLines = []
+    self.__private_mOpenSourceOnError = openSourceOnError
     self.mLogUtilityTool = logUtilityTool
 
-  #·································································································
+  #·······················································································
+
+  def getTitle (self):
+    return self.__private_mTitle
+
+  #·······················································································
+
+  def getCommand (self):
+    return self.__private_mCommand
+
+  #·······················································································
+
+  def getOpenSourceOnError (self):
+    return self.__private_mOpenSourceOnError
+
+  #·······················································································
+
+  def appendToOutputLines (self, line) :
+    self.__private_mOutputLines.append (line)
+
+  #·······················································································
+
+  def getOutputLines (self) :
+    return self.__private_mOutputLines
+
+  #·······················································································
 
   def run (self, displayLock, terminationSemaphore, showCommand, progressString):
     displayLock.acquire ()
-    if self.mTitle != "":
-      print (progressString + BOLD_BLUE () + self.mTitle + ENDC ())
-    if (self.mTitle == "") or showCommand :
+    if self.__private_mTitle != "":
+      print (progressString + BOLD_BLUE () + self.__private_mTitle + ENDC ())
+    if (self.__private_mTitle == "") or showCommand :
       cmdAsString = ""
-      for s in self.mCommand:
+      for s in self.__private_mCommand:
         if (s == "") or (s.find (" ") >= 0):
           cmdAsString += '"' + s + '" '
         else:
@@ -306,16 +368,16 @@ class Job:
     thread = threading.Thread (target=runInThread, args=(self, displayLock, terminationSemaphore))
     thread.start()
 
-  #·································································································
+  #·······················································································
 
   def runPostCommand (self, displayLock, terminationSemaphore, showCommand):
     postCommand = self.mPostCommands [0]
-    self.mCommand = postCommand.mCommand
+    self.__private_mCommand = postCommand.getCommand ()
     displayLock.acquire ()
-    print (BOLD_BLUE () + "       " + postCommand.mTitle + ENDC ())
+    print (BOLD_BLUE () + "       " + postCommand.getTitle () + ENDC ())
     if showCommand:
       cmdAsString = ""
-      for s in self.mCommand:
+      for s in self.__private_mCommand:
         if (s == "") or (s.find (" ") >= 0):
           cmdAsString += '"' + s + '" '
         else:
@@ -325,71 +387,173 @@ class Job:
     thread = threading.Thread (target=runInThread, args=(self, displayLock, terminationSemaphore))
     thread.start()
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 #   class Rule
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 class Rule:
   mTargets = []
   mDependences = []
-  mCommand = []
+  __private_mCommand = []
   mSecondaryMostRecentModificationDate = 0.0 # Far in the past
-  mTitle = ""
+  __private_mTitle = ""
   mPostCommands = []
-  mPriority = 0
-  mDeleteTargetOnError = False # No operation on error
-  mCleanOperation = 0 # No operation on clean
-  mOpenSourceOnError = False # Do not try to open source file on error
+  __private_mPriority = 0
+  __private_mDeleteTargetOnError = True
+  __private_mCleanOperation = 0 # No operation on clean
+  __private_mOpenSourceOnError = False # Do not try to open source file on error
 
-  #·································································································
+  #·······················································································
 
-  def __init__ (self, targets, title = ""):
-    # print ("Rule '" + title + "'")
-    if not type (targets) is list:
-      print (BOLD_RED () + "*** Rule type instanciation: first argument 'targets' is not a list ***" + ENDC ())
+  def __init__ (self, toolPath, title = "", dependences = []):
+    if not type (toolPath) is str:
+      print (BOLD_RED ()
+             + "*** Rule type instanciation: first argument 'toolPath' is not a string ***"
+             + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
-    else:
-      for aTarget in targets:
-        # print ("  Target '" + aTarget + "'")
-        if not argumentIsString (aTarget):
-          print (BOLD_RED () + "*** Rule type instanciation: an element of first argument 'targets' is not a string ***" + ENDC ())
+    if not type (title) is str:
+      print (BOLD_RED ()
+             + "*** Rule type instanciation: second argument 'title' is not a string ***"
+             + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    if type (dependences) is list :
+      for dep in dependences:
+        if not type (dep) is str:
+          print (BOLD_RED ()
+                 + "*** Rule type instanciation: an element of third argument "
+                 + "'dependences' is not a string ***"
+                 + ENDC ())
           traceback.print_stack ()
           sys.exit (1)
-    if not argumentIsString (title):
-      print (BOLD_RED () + "*** Rule type instanciation: second argument 'title' is not a string ***" + ENDC ())
+    else:
+      print (BOLD_RED ()
+             + "*** Rule type instanciation: third argument 'dependences' is not a list ***"
+             + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
-    self.mTargets = copy.deepcopy (targets)
-    self.mDependences = []
-    self.mCommand = []
+    self.mTargets = []
+    self.mDependences = copy.deepcopy (dependences)
+    self.__private_mCommand = [toolPath]
     self.mSecondaryMostRecentModificationDate = 0.0
     self.mPostCommands = []
-    self.mPriority = 0
-    self.mDeleteTargetOnError = False # No operation on error
-    self.mOpenSourceOnError = False # Do not try to open source file on error
-    self.mCleanOperation = 0 # No operation on clean
+    self.__private_mPriority = 0
+    self.__private_mDeleteTargetOnError = True
+    self.__private_mOpenSourceOnError = False # Do not try to open source file on error
+    self.__private_mCleanOperation = 0 # No operation on clean
     if title == "":
-      self.mTitle = "Building"
+      self.__private_mTitle = "Building"
       for s in targets:
-        self.mTitle += " " + s
+        self.__private_mTitle += " " + s
     else:
-      self.mTitle = copy.deepcopy (title)
+      self.__private_mTitle = copy.deepcopy (title)
 
-  #·································································································
+  #·······················································································
+
+  def getTitle (self):
+    return self.__private_mTitle
+
+  #·······················································································
+
+  def getCommand (self):
+    return self.__private_mCommand
+
+  #·······················································································
+
+  def getPriority (self):
+    return self.__private_mPriority
+
+  #·······················································································
+
+  def getCleanOperation (self):
+    return self.__private_mCleanOperation
+
+  #·······················································································
+
+  def setOpenSourceOnError (self):
+    self.__private_mOpenSourceOnError = True
+
+  #·······················································································
+
+  def getOpenSourceOnError (self):
+    return self.__private_mOpenSourceOnError
+
+  #·······················································································
+
+  def getDeleteTargetOnError (self):
+    return self.__private_mDeleteTargetOnError
+
+  #·······················································································
 
   def deleteTargetFileOnClean (self):
-    self.mCleanOperation = 1
+    self.__private_mCleanOperation = 1
 
-  #·································································································
+  #·······················································································
 
   def deleteTargetDirectoryOnClean (self):
-    self.mCleanOperation = 2
+    self.__private_mCleanOperation = 2
 
-  #·································································································
+  #·······················································································
+
+  def appendOption (self, option):
+    if not type (option) is str:
+      print (BOLD_RED () + "*** Rule type instanciation: argument 'option' is not a string ***" + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    self.__private_mCommand.append (option)
+
+  #·······················································································
+
+  def appendOptionList (self, optionList):
+    for option in optionList:
+      self.appendOption (option)
+
+  #·······················································································
+
+  def appendSource (self, source):
+    if not type (source) is str:
+      print (BOLD_RED () + "*** Rule type instanciation: argument 'source' is not a string ***" + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    self.__private_mCommand.append (source)
+    self.mDependences.append (source)
+
+  #·······················································································
+
+  def appendSourceList (self, sourceList):
+    for source in sourceList:
+      self.appendSource (source)
+
+  #·······················································································
+
+  def appendTarget (self, target):
+    if not type (target) is str:
+      print (BOLD_RED () + "*** Rule type instanciation: argument 'target' is not a string ***" + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    self.mTargets.append (target)
+    self.__private_mCommand.append (target)
+
+  #·······················································································
+
+  def enterImplicitTarget (self, target):
+    if not type (target) is str:
+      print (BOLD_RED () + "*** Rule type instanciation: argument 'target' is not a string ***" + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    self.mTargets.append (target)
+
+  #·······················································································
+
+  def appendTargetList (self, targetList):
+    for target in targetList:
+      self.appendTarget (target)
+
+  #·······················································································
 
   def enterSecondaryDependanceFile (self, secondaryDependanceFile, make):
-    if not argumentIsString (secondaryDependanceFile):
+    if not type (secondaryDependanceFile) is str:
       print (BOLD_RED () + "*** Rule.enterSecondaryDependanceFile: 'secondaryDependanceFile' argument is not a string ***" + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
@@ -421,9 +585,45 @@ class Rule:
                 self.mSecondaryMostRecentModificationDate = modifDate
                 #print (BOLD_BLUE () + str (modifDate) + ENDC ())
 
-#---------------------------------------------------------------------------------------------------
+  #·······················································································
+
+  def appendSecondaryDependanceFile (self, secondaryDependanceFile, make):
+    if not type (secondaryDependanceFile) is str:
+      print (BOLD_RED () + "*** Rule.enterSecondaryDependanceFile: 'secondaryDependanceFile' argument is not a string ***" + ENDC ())
+      traceback.print_stack ()
+      sys.exit (1)
+    if make.mSelectedGoal != "clean":
+      filePath = os.path.abspath (secondaryDependanceFile)
+      self.__private_mCommand.append (filePath)
+      if not os.path.exists (filePath):
+        self.mSecondaryMostRecentModificationDate = sys.float_info.max # Very far in future
+      else:
+        f = open (filePath, "r")
+        s = f.read ()
+        f.close ()
+        s = s.replace ("\\ ", "\x01") # Replace escaped spaces by \0x01
+        s = s.replace ("\\\n", "") # Suppress \ at the end of lines
+        liste = s.split ("\n\n")
+        # print ("DEP " + secondaryDependanceFile)
+        for s in liste:
+          # print ("S " + s)
+          components = s.split (':')
+          # print (str (len (components)))
+          #target = components [0].replace ("\x01", " ")
+          #print ("------- Optional dependency rules for target '" + target + "'")
+          #print ("Secondary target '" + target + "'")
+          if len (components) > 1 :
+            for src in components [1].split ():
+              secondarySource = src.replace ("\x01", " ")
+              # print ("  SECONDARY SOURCE  '" + secondarySource + "'")
+              modifDate = modificationDateForFile (make.mModificationDateDictionary, secondarySource)
+              if self.mSecondaryMostRecentModificationDate < modifDate :
+                self.mSecondaryMostRecentModificationDate = modifDate
+                #print (BOLD_BLUE () + str (modifDate) + ENDC ())
+
+#-----------------------------------------------------------------------------------------
 #   class Make
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 class Make:
   mRuleList = []
@@ -439,10 +639,10 @@ class Make:
   mShowProgressString = True
   mAlreadyBuildTargetSet = set ()
 
-  #·································································································
+  #·······················································································
 
   def __init__ (self, goal, logUtilityTool=False):
-    if not argumentIsString (goal):
+    if not type (goal) is str:
       print (BOLD_RED () + "*** Make instanciation: 'goal' argument is not a string ***" + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
@@ -456,12 +656,12 @@ class Make:
     self.mMacTextEditor = "TextEdit"
     self.mLogUtilityTool = logUtilityTool
 
-  #·································································································
+  #·······················································································
 
   def doNotShowProgressString (self) :
      self.mShowProgressString = False
 
-  #·································································································
+  #·······················································································
 
   def addRule (self, rule):
     if not isinstance (rule, Rule):
@@ -470,7 +670,7 @@ class Make:
       sys.exit (1)
     self.mRuleList.append (copy.deepcopy (rule))
 
-  #·································································································
+  #·······················································································
 
   def printRules (self):
     print (BOLD_BLUE () + "--- Print " + str (len (self.mRuleList)) + " rule" + ("s" if len (self.mRuleList) > 1 else "") + " ---" + ENDC ())
@@ -482,15 +682,15 @@ class Make:
       for dep in rule.mDependences:
         print ("  Dependence: \"" + dep + "\"")
       s = "  Command: "
-      for cmd in rule.mCommand:
+      for cmd in rule.getCommand ():
         s += " \"" + cmd + "\""
       print (s)
-      print ("  Title: \"" + rule.mTitle + "\"")
-      print ("  Delete target on error: " + ("yes" if rule.mDeleteTargetOnError else "no"))
+      print ("  Title: \"" + rule.getTitle () + "\"")
+      print ("  Delete target on error: " + ("yes" if rule.getDeleteTargetOnError () else "no"))
       cleanOp = "none"
-      if rule.mCleanOperation == 1:
+      if rule.getCleanOperation () == 1:
         cleanOp = "delete target file(s)"
-      elif rule.mCleanOperation == 2:
+      elif rule.getCleanOperation () == 2:
         dirSet = set ()
         for s in rule.mTargets:
           path = os.path.dirname (s)
@@ -504,14 +704,14 @@ class Make:
       for postCommand in rule.mPostCommands:
          index = index + 1
          s = "  Post command " + str (index) + ": "
-         for cmd in postCommand.mCommand:
+         for cmd in postCommand.getCommand ():
            s += " \"" + cmd + "\""
          print (s)
-         print ("    Title: \"" + postCommand.mTitle + "\"")
+         print ("    Title: \"" + postCommand.getTitle () + "\"")
 
     print (BOLD_BLUE () + "--- End of print rule ---" + ENDC ())
 
-  #·································································································
+  #·······················································································
 
   def writeRuleDependancesInDotFile (self, dotFileName):
     s = "digraph G {\n"
@@ -529,7 +729,7 @@ class Make:
     f.write (s)
     f.close ()
 
-  #·································································································
+  #·······················································································
 
   def checkRules (self):
     if self.mErrorCount == 0:
@@ -584,7 +784,7 @@ class Make:
           for dep in aRule.mDependences:
             print (BOLD_RED () + "      '" + dep + "'" + ENDC ())
 
-  #·································································································
+  #·······················································································
 
   def existsJobForTarget (self, target):
     for job in self.mJobList:
@@ -593,7 +793,7 @@ class Make:
           return True
     return False
 
-  #·································································································
+  #·······················································································
 
   def makeJob (self, target): # Return a bool indicating wheither the target should be built
   #--- If there are errors, return immediatly
@@ -650,11 +850,11 @@ class Make:
       self.mJobList.append (Job (
         rule.mTargets,
         jobDependenceFiles,
-        rule.mCommand,
+        rule.getCommand (),
         rule.mPostCommands,
-        rule.mPriority,
-        rule.mTitle,
-        rule.mOpenSourceOnError,
+        rule.getPriority (),
+        rule.getTitle (),
+        rule.getOpenSourceOnError (),
         self.mLogUtilityTool
       ))
     else:
@@ -662,7 +862,7 @@ class Make:
   #--- Return
     return appendToJobList
 
-  #·································································································
+  #·······················································································
   #Job state
   # 0: waiting
   # 1:running
@@ -697,8 +897,11 @@ class Make:
                   absTargetDirectory = os.path.dirname (os.path.abspath (aTarget))
                   if not os.path.exists (absTargetDirectory):
                     displayLock.acquire ()
-                    path = pathlib.Path (os.path.dirname (aTarget))
-                    path.mkdir (parents=True)
+                    runCommand (
+                      ["mkdir", "-p", absTargetDirectory], "Making \"" + absTargetDirectory + "\" directory",
+                      showCommand,
+                      job.mLogUtilityTool
+                    )
                     displayLock.release ()
                 #--- Progress string
                 launchedJobCount += 1.0
@@ -739,8 +942,8 @@ class Make:
               jobCount = jobCount - 1
               job.mState = 4 # Means Terminated
               index = index - 1 # For removing job from list
-              if job.mOpenSourceOnError:
-                for line in job.mOutputLines:
+              if job.getOpenSourceOnError () :
+                for line in job.getOutputLines ():
                   components = line.split (':')
                   if (len (components) > 1) and os.path.exists (os.path.abspath (components [0])) :
                     if sys.platform == "darwin":
@@ -762,8 +965,6 @@ class Make:
             elif job.mState == 4: # Completed: delete job
               index = index - 1
               self.mJobList.pop (index) # Remove terminated job
-              #displayLock.acquire ()
-              #print ("Completed '" + job.mTitle + "'")
               #--- Remove dependences from this job
               idx = 0
               while idx < len (self.mJobList):
@@ -772,8 +973,6 @@ class Make:
                 for aTarget in job.mTargets:
                   while aJob.mRequiredFiles.count (aTarget) > 0 :
                     aJob.mRequiredFiles.remove (aTarget)
-                  #print ("  Removed from '" + aJob.mTitle + "': " + str (len (aJob.mRequiredFiles)))
-              #displayLock.release ()
               #--- Signal error ?
               if (job.mReturnCode > 0) and (returnCode == 0):
                 self.mErrorCount = self.mErrorCount + 1
@@ -783,7 +982,7 @@ class Make:
                 returnCode = job.mReturnCode
           loop = (len (self.mJobList) > 0) if (returnCode == 0) else (jobCount > 0)
 
-  #·································································································
+  #·······················································································
 
   def searchFileInRelativeDirectories (self, file, directoryList): # returns "" if not found, register error
     matchCount = 0
@@ -805,7 +1004,7 @@ class Make:
       result = ""
     return result
 
-  #·································································································
+  #·······················································································
 
   def searchFileInDirectories (self, file, directoryList): # returns "" if not found, register error
     matchCount = 0
@@ -824,10 +1023,10 @@ class Make:
       result = ""
     return result
 
-  #·································································································
+  #·······················································································
 
   def addGoal (self, goal, targetList, message):
-    if not argumentIsString (goal):
+    if not type (goal) is str:
       print (BOLD_RED () + "*** Make.addGoal: 'goal' first argument is not a string ***" + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
@@ -837,11 +1036,11 @@ class Make:
       sys.exit (1)
     else:
       for aTarget in targetList:
-        if not argumentIsString (aTarget):
+        if not type (aTarget) is str:
           print (BOLD_RED () + "*** Make.addGoal: an element of 'targetList' second argument 'targets' is not a string ***" + ENDC ())
           traceback.print_stack ()
           sys.exit (1)
-    if not argumentIsString (message):
+    if not type (message) is str:
       print (BOLD_RED () + "*** Make.addGoal: 'message' third argument is not a string ***" + ENDC ())
       traceback.print_stack ()
       sys.exit (1)
@@ -851,7 +1050,7 @@ class Make:
       self.mGoals [goal] = (targetList, message)
     #print ('%s' % ', '.join(map(str, self.mGoals)))
 
-  #·································································································
+  #·······················································································
 
   def printGoals (self):
     print (BOLD_BLUE () + "--- Print " + str (len (self.mGoals)) + " goal" + ("s" if len (self.mGoals) > 1 else "") + " ---" + ENDC ())
@@ -864,7 +1063,7 @@ class Make:
 
     print (BOLD_BLUE () + "--- End of print goals ---" + ENDC ())
 
-  #·································································································
+  #·······················································································
 
   def runGoal (self, maxConcurrentJobs, showCommand):
     if not isinstance (maxConcurrentJobs, int):
@@ -883,16 +1082,16 @@ class Make:
       if self.mErrorCount > 0:
         for rule in self.mRuleList:
           for aTarget in rule.mTargets:
-            if rule.mDeleteTargetOnError and os.path.exists (os.path.abspath (aTarget)):
+            if rule.getDeleteTargetOnError () and os.path.exists (os.path.abspath (aTarget)):
               runCommand (["rm", aTarget], "Delete \"" + aTarget + "\" on error", showCommand, self.mLogUtilityTool)
     elif self.mSelectedGoal == "clean" :
       filesToRemoveList = []
       directoriesToRemoveSet = set ()
       for rule in self.mRuleList:
-        if rule.mCleanOperation == 1: # Delete target
+        if rule.getCleanOperation () == 1: # Delete target
           for aTarget in rule.mTargets:
             filesToRemoveList.append (aTarget)
-        elif rule.mCleanOperation == 2: # Delete target directories
+        elif rule.getCleanOperation () == 2: # Delete target directories
           for aTarget in rule.mTargets:
             dirPath = os.path.dirname (aTarget)
             if dirPath == "":
@@ -919,18 +1118,18 @@ class Make:
       print (BOLD_RED () + errorMessage + ENDC ())
       self.mErrorCount = self.mErrorCount + 1
 
-  #·································································································
+  #·······················································································
 
   def simulateClean (self):
     self.mSimulateClean = True
 
-  #·································································································
+  #·······················································································
 
   def enterError (self, message):
     print (BOLD_RED () + message + ENDC ())
     self.mErrorCount = self.mErrorCount + 1
 
-  #·································································································
+  #·······················································································
 
   def printErrorCountAndExitOnError (self):
     if self.mErrorCount == 1:
@@ -940,7 +1139,7 @@ class Make:
       print (BOLD_RED () + str (self.mErrorCount) + " errors." + ENDC ())
       sys.exit (1)
 
-  #·································································································
+  #·······················································································
 
   def printErrorCount (self):
     if self.mErrorCount == 1:
@@ -948,9 +1147,9 @@ class Make:
     elif self.mErrorCount > 1:
       print (BOLD_RED () + str (self.mErrorCount) + " errors." + ENDC ())
 
-  #·································································································
+  #·······················································································
 
   def errorCount (self):
     return self.mErrorCount
 
-#---------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
