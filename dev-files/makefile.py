@@ -1,6 +1,5 @@
 #! /usr/bin/python3
 # -*- coding: UTF-8 -*-
-
 #-----------------------------------------------------------------------------------------
 #   Releases
 #-----------------------------------------------------------------------------------------
@@ -33,7 +32,6 @@
 #        new API
 #
 #-----------------------------------------------------------------------------------------
-# http://www.diveintopython3.net/porting-code-to-python-3-with-2to3.html
 
 import subprocess, sys, os, copy
 import urllib, shutil, subprocess
@@ -568,22 +566,14 @@ class Rule:
         s = s.replace ("\\ ", "\x01") # Replace escaped spaces by \0x01
         s = s.replace ("\\\n", "") # Suppress \ at the end of lines
         liste = s.split ("\n\n")
-        # print ("DEP " + secondaryDependanceFile)
         for s in liste:
-          # print ("S " + s)
           components = s.split (':')
-          # print (str (len (components)))
-          #target = components [0].replace ("\x01", " ")
-          #print ("------- Optional dependency rules for target '" + target + "'")
-          #print ("Secondary target '" + target + "'")
           if len (components) > 1 :
             for src in components [1].split ():
               secondarySource = src.replace ("\x01", " ")
-              # print ("  SECONDARY SOURCE  '" + secondarySource + "'")
               modifDate = modificationDateForFile (make.mModificationDateDictionary, secondarySource)
               if self.mSecondaryMostRecentModificationDate < modifDate :
                 self.mSecondaryMostRecentModificationDate = modifDate
-                #print (BOLD_BLUE () + str (modifDate) + ENDC ())
 
   #·······················································································
 
@@ -604,22 +594,14 @@ class Rule:
         s = s.replace ("\\ ", "\x01") # Replace escaped spaces by \0x01
         s = s.replace ("\\\n", "") # Suppress \ at the end of lines
         liste = s.split ("\n\n")
-        # print ("DEP " + secondaryDependanceFile)
         for s in liste:
-          # print ("S " + s)
           components = s.split (':')
-          # print (str (len (components)))
-          #target = components [0].replace ("\x01", " ")
-          #print ("------- Optional dependency rules for target '" + target + "'")
-          #print ("Secondary target '" + target + "'")
           if len (components) > 1 :
             for src in components [1].split ():
               secondarySource = src.replace ("\x01", " ")
-              # print ("  SECONDARY SOURCE  '" + secondarySource + "'")
               modifDate = modificationDateForFile (make.mModificationDateDictionary, secondarySource)
               if self.mSecondaryMostRecentModificationDate < modifDate :
                 self.mSecondaryMostRecentModificationDate = modifDate
-                #print (BOLD_BLUE () + str (modifDate) + ENDC ())
 
 #-----------------------------------------------------------------------------------------
 #   class Make
@@ -916,7 +898,6 @@ class Make:
                 jobCount = jobCount + 1
                 job.mState = 3 # Means post command is running
         #--- Wait for a job termination
-          #print ("wait " + str (jobCount) + " " + str (len (self.mJobList)))
           terminationSemaphore.acquire ()
         #--- Checks for terminated jobs
           index = 0
