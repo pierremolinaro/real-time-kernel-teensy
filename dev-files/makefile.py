@@ -897,11 +897,13 @@ class Make:
                   absTargetDirectory = os.path.dirname (os.path.abspath (aTarget))
                   if not os.path.exists (absTargetDirectory):
                     displayLock.acquire ()
-                    runCommand (
-                      ["mkdir", "-p", absTargetDirectory], "Making \"" + absTargetDirectory + "\" directory",
-                      showCommand,
-                      job.mLogUtilityTool
-                    )
+                    os.mkdir (absTargetDirectory)
+                    print (BOLD_BLUE () + "Making \"" + absTargetDirectory + "\" directory" + ENDC ())
+#                     runCommand (
+#                       ["mkdir", "-p", absTargetDirectory], "Making \"" + absTargetDirectory + "\" directory",
+#                       showCommand,
+#                       job.mLogUtilityTool
+#                     )
                     displayLock.release ()
                 #--- Progress string
                 launchedJobCount += 1.0

@@ -118,13 +118,13 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   elif SYSTEM_NAME == "Windows" :
     BASE_NAME = "arm-none-eabi"
     TOOL_DIR = os.path.expanduser (WINDOWS_TOOL_DIR) + "/"
-    AS_TOOL = TOOL_DIR + BASE_NAME + "-as"
+    AS_TOOL = TOOL_DIR + BASE_NAME + "-as.exe"
     AS_TOOL_OPTIONS = ["-mthumb", "-mcpu=cortex-m4"]
-    COMPILER_TOOL = TOOL_DIR + BASE_NAME + "-gcc"
+    COMPILER_TOOL = TOOL_DIR + BASE_NAME + "-gcc.exe"
     COMPILER_TOOL_OPTIONS = ["-mthumb", "-mcpu=cortex-m4"]
-    OBJCOPY_TOOL = TOOL_DIR + BASE_NAME + "-objcopy"
-    DISPLAY_OBJ_SIZE_TOOL = TOOL_DIR + BASE_NAME + "-size"
-    OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
+    OBJCOPY_TOOL = TOOL_DIR + BASE_NAME + "-objcopy.exe"
+    DISPLAY_OBJ_SIZE_TOOL = TOOL_DIR + BASE_NAME + "-size.exe"
+    OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump.exe"
     TEENSY_TOOLS_DIR = os.path.expanduser (WINDOWS_TEENSY_TOOLS_DIR) + "/"
     TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile.exe"
   else:
