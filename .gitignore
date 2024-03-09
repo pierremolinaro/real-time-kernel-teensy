@@ -4,6 +4,7 @@
 ## Other files
 *.pyc
 *.list
+solutions/*/zASBUILDS/
 solutions/*/zBUILDS/
 solutions/*/zSOURCES/
 solutions/*/zPRODUCTS/
