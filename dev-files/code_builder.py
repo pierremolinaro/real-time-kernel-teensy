@@ -20,9 +20,9 @@ WINDOWS_TOOL_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-compi
 # TEENSY POST COMPILE TOOL
 #---------------------------------------------------------------------------------------------------
 
-MACOS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.58.0"
-LINUX_TEENSY_TOOLS_DIR = "~/.arduino15/packages/teensy/tools/teensy-tools/1.58.0"
-WINDOWS_TEENSY_TOOLS_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-tools/1.58.0"
+MACOS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.59.0"
+LINUX_TEENSY_TOOLS_DIR = "~/.arduino15/packages/teensy/tools/teensy-tools/1.59.0"
+WINDOWS_TEENSY_TOOLS_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-tools/1.59.0"
 
 #---------------------------------------------------------------------------------------------------
 #   Run process and wait for termination
@@ -209,7 +209,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build all header file
-  allHeadersSecondaryDependenceFile = BUILD_DIR + "/all-headers.dep"
+  allHeadersSecondaryDependenceFile = BUILD_DIR + "/all-headers.d"
   allHeaders_file = GENERATED_SOURCE_DIR + "/all-headers.h"
   rule = makefile.Rule ("python3", "Build all headers file", ["makefile.json"])
   rule.appendSource ("../../dev-files/build_all_header_file.py") ;
@@ -288,13 +288,13 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOption ("-DSTATIC=")
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
-    rule.appendSecondaryDependanceFile (objectFileForChecking + ".dep", make) ;
+    rule.appendSecondaryDependanceFile (objectFileForChecking + ".d", make) ;
 
 #     rule = makefile.Rule ([objectFileForChecking], "Checking " + source)
 #     rule.mDependences.append (allHeaders_file)
 #     rule.mDependences.append (sourcePath)
 #     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (objectFileForChecking + ".dep", make)
+#     rule.enterSecondaryDependanceFile (objectFileForChecking + ".d", make)
 #     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
 #     rule.mCommand += common_definitions.checkModeOptions ()
 #     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
@@ -303,7 +303,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #     rule.mCommand += ["-o", objectFileForChecking]
 #     rule.mCommand += ["-DSTATIC="]
 #     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFileForChecking + ".dep"]
+#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFileForChecking + ".d"]
     make.addRule (rule)
     rule.mPriority = -1
     allGoal.append (objectFileForChecking)
@@ -320,7 +320,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOption ("-DSTATIC=static __attribute__((unused))" if GROUP_SOURCES else "-DSTATIC=")
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
-    rule.appendSecondaryDependanceFile (objectFile + ".dep", make) ;
+    rule.appendSecondaryDependanceFile (objectFile + ".d", make) ;
 
 
 #     rule = makefile.Rule ([objectFile], "Compiling " + source)
@@ -332,11 +332,11 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #     rule.mCommand += ["-o", objectFile]
 #     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
 #     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFile + ".dep"]
+#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFile + ".d"]
 #     rule.mDependences.append (allHeaders_file)
 #     rule.mDependences.append (sourcePath)
 #     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (objectFile + ".dep", make)
+#     rule.enterSecondaryDependanceFile (objectFile + ".d", make)
     make.addRule (rule)
     objectFileList.append (objectFile)
   #--- objdump python source
@@ -366,7 +366,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOption ("-DSTATIC=")
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
-    rule.appendSecondaryDependanceFile (asObjectFile + ".dep", make) ;
+    rule.appendSecondaryDependanceFile (asObjectFile + ".d", make) ;
 
 
 #     rule = makefile.Rule ([asObjectFile], "Compiling -> s " + source)
@@ -377,11 +377,11 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
 #     rule.mCommand += ["-o", asObjectFile]
 #     rule.mCommand += ["-DSTATIC="]
 #     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", asObjectFile + ".dep"]
+#     rule.mCommand += ["-MMD", "-MP", "-MF", asObjectFile + ".d"]
 #     rule.mDependences.append (sourcePath)
 #     rule.mDependences.append (allHeaders_file)
 #     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (asObjectFile + ".dep", make)
+#     rule.enterSecondaryDependanceFile (asObjectFile + ".d", make)
     make.addRule (rule)
   #--- AS rule, getting output assembler file
     listingFile = ASBUILD_DIR + "/" + source + ".s.list"
@@ -415,17 +415,17 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       rule.appendTarget (objectFile)
       rule.appendOptionList (includeDirsInCompilerCommand)
       rule.appendOption ("--MD")
-      rule.appendSecondaryDependanceFile (objectFile + ".dep", make) ;
+      rule.appendSecondaryDependanceFile (objectFile + ".d", make) ;
 
 #       rule = makefile.Rule ([objectFile], "Assembling " + source)
 #       rule.mCommand += AS_TOOL_WITH_OPTIONS
 #       rule.mCommand += [sourcePath]
 #       rule.mCommand += ["-o", objectFile]
 #       rule.mCommand += includeDirsInCompilerCommand
-#       rule.mCommand += ["--MD", objectFile + ".dep"]
+#       rule.mCommand += ["--MD", objectFile + ".d"]
 #       rule.mDependences.append (sourcePath)
 #       rule.mDependences.append ("makefile.json")
-#       rule.enterSecondaryDependanceFile (objectFile + ".dep", make)
+#       rule.enterSecondaryDependanceFile (objectFile + ".d", make)
       make.addRule (rule)
       objectFileList.append (objectFile)
     #--- Add listing file
