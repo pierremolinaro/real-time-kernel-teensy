@@ -899,11 +899,6 @@ class Make:
                     displayLock.acquire ()
                     os.mkdir (absTargetDirectory)
                     print (BOLD_BLUE () + "Making \"" + absTargetDirectory + "\" directory" + ENDC ())
-#                     runCommand (
-#                       ["mkdir", "-p", absTargetDirectory], "Making \"" + absTargetDirectory + "\" directory",
-#                       showCommand,
-#                       job.mLogUtilityTool
-#                     )
                     displayLock.release ()
                 #--- Progress string
                 launchedJobCount += 1.0
@@ -1085,7 +1080,9 @@ class Make:
         for rule in self.mRuleList:
           for aTarget in rule.mTargets:
             if rule.getDeleteTargetOnError () and os.path.exists (os.path.abspath (aTarget)):
-              runCommand (["rm", aTarget], "Delete \"" + aTarget + "\" on error", showCommand, self.mLogUtilityTool)
+              os.remove (aTarget)
+              print (BOLD_BLUE () + "Delete \"" + aTarget + "\" on error" + ENDC ())
+            #  runCommand (["rm", aTarget], "Delete \"" + aTarget + "\" on error", showCommand, self.mLogUtilityTool)
     elif self.mSelectedGoal == "clean" :
       filesToRemoveList = []
       directoriesToRemoveSet = set ()

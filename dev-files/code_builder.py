@@ -204,8 +204,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendOption (TASK_COUNT) ;
   rule.appendOption (teensyName) ;
   rule.appendOption ("1" if ASSERTION_GENERATION else "0") ;
-#   rule.mDependences.append ("makefile.json")
-#   rule.mCommand += ["python3", "../../dev-files/build_base_header_file.py", baseHeader_file, str (CPU_MHZ), TASK_COUNT, teensyName, "1" if ASSERTION_GENERATION else "0"]
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build all header file
@@ -216,13 +214,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendTarget (allHeaders_file) ;
   rule.appendTarget (allHeadersSecondaryDependenceFile) ;
   rule.appendSourceList (H_SOURCE_LIST) ;
-
-#   rule = makefile.Rule ([allHeaders_file, allHeadersSecondaryDependenceFile], "Build all headers file")
-#   rule.mDependences.append ("makefile.json")
-#   rule.mDependences += H_SOURCE_LIST
-#   rule.mCommand += ["python3", "../../dev-files/build_all_header_file.py", allHeaders_file, allHeadersSecondaryDependenceFile]
-#   rule.mCommand += H_SOURCE_LIST
-#   rule.enterSecondaryDependanceFile (allHeadersSecondaryDependenceFile, make)
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Build interrupt handler files
@@ -237,17 +228,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendOption (serviceScheme) ;
   rule.appendOption (sectionScheme) ;
   rule.appendSourceList (H_SOURCE_LIST) ;
-
-#   rule = makefile.Rule ([interruptHandlerSFile, interruptHandlerCppFile], "Build interrupt files")
-#   rule.mDependences += H_SOURCE_LIST
-#   rule.mDependences.append ("makefile.json")
-#   rule.mDependences.append ("../../dev-files/build_interrupt_handlers.py")
-#   rule.mCommand += ["python3", "../../dev-files/build_interrupt_handlers.py"]
-#   rule.mCommand += [interruptHandlerCppFile]
-#   rule.mCommand += [interruptHandlerSFile]
-#   rule.mCommand += [serviceScheme]
-#   rule.mCommand += [sectionScheme]
-#   rule.mCommand += H_SOURCE_LIST
   rule.mPriority = -1
   make.addRule (rule)
 #--------------------------------------------------------------------------- Group sources ?
@@ -257,12 +237,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendSource ("../../dev-files/build_grouped_sources.py") ;
     rule.appendTarget (allSourceFile) ;
     rule.appendSourceList (CPP_SOURCE_LIST) ;
-
-#     rule = makefile.Rule ([allSourceFile], "Group all sources")
-#     rule.mDependences += CPP_SOURCE_LIST
-#     rule.mDependences.append ("makefile.json")
-#     rule.mCommand += ["python3", "../../dev-files/build_grouped_sources.py", allSourceFile]
-#     rule.mCommand += CPP_SOURCE_LIST
     rule.mPriority = -1
     make.addRule (rule)
     CPP_SOURCE_LIST = [allSourceFile]
@@ -289,21 +263,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
     rule.appendSecondaryDependanceFile (objectFileForChecking + ".d", make) ;
-
-#     rule = makefile.Rule ([objectFileForChecking], "Checking " + source)
-#     rule.mDependences.append (allHeaders_file)
-#     rule.mDependences.append (sourcePath)
-#     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (objectFileForChecking + ".d", make)
-#     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
-#     rule.mCommand += common_definitions.checkModeOptions ()
-#     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
-#     rule.mCommand += common_definitions.Cpp_actualOptions (False)
-#     rule.mCommand += ["-c", sourcePath]
-#     rule.mCommand += ["-o", objectFileForChecking]
-#     rule.mCommand += ["-DSTATIC="]
-#     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFileForChecking + ".d"]
     make.addRule (rule)
     rule.mPriority = -1
     allGoal.append (objectFileForChecking)
@@ -321,22 +280,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
     rule.appendSecondaryDependanceFile (objectFile + ".d", make) ;
-
-
-#     rule = makefile.Rule ([objectFile], "Compiling " + source)
-#     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
-#     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
-#     rule.mCommand += common_definitions.Cpp_actualOptions (usesLTO)
-#     rule.mCommand += ["-g"]
-#     rule.mCommand += ["-c", sourcePath]
-#     rule.mCommand += ["-o", objectFile]
-#     rule.mCommand += ["-DSTATIC=static __attribute__((unused))"] if GROUP_SOURCES else ["-DSTATIC="]
-#     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", objectFile + ".d"]
-#     rule.mDependences.append (allHeaders_file)
-#     rule.mDependences.append (sourcePath)
-#     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (objectFile + ".d", make)
     make.addRule (rule)
     objectFileList.append (objectFile)
   #--- objdump python source
@@ -346,11 +289,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendSource (OBJDUMP_TOOL)
     rule.appendSource (sourcePath)
     rule.appendTarget (objdumpPythonFile)
-
-#     rule = makefile.Rule ([objdumpPythonFile], "Building " + source + ".objdump.py")
-#     rule.mDependences.append (objectFile)
-#     rule.mDependences.append ("makefile.json")
-#     rule.mCommand += ["python3", "../../dev-files/build_objdump.py", OBJDUMP_TOOL, source, objdumpPythonFile]
     rule.mPriority = -1
     make.addRule (rule)
     allGoal.append (objdumpPythonFile)
@@ -367,38 +305,16 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOptionList (includeDirsInCompilerCommand)
     rule.appendOptionList (["-MMD", "-MP", "-MF"])
     rule.appendSecondaryDependanceFile (asObjectFile + ".d", make) ;
-
-
-#     rule = makefile.Rule ([asObjectFile], "Compiling -> s " + source)
-#     rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
-#     rule.mCommand += common_definitions.C_Cpp_optimizationOptions ()
-#     rule.mCommand += common_definitions.Cpp_actualOptions (usesLTO)
-#     rule.mCommand += ["-S", sourcePath]
-#     rule.mCommand += ["-o", asObjectFile]
-#     rule.mCommand += ["-DSTATIC="]
-#     rule.mCommand += includeDirsInCompilerCommand
-#     rule.mCommand += ["-MMD", "-MP", "-MF", asObjectFile + ".d"]
-#     rule.mDependences.append (sourcePath)
-#     rule.mDependences.append (allHeaders_file)
-#     rule.mDependences.append ("makefile.json")
-#     rule.enterSecondaryDependanceFile (asObjectFile + ".d", make)
     make.addRule (rule)
   #--- AS rule, getting output assembler file
     listingFile = ASBUILD_DIR + "/" + source + ".s.list"
     rule = makefile.Rule (AS_TOOL, "Assembling " + asObjectFile + " -> listing", ["makefile.json"])
     rule.appendOptionList (AS_TOOL_OPTIONS)
     rule.appendSource (asObjectFile)
-    rule.appendOptionList (["-o", "/dev/null", "-aln=" + listingFile])
+    rule.appendOption ("-o")
+    rule.appendTarget (listingFile + ".o")
+    rule.appendOption ("-aln=" + listingFile)
     rule.enterImplicitTarget (listingFile)
-
-#     rule = makefile.Rule ([listingFile], "Assembling -> listing " + source)
-#     rule.mCommand += AS_TOOL_WITH_OPTIONS
-#     rule.mCommand += [asObjectFile]
-#     rule.mCommand += ["-o", "/dev/null"]
-#     rule.mCommand += ["-aln=" + listingFile]
-#     rule.mDependences.append (asObjectFile)
-#     rule.mDependences.append (allHeaders_file)
-#     rule.mDependences.append ("makefile.json")
     make.addRule (rule)
     asObjectFileList.append (listingFile)
 #-- Add ARM S files
@@ -416,16 +332,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       rule.appendOptionList (includeDirsInCompilerCommand)
       rule.appendOption ("--MD")
       rule.appendSecondaryDependanceFile (objectFile + ".d", make) ;
-
-#       rule = makefile.Rule ([objectFile], "Assembling " + source)
-#       rule.mCommand += AS_TOOL_WITH_OPTIONS
-#       rule.mCommand += [sourcePath]
-#       rule.mCommand += ["-o", objectFile]
-#       rule.mCommand += includeDirsInCompilerCommand
-#       rule.mCommand += ["--MD", objectFile + ".d"]
-#       rule.mDependences.append (sourcePath)
-#       rule.mDependences.append ("makefile.json")
-#       rule.enterSecondaryDependanceFile (objectFile + ".d", make)
       make.addRule (rule)
       objectFileList.append (objectFile)
     #--- Add listing file
@@ -435,14 +341,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       rule.appendSource (sourcePath)
       rule.appendOptionList (["-o", "/dev/null", "-aln=" + listingFile])
       rule.enterImplicitTarget (listingFile)
-
-#       rule = makefile.Rule ([listingFile], "Assembling -> listing " + source)
-#       rule.mCommand += AS_TOOL_WITH_OPTIONS
-#       rule.mCommand += [sourcePath]
-#       rule.mCommand += ["-o", "/dev/null"]
-#       rule.mCommand += ["-aln=" + listingFile]
-#       rule.mDependences.append (sourcePath)
-#       rule.mDependences.append ("makefile.json")
       make.addRule (rule)
       asObjectFileList.append (listingFile)
 #--------------------------------------------------------------------------- Link for internal flash
@@ -460,17 +358,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendOptionList (common_definitions.commonLinkerFlags (usesLTO))
   rule.appendOption ("-o")
   rule.appendTarget (PRODUCT_INTERNAL_FLASH + ".elf")
-
-#   rule = makefile.Rule ([PRODUCT_INTERNAL_FLASH + ".elf"], "Linking " + PRODUCT_INTERNAL_FLASH + ".elf")
-#   rule.mDependences += objectFileList
-#   rule.mDependences.append (LINKER_SCRIPT_INTERNAL_FLASH)
-#   rule.mDependences.append ("makefile.json")
-#   rule.mCommand += COMPILER_TOOL_WITH_OPTIONS
-#   rule.mCommand += objectFileList
-#   rule.mCommand += ["-T" + LINKER_SCRIPT_INTERNAL_FLASH]
-#   rule.mCommand.append ("-Wl,-Map=" + PRODUCT_INTERNAL_FLASH + ".map")
-#   rule.mCommand += common_definitions.commonLinkerFlags (usesLTO)
-#   rule.mCommand += ["-o", PRODUCT_INTERNAL_FLASH + ".elf"]
   make.addRule (rule)
 #--- Add hex rule
   allGoal.append (PRODUCT_INTERNAL_FLASH + ".hex")
@@ -478,15 +365,6 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendOptionList (["-O", "ihex"])
   rule.appendSource (PRODUCT_INTERNAL_FLASH + ".elf")
   rule.appendTarget (PRODUCT_INTERNAL_FLASH + ".hex")
-
-#   rule = makefile.Rule ([PRODUCT_INTERNAL_FLASH + ".hex"], "Hexing " + PRODUCT_INTERNAL_FLASH + ".hex")
-#   rule.mDependences.append (PRODUCT_INTERNAL_FLASH + ".elf")
-#   rule.mDependences.append ("makefile.json")
-#   rule.mCommand += OBJCOPY_TOOL_WITH_OPTIONS
-#   rule.mCommand.append ("-O")
-#   rule.mCommand.append ("ihex")
-#   rule.mCommand.append (PRODUCT_INTERNAL_FLASH + ".elf")
-#   rule.mCommand.append (PRODUCT_INTERNAL_FLASH + ".hex")
   make.addRule (rule)
 #--------------------------------------------------------------------------- Goals
   make.addGoal ("all", allGoal, "Build all")
