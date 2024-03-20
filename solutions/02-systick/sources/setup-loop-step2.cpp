@@ -18,7 +18,7 @@ void loop (void) {
 //--- Drive PTD7 high --> led is on
   GPIOD_PSOR = 1 << 7 ;
 //--- Wait...
-  busyWaitDuring (250) ;
+  busyWaitDuring (25) ;
 //--- Drive PTD7 low --> led is off
   GPIOD_PCOR = 1 << 7 ;
 //--- Wait...

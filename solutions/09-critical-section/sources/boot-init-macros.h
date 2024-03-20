@@ -20,7 +20,8 @@
 
 //-----------------------------------------------------------------------------
 //
-// Inscrire l'adresse de la routine dans la section '"boot.routine.array' pour exécution automatique lors du démarrage
+// Inscrire l'adresse de la routine dans la section 'boot.routine.array'
+// pour exécution automatique lors du démarrage
 //
 //-----------------------------------------------------------------------------
 
@@ -32,7 +33,8 @@
 
 //-----------------------------------------------------------------------------
 //
-// Inscrire l'adresse de la routine dans la section 'init.routine.array' pour exécution automatique lors du démarrage
+// Inscrire l'adresse de la routine dans la section 'init.routine.array'
+// pour exécution automatique lors du démarrage
 //
 //-----------------------------------------------------------------------------
 
