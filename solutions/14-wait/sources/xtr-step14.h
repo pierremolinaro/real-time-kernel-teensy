@@ -11,7 +11,7 @@
 typedef void (* RoutineTaskType) (USER_MODE) ;
 
 //-----------------------------------------------------------------------------
-//   kernel_createTask                                                                                                *
+//   kernel_createTask
 //-----------------------------------------------------------------------------
 
 void kernel_createTask (INIT_MODE_

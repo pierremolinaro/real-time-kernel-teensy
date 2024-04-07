@@ -271,7 +271,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.appendOptionList (COMPILER_TOOL_OPTIONS)
     rule.appendOptionList (common_definitions.C_Cpp_optimizationOptions ())
     rule.appendOptionList (common_definitions.Cpp_actualOptions (False))
-    rule.appendOption ("-g")
+#    rule.appendOption ("-g")
     rule.appendOption ("-c")
     rule.appendSource (sourcePath)
     rule.appendOption ("-o")
