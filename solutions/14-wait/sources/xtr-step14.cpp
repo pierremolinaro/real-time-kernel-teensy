@@ -1,10 +1,10 @@
 #include "all-headers.h"
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #define ENABLE_XTR_ASSERTIONS
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #ifdef ENABLE_XTR_ASSERTIONS
   #define XTR_ASSERT_NON_NULL_POINTER(ptr) assertNonNullPointer (ptr, __FILE__, __LINE__) ;
@@ -12,7 +12,7 @@
   #define XTR_ASSERT_NON_NULL_POINTER(ptr)
 #endif
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #ifdef ENABLE_XTR_ASSERTIONS
   #define XTR_ASSERT(condition,value) assertion (condition, value, __FILE__, __LINE__) ;
@@ -224,13 +224,13 @@ void service_taskSelfTerminates (KERNEL_MODE) {
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //   DEADLINE LIST
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 static TaskList gDeadlineWaitingTaskList ;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
   XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
@@ -241,7 +241,7 @@ void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
   kernel_makeNoTaskRunning (MODE) ;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurrentDate) {
   TaskList::Iterator iterator (MODE_ gDeadlineWaitingTaskList) ;
@@ -255,8 +255,8 @@ static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurren
   }
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------

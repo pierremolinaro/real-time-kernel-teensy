@@ -140,3 +140,38 @@ void service_waitUntil (KERNEL_MODE_ const uint32_t inDeadlineMS) {
 }
 
 //-----------------------------------------------------------------------------
+//   DEADLINE LIST
+//-----------------------------------------------------------------------------
+
+static TaskList gDeadlineWaitingTaskList ;
+
+//-----------------------------------------------------------------------------
+
+void kernel_blockOnDeadline (KERNEL_MODE_ const uint32_t inDeadline) {
+  XTR_ASSERT_NON_NULL_POINTER (gRunningTaskControlBlockPtr) ;
+//--- Insert in deadline list
+  gRunningTaskControlBlockPtr->mDeadline = inDeadline ;
+  gDeadlineWaitingTaskList.enterTask (MODE_ gRunningTaskControlBlockPtr) ;
+//--- Block task
+  kernel_makeNoTaskRunning (MODE) ;
+}
+
+//-----------------------------------------------------------------------------
+
+static void irq_makeTasksReadyFromCurrentDate (IRQ_MODE_ const uint32_t inCurrentDate) {
+  TaskList::Iterator iterator (MODE_ gDeadlineWaitingTaskList) ;
+  while (TaskControlBlock * task = iterator.nextTask (MODE)) {
+    if (inCurrentDate >= task->mDeadline) {
+    //--- Remove task from deadline list
+      gDeadlineWaitingTaskList.removeTask (MODE_ task) ;
+   //--- Make task ready
+      kernel_makeTaskReady (MODE_ task) ;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+MACRO_REAL_TIME_ISR (irq_makeTasksReadyFromCurrentDate) ;
+
+//-----------------------------------------------------------------------------
