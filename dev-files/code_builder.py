@@ -1,32 +1,16 @@
 # -*- coding: UTF-8 -*-
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
-import sys, os, subprocess, shutil, json, platform
+import sys, os, subprocess, shutil, json, platform, dev_tool_pathes
 
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 import makefile
 import common_definitions
 
-#---------------------------------------------------------------------------------------------------
-# GGC TOOL PATH
-#---------------------------------------------------------------------------------------------------
-
-MACOS_TOOL_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
-LINUX_TOOL_DIR = "~/.arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
-WINDOWS_TOOL_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-compile/11.3.1/arm/bin"
-
-#---------------------------------------------------------------------------------------------------
-# TEENSY POST COMPILE TOOL
-#---------------------------------------------------------------------------------------------------
-
-MACOS_TEENSY_TOOLS_DIR = "~/Library/Arduino15/packages/teensy/tools/teensy-tools/1.59.0"
-LINUX_TEENSY_TOOLS_DIR = "~/.arduino15/packages/teensy/tools/teensy-tools/1.59.0"
-WINDOWS_TEENSY_TOOLS_DIR = "~/AppData/Local/Arduino15/packages/teensy/tools/teensy-tools/1.59.0"
-
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #   Run process and wait for termination
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 def runProcess (command) :
   string = makefile.BOLD_GREEN ()
@@ -39,9 +23,9 @@ def runProcess (command) :
     print (makefile.BOLD_RED () + "Error " + str (returncode) + makefile.ENDC ())
     sys.exit (returncode)
 
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #   Run process, get output and wait for termination
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 def runProcessAndGetOutput (command) :
   result = ""
@@ -60,9 +44,9 @@ def runProcessAndGetOutput (command) :
     sys.exit (childProcess.returncode)
   return result
 
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #   dictionaryFromJsonFile
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 def dictionaryFromJsonFile (file) :
   result = {}
@@ -79,21 +63,21 @@ def dictionaryFromJsonFile (file) :
   return result
 
 
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #   buildCode
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
-#--------------------------------------------------------------------------- Prepare
+#---------------------------------------- Prepare
   os.chdir (projectDir)
   make = makefile.Make (GOAL)
 #  make.mMacTextEditor = "TextWrangler"
   allGoal = []
-#--------------------------------------------------------------------------- Get platform ?
+#---------------------------------------- Get platform ?
   SYSTEM_NAME = platform.system ()
   if SYSTEM_NAME == "Darwin" :
     BASE_NAME = "arm-none-eabi"
-    TOOL_DIR = os.path.expanduser (MACOS_TOOL_DIR) + "/"
+    TOOL_DIR = dev_tool_pathes.MACOS_ARM_TOOL_CHAIN_DIR ()
     AS_TOOL = TOOL_DIR + BASE_NAME + "-as"
     AS_TOOL_OPTIONS = ["-mthumb", "-mcpu=cortex-m4"]
     COMPILER_TOOL = TOOL_DIR + BASE_NAME + "-gcc"
@@ -101,11 +85,11 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     OBJCOPY_TOOL = TOOL_DIR + BASE_NAME + "-objcopy"
     DISPLAY_OBJ_SIZE_TOOL = TOOL_DIR + BASE_NAME + "-size"
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
-    TEENSY_TOOLS_DIR = os.path.expanduser (MACOS_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_TOOLS_DIR = dev_tool_pathes.MACOS_TEENSY_TOOLS_DIR ()
     TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile"
   elif SYSTEM_NAME == "Linux" :
     BASE_NAME = "arm-none-eabi"
-    TOOL_DIR = os.path.expanduser (LINUX_TOOL_DIR) + "/"
+    TOOL_DIR = dev_tool_pathes.LINUX_ARM_TOOL_CHAIN_DIR ()
     AS_TOOL = TOOL_DIR + BASE_NAME + "-as"
     AS_TOOL_OPTIONS = ["-mthumb", "-mcpu=cortex-m4"]
     COMPILER_TOOL = TOOL_DIR + BASE_NAME + "-gcc"
@@ -113,11 +97,11 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     OBJCOPY_TOOL = TOOL_DIR + BASE_NAME + "-objcopy"
     DISPLAY_OBJ_SIZE_TOOL = TOOL_DIR + BASE_NAME + "-size"
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump"
-    TEENSY_TOOLS_DIR = os.path.expanduser (LINUX_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_TOOLS_DIR = dev_tool_pathes.LINUX_TEENSY_TOOLS_DIR ()
     TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile"
   elif SYSTEM_NAME == "Windows" :
     BASE_NAME = "arm-none-eabi"
-    TOOL_DIR = os.path.expanduser (WINDOWS_TOOL_DIR) + "/"
+    TOOL_DIR = dev_tool_pathes.WINDOWS_ARM_TOOL_CHAIN_DIR ()
     AS_TOOL = TOOL_DIR + BASE_NAME + "-as.exe"
     AS_TOOL_OPTIONS = ["-mthumb", "-mcpu=cortex-m4"]
     COMPILER_TOOL = TOOL_DIR + BASE_NAME + "-gcc.exe"
@@ -125,12 +109,12 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     OBJCOPY_TOOL = TOOL_DIR + BASE_NAME + "-objcopy.exe"
     DISPLAY_OBJ_SIZE_TOOL = TOOL_DIR + BASE_NAME + "-size.exe"
     OBJDUMP_TOOL = TOOL_DIR + BASE_NAME + "-objdump.exe"
-    TEENSY_TOOLS_DIR = os.path.expanduser (WINDOWS_TEENSY_TOOLS_DIR) + "/"
+    TEENSY_TOOLS_DIR = dev_tool_pathes.WINDOWS_TEENSY_TOOLS_DIR ()
     TEENSY_POST_COMPILE = TEENSY_TOOLS_DIR + "teensy_post_compile.exe"
   else:
     print (makefile.BOLD_RED () + "Unhandled platform: '" + SYSTEM_NAME + "'" + makefile.ENDC ())
     sys.exit (1)
-#--------------------------------------------------------------------------- Analyze JSON file
+#---------------------------------------- Analyze JSON file
   print (makefile.BOLD_GREEN () + "--- Making " + projectDir + makefile.ENDC ())
   dictionaire = dictionaryFromJsonFile (projectDir + "/makefile.json")
 #--- TEENSY
@@ -168,12 +152,12 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   sectionScheme = ""
   if "SECTION-SCHEME" in dictionaire :
     sectionScheme = dictionaire ["SECTION-SCHEME"]
-#--------------------------------------------------------------------------- Directories
+#---------------------------------------- Directories
   BUILD_DIR = common_definitions.buildDirectory ()
   GENERATED_SOURCE_DIR = common_definitions.generatedSourceDirectory ()
   PRODUCT_DIR = common_definitions.productDirectory ()
   ASBUILD_DIR = common_definitions.asDirectory ()
-#--------------------------------------------------------------------------- Build source lists
+#---------------------------------------- Build source lists
   includeDirsInCompilerCommand = ["-I", GENERATED_SOURCE_DIR, "-I", projectDir]
   H_SOURCE_LIST = []
   CPP_SOURCE_LIST = []
@@ -194,7 +178,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
           pass # Ignored file
         elif extension != "" : # Ceci permet d'ignorer les fichés cachés (dont les noms commencent par un point)
           print (makefile.MAGENTA () + makefile.BOLD () + "Note: unhandled file " + sourcePath + makefile.ENDC ())
-#--------------------------------------------------------------------------- Build base header file
+#---------------------------------------- Build base header file
   baseHeader_file = GENERATED_SOURCE_DIR + "/base.h"
   H_SOURCE_LIST.insert (0, baseHeader_file)
   rule = makefile.Rule ("python3", "Build base header file", ["makefile.json"])
@@ -206,7 +190,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendOption ("1" if ASSERTION_GENERATION else "0") ;
   rule.mPriority = -1
   make.addRule (rule)
-#--------------------------------------------------------------------------- Build all header file
+#---------------------------------------- Build all header file
   allHeadersSecondaryDependenceFile = BUILD_DIR + "/all-headers.d"
   allHeaders_file = GENERATED_SOURCE_DIR + "/all-headers.h"
   rule = makefile.Rule ("python3", "Build all headers file", ["makefile.json"])
@@ -216,7 +200,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendSourceList (H_SOURCE_LIST) ;
   rule.mPriority = -1
   make.addRule (rule)
-#--------------------------------------------------------------------------- Build interrupt handler files
+#---------------------------------------- Build interrupt handler files
   interruptHandlerSFile = GENERATED_SOURCE_DIR + "/interrupt-handlers.s"
   interruptHandlerCppFile = GENERATED_SOURCE_DIR + "/interrupt-handler-helper.cpp"
   S_SOURCE_LIST.append (interruptHandlerSFile)
@@ -230,7 +214,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendSourceList (H_SOURCE_LIST) ;
   rule.mPriority = -1
   make.addRule (rule)
-#--------------------------------------------------------------------------- Group sources ?
+#---------------------------------------- Group sources ?
   if GROUP_SOURCES :
     allSourceFile = GENERATED_SOURCE_DIR + "/all-sources.cpp"
     rule = makefile.Rule ("python3", "Group all sources", ["makefile.json"])
@@ -240,7 +224,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     rule.mPriority = -1
     make.addRule (rule)
     CPP_SOURCE_LIST = [allSourceFile]
-#--------------------------------------------------------------------------- Build makefile rules
+#---------------------------------------- Build makefile rules
   objectFileList = []
   asObjectFileList = []
 #--- CPP source files
@@ -345,7 +329,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
       rule.enterImplicitTarget (listingFile)
       make.addRule (rule)
       asObjectFileList.append (listingFile)
-#--------------------------------------------------------------------------- Link for internal flash
+#---------------------------------------- Link for internal flash
   PRODUCT_INTERNAL_FLASH = PRODUCT_DIR + "/product"
   LINKER_SCRIPT_INTERNAL_FLASH = "../../dev-files/" + linkerScript
   allGoal.append (PRODUCT_INTERNAL_FLASH + ".elf")
@@ -368,23 +352,23 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
   rule.appendSource (PRODUCT_INTERNAL_FLASH + ".elf")
   rule.appendTarget (PRODUCT_INTERNAL_FLASH + ".hex")
   make.addRule (rule)
-#--------------------------------------------------------------------------- Goals
+#---------------------------------------- Goals
   make.addGoal ("all", allGoal, "Build all")
   make.addGoal ("run", allGoal, "Building all and run")
   make.addGoal ("view-hex", allGoal, "Building all and show hex")
   make.addGoal ("display-obj-size", allGoal, "Build binaries and display object sizes")
   make.addGoal ("as", asObjectFileList, "Compile C and C++ to assembly")
-#--------------------------------------------------------------------------- Run jobs
+#---------------------------------------- Run jobs
 #  make.printRules ()
 #  make.checkRules ()
 #   make.writeRuleDependancesInDotFile ("dependances.dot")
   make.runGoal (maxConcurrentJobs, showCommand)
-#--------------------------------------------------------------------------- Ok ?
+#---------------------------------------- Ok ?
   make.printErrorCountAndExitOnError ()
-#---------------------------------------------------------------------------- "display-obj-size"
+#---------------------------------------- "display-obj-size"
   if GOAL == "display-obj-size" :
     makefile.runCommand ([DISPLAY_OBJ_SIZE_TOOL] + objectFileList + ["-t"], "Display Object Size", False, showCommand)
-#---------------------------------------------------------------------------- "All" or "run"
+#---------------------------------------- "All" or "run"
   if (GOAL == "all") or (GOAL == "run") or (GOAL == "view-hex") :
     s = runProcessAndGetOutput ([DISPLAY_OBJ_SIZE_TOOL, "-t", PRODUCT_INTERNAL_FLASH + ".elf"])
     secondLine = s.split('\n')[1]
@@ -392,7 +376,7 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     print ("  ROM code:    " + str (numbers [0]) + " bytes")
     print ("  ROM data:    " + str (numbers [1]) + " bytes")
     print ("  RAM + STACK: " + str (numbers [2]) + " bytes")
-#----------------------------------------------- Run ?
+#---------------------------------------- Run ?
   if GOAL == "run":
     #FLASH_TEENSY = [TEENSY_POST_COMPILE, "-w", "-v", "-mmcu=TEENSY36"]
     if not os.path.exists (TEENSY_POST_COMPILE) :
@@ -414,4 +398,4 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     scriptDir = os.path.dirname (os.path.abspath (__file__))
     runProcess (["python3", scriptDir+ "/view-hex.py", PRODUCT_INTERNAL_FLASH + ".hex"])
 
-#---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
