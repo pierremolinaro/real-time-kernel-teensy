@@ -270,8 +270,8 @@ def buildCode (GOAL, projectDir, maxConcurrentJobs, showCommand):
     objdumpPythonFile = BUILD_DIR + "/" + source + ".objdump.py"
     rule = makefile.Rule ("python3", "Building " + source + ".objdump.py", ["makefile.json"])
     rule.appendSource ("../../dev-files/build_objdump.py")
-    rule.appendSource (OBJDUMP_TOOL)
-    rule.appendSource (sourcePath)
+    rule.appendOption (OBJDUMP_TOOL)
+    rule.appendOption (source + ".o")
     rule.appendTarget (objdumpPythonFile)
     rule.mPriority = -1
     make.addRule (rule)

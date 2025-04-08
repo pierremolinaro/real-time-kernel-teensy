@@ -11,7 +11,7 @@ import sys, os, subprocess
 scriptDir = os.path.dirname (os.path.abspath (sys.argv [0]))
 os.chdir (scriptDir)
 #---
-returncode = subprocess.call (["$OBJDUMP$", "-S", "$SOURCE$.o"])
+returncode = subprocess.call (["$OBJDUMP$", "-S", "$SOURCE$"])
 if returncode != 0 :
   sys.exit (returncode)
 

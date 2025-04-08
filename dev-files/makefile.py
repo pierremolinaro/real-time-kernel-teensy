@@ -93,49 +93,49 @@ def processorCount () :
 
 def BLACK () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[90m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[30m'
 
 #····································································································
 
 def RED () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[91m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[31m'
 
 #····································································································
 
 def GREEN () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[92m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[32m'
 
 #····································································································
 
 def YELLOW () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[93m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[33m'
 
 #····································································································
 
 def BLUE () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[94m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[34m'
 
 #····································································································
 
 def MAGENTA () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[95m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[35m'
 
 #····································································································
 
 def CYAN () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[96m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[36m'
 
 #····································································································
 
 def WHITE () :
   SYSTEM_NAME = platform.system ()
-  return "" if SYSTEM_NAME == "Windows" else '\033[97m'
+  return "" if SYSTEM_NAME == "Windows" else '\033[37m'
 
 #····································································································
 
