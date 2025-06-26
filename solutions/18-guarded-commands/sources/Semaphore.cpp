@@ -72,7 +72,7 @@ bool Semaphore::sys_guarded_P (SECTION_MODE) {
   const bool accepted = mValue > 0 ;
   guard_handleCommand (MODE_ mGuardList, accepted) ;
   if (accepted) {
-    mValue -- ;
+    mValue -= 1 ;
   }
   return accepted ;
 }
