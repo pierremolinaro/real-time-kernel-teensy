@@ -98,26 +98,26 @@ compress (scriptDir, ARCHIVE_NAME)
 # runProcess (["mv", ARCHIVE_NAME + ".tar.bz2", os.path.expanduser ("~/Desktop/")])
 
 #-------------------------------------- Documents
-DOCUMENT_DIR = os.path.expanduser ("~/Desktop/info-treel-documents")
+DOCUMENT_DIR = os.path.expanduser ("info-treel-documents")
 #--- Remove archive
 runProcess (["rm", "-fR", DOCUMENT_DIR])
 #--- Create archive
 runProcess (["mkdir", DOCUMENT_DIR])
 #--- Copy PDF files
-for root, dirs, files in os.walk ("keynotes-2021-2022") :
-  for name in files:
-    keynotePath = os.path.join (root, name)
-    (base, extension) = os.path.splitext (name)
-    if extension == ".key" :
-      pdfSourcePath = "pdf-2021-2022/" + base + ".pdf"
-      if not os.path.exists (pdfSourcePath) :
-        print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'existe pas" + bcolors.ENDC)
-        sys.exit (1)
-      elif os.path.getmtime (pdfSourcePath) < os.path.getmtime (keynotePath) :
-        print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'est pas à jour" + bcolors.ENDC)
-        sys.exit (1)
-      else:
-        runProcess (["cp", pdfSourcePath, DOCUMENT_DIR])
+# for root, dirs, files in os.walk ("keynotes-2021-2022") :
+#   for name in files:
+#     keynotePath = os.path.join (root, name)
+#     (base, extension) = os.path.splitext (name)
+#     if extension == ".key" :
+#       pdfSourcePath = "pdf-2021-2022/" + base + ".pdf"
+#       if not os.path.exists (pdfSourcePath) :
+#         print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'existe pas" + bcolors.ENDC)
+#         sys.exit (1)
+#       elif os.path.getmtime (pdfSourcePath) < os.path.getmtime (keynotePath) :
+#         print (bcolors.BOLD_RED + "Le fichier '" + pdfSourcePath + "' n'est pas à jour" + bcolors.ENDC)
+#         sys.exit (1)
+#       else:
+#         runProcess (["cp", pdfSourcePath, DOCUMENT_DIR])
 #--- Step 03
 runProcess (["mkdir", DOCUMENT_DIR + "/03-files"])
 runProcess (["cp", "solutions/03-software-modes/sources/software-modes.h", DOCUMENT_DIR + "/03-files"])
@@ -187,6 +187,7 @@ runProcess (["cp", "solutions/18-guarded-commands/sources/xtr.cpp", DOCUMENT_DIR
 # runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/can-settings.h", DOCUMENT_DIR + "/19-files"])
 # runProcess (["cp", "solutions/19-can-network--active-send-receive/sources/can/CANMessage.h", DOCUMENT_DIR + "/19-files"])
 # compress (DOCUMENT_DIR, "19-files")
+compress (scriptDir, DOCUMENT_DIR)
 
 
 #——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————*
